@@ -1,12 +1,22 @@
 <?php
-function __autoload($class_name) { require_once './include/' .$class_name . '.php'; }
+require_once './include/autoloader.php';
 
 $db_obj = new DBCon();
-$html_header_obj = new HTMLHeader("eContriver");
-//$user_obj = new User();
-//$html_login_obj = new HTMLLogin($user_obj);
-$html_doc_obj = new HTMLDoc($html_header_obj->getHTMLHeader(),$html_body_str);
+$site_info_obj = new SiteInfo();
+$user_obj = new User($db_obj);
 
-echo $html_doc_obj->getHTMLDoc();
+$header_arr[] = new HTMLHeader('');
+$body_arr[] = "<div class=\"banner_ie_limiter\" ></div>\n";
+$body_arr[] = "<div class=\"banner\" >\n";
+$body_arr[] = new HTMLLogin($user_obj);
+$body_arr[] = new HTMLLogo($site_info_obj);
+$body_arr[] = "</div>\n";
+$body_arr[] = "<div class=\"mid\" >\n";
+$body_arr[] = "<h3>Free Multi-User Account Registry</h3>\n";
+$body_arr[] = "</div>\n";
+$html_doc_obj = new HTMLDoc($header_arr,$body_arr);
+
+
+echo $html_doc_obj;
 
 ?>

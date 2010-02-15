@@ -1,5 +1,4 @@
 <?php
-
 $file = '../include/db.ini';
 $mode = 0666;
 
@@ -12,5 +11,4 @@ printf("Mode set to: %o octal <br>\n", $mode);
 
 $new_mode_o = substr(sprintf('%o', fileperms($file)), -4);
 printf("Reading mode from file: %s octal <br>\n", $new_mode_o);
-
 ?>
