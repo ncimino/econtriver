@@ -26,15 +26,18 @@ class DBCon {
   public function connect() {
     if (! $ini_arr = parse_ini_file($this->ini_file)) {
       throw new Exception("ERROR:DBCon:connect - parse_ini_file - Failed to parse '{$this->ini_file}' <br />\n");
-    }
-    if (! $this->link = mysql_connect($ini_arr['dbinfo.host'],$ini_arr['dbinfo.user'],$ini_arr['dbinfo.pw'])) {
+    } elseif (! $this->link = mysql_connect($ini_arr['dbinfo.host'],$ini_arr['dbinfo.user'],$ini_arr['dbinfo.pw'])) {
       throw new Exception("ERROR:DBCon:connect - mysql_connect - " . mysql_error() . " <br />\n");
+    } else {
+      return true;
     }
   }
 
   public function selectDB() {
     if (! mysql_select_db($this->database,$this->link)) {
       throw new Exception("ERROR:DBCon:selectDB - mysql_select_db - " . mysql_error() . " <br />\n");
+    } else {
+      return true;
     }
   }
 
@@ -44,9 +47,10 @@ class DBCon {
       $this->result = mysql_query($sql,$this->link);
       if (! $this->result) {
         throw new Exception("ERROR:DBCon:query - mysql_query - " . mysql_error() . " <br />\n");
+      } else {
+        return $this->result;
       }
-      return $this->result;
-    }else{
+    } else {
       return false;
     }
   }

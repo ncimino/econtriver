@@ -1,7 +1,7 @@
 //<a href="javascript:submitForm(this)">Submit</a>
 function submitForm(thisfield)
 {
-	thisfield.form.submit();
+	document.getElementById(thisfield).submit();
 }
 
 //OnKeyPress='return enterSubmit(this,event);'

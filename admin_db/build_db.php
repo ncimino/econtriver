@@ -1,5 +1,5 @@
 <?php
-function __autoload($class_name) { require_once '../include/' .$class_name . '.php'; }
+require_once '../include/autoloader.php';
 
 try {
   $db_obj = new DBCon(false);
