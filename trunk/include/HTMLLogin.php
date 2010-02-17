@@ -1,6 +1,6 @@
 <?php
 class HTMLLogin {
-  private $user_obj;
+  public $user_obj;
   private $html_login_arr;
   private $html_form_arr;
 
