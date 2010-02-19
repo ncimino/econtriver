@@ -9,3 +9,4 @@ class HTML {
     $this->HTMLDocument = $HTMLImplementation->createDocument(null, 'html', $HTMLDocumentType);
   }
 }
+?>
