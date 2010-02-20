@@ -1,7 +1,7 @@
 <?php
 class HTMLLink extends HTMLElement {
-  function __construct($HTMLDocument,$parentElement) {
-    parent::__construct($HTMLDocument->HTMLDocument,$parentElement->HTMLElement,'link');
+  function __construct($parentElement) {
+    parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'link');
   }
 }
 ?>
