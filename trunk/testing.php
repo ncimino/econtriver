@@ -10,29 +10,13 @@ $HTMLKeywords = new HTMLKeywords($HTMLHead,'econtriver,contriver,accounting,regi
 $HTMLDescription = new HTMLDescription($HTMLHead,'Account, investment, loan, project, and cash transaction tracking and management site with ability to share and log all account modifications');
 $HTMLStylesheet = new HTMLStylesheet($HTMLHead,'./css/main.css');
 $HTMLScript = new HTMLScript($HTMLHead,'','./js/main.js');
-$script = "var i=10;
-if (i<5)
-  {
-  // some code
-  }";
-$HTMLScript2 = new HTMLScript($HTMLHead,$script);
 
 $HTMLBody = new HTMLBody($page);
 $HTMLDiv = new HTMLDiv($HTMLBody);
 
-/*
-$something = 'ha';
-$text = $page->HTMLDocument->createTextNode('/*');
-$HTMLDiv->HTMLElement->appendChild($text);
-$text = $page->HTMLDocument->createCDATASection('* /'.$something.'/*');
-$HTMLDiv->HTMLElement->appendChild($text);
-$text = $page->HTMLDocument->createTextNode('* /');
-$HTMLDiv->HTMLElement->appendChild($text);
-*/
-
 $HTMLDiv2 = new HTMLDiv($HTMLDiv);
-$HTMLDiv2->setAttribute( 'id', 'page_div' );
-$HTMLDiv2->setAttribute( 'class', 'page' );
+$HTMLDiv2->setId( 'page_div' );
+$HTMLDiv2->setClass( 'page' );
 /*
 <!--[if lte IE 6]>
 <style>

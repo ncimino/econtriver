@@ -10,11 +10,12 @@ abstract class HTMLElement {
     if ($innerHTML==NULL) { return $this->HTMLElement = $HTMLDocument->createElement( $tagName ); } 
     else { return $this->HTMLElement = $HTMLDocument->createElement( $tagName, $innerHTML ); }
   }
-  function createTextNode($HTMLDocument,$data) { return $HTMLDocument->createTextNode( $data ); }
+  function createCDATASection($HTMLDocument,$content) { return $HTMLDocument->createCDATASection($content); }
   function createComment($HTMLDocument,$data) { return $HTMLDocument->createComment( $data ); }
+  function createTextNode($HTMLDocument,$data) { return $HTMLDocument->createTextNode( $data ); }
   function setAttribute($name,$value) { $this->HTMLElement->setAttribute( $name, $value ); }
-  function setIs($idName) { $this->setAttribute('id',$idName); }
   function setClass($className) { $this->setAttribute('class',$className); }
+  function setId($idName) { $this->setAttribute('id',$idName); }
   function setStyle($styles) { $this->setAttribute('style',$styles); }
   function setTitle($classTitle) { $this->setAttribute('title',$classTitle); }
 }
