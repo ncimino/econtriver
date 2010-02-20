@@ -1,7 +1,7 @@
 <?php
 class HTMLHead extends HTMLElement {
   function __construct($HTMLDocument) {
-    parent::__construct($HTMLDocument->HTMLDocument,$HTMLDocument->HTMLDocument->documentElement,'head','');
+    parent::__construct($HTMLDocument,$HTMLDocument->documentElement,'head','');
   }
   /*
   public function __construct($document)
