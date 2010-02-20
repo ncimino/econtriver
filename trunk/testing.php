@@ -1,9 +1,9 @@
 <?php
 function __autoload($class_name) { require_once './include/' .$class_name . '.php'; }
 
-$page = new HTML();
+$HTMLDocument = HTMLDocument::createHTMLDocument();
 
-$HTMLHead = new HTMLHead($page);
+$HTMLHead = new HTMLHead($HTMLDocument);
 $HTMLTitle = new HTMLTitle($HTMLHead,'eContriver');
 $HTMLShortcutIcon = new HTMLShortcutIcon($HTMLHead,'./images/icon_16.png','image/png');
 $HTMLKeywords = new HTMLKeywords($HTMLHead,'econtriver,contriver,accounting,registry,checkbook,check,balance,savings,saving,checking,loans,loan,tracking,log,shared,accounts,account,investments,track,monitor,watch');
@@ -11,7 +11,7 @@ $HTMLDescription = new HTMLDescription($HTMLHead,'Account, investment, loan, pro
 $HTMLStylesheet = new HTMLStylesheet($HTMLHead,'./css/main.css');
 $HTMLScript = new HTMLScript($HTMLHead,'','./js/main.js');
 
-$HTMLBody = new HTMLBody($page);
+$HTMLBody = new HTMLBody($HTMLDocument);
 $HTMLDiv = new HTMLDiv($HTMLBody);
 
 $HTMLDiv2 = new HTMLDiv($HTMLDiv);
@@ -26,5 +26,5 @@ div.banner_shadow {
 </style>
 <![endif]-->
 */
-printf( '%s', $page->HTMLDocument->saveXML() );
+printf( '%s', $HTMLDocument->saveXML() );
 ?>
