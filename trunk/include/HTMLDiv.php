@@ -1,7 +1,7 @@
 <?php
 class HTMLDiv extends HTMLElement {
-  function __construct($HTMLDocument,$parentElement) {
-    parent::__construct($HTMLDocument->HTMLDocument,$parentElement->HTMLElement,'div','');
+  function __construct($parentElement) {
+    parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'div','');
   }
 }
 ?>
