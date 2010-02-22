@@ -5,7 +5,7 @@ body {
 	margin: 8px;
 }
 
-form, div, h1 {
+form, div, p, a, h1 {
     margin: 0px;
     padding: 0px;
 }
@@ -38,7 +38,7 @@ div.banner_shadow {
 	padding: 2px;
 	width: 371px;
 	height: 80px;
-	top: 2px;
+	top: 1px;
 	right: -3px;
 	 z-index: -1;
 }

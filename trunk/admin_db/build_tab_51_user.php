@@ -1,5 +1,5 @@
 <?php
-require_once '../include/autoloader.php';
+require_once '../include/autoload.php';
 
 try {
   $db_obj = new DBCon();
@@ -8,6 +8,7 @@ try {
 user_id int NOT NULL AUTO_INCREMENT, 
 CONSTRAINT user_id PRIMARY KEY(user_id),
 password varchar(255) NOT NULL,
+handle varchar(255),
 email varchar(255) NOT NULL,
 timezone varchar(255) NOT NULL,
 date_format varchar(255) NOT NULL,

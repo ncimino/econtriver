@@ -1,5 +1,5 @@
 <?php
-require_once '../include/autoloader.php';
+require_once '../include/autoload.php';
 $directory = '.';
 $handler = opendir($directory);
 while ($file = readdir($handler)) {

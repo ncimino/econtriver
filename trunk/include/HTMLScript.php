@@ -2,17 +2,16 @@
 class HTMLScript extends HTMLElement {
   function __construct($parentElement,$content=NULL,$URL=NULL) {
     parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'script','');
-    if(!empty($content)) { $this->createCDATASection($parentElement->HTMLElement->ownerDocument,$content); }
+    if(!empty($content)) {
+      $textNode[0] = $parentElement->HTMLElement->ownerDocument->createTextNode("\n/*");
+      $this->HTMLElement->appendChild($textNode[0]);
+      $CDATASection = $parentElement->HTMLElement->ownerDocument->createCDATASection("*/\n".$content."\n/*");
+      $this->HTMLElement->appendChild($CDATASection);
+      $textNode[1] = $parentElement->HTMLElement->ownerDocument->createTextNode("*/\n");
+      $this->HTMLElement->appendChild($textNode[1]);
+    }
     $this->setAttribute( 'type' , 'text/javascript' );
     if(!empty($URL)) { $this->setAttribute( 'src' , $URL ); }
-  }
-  function createCDATASection($HTMLDocument,$content) {
-    $text = $HTMLDocument->createTextNode("\n/*");
-    $this->HTMLElement->appendChild($text);
-    $text = parent::createCDATASection($HTMLDocument,"*/\n".$content."\n/*");
-    $this->HTMLElement->appendChild($text);
-    $text = $HTMLDocument->createTextNode("*/\n");
-    $this->HTMLElement->appendChild($text);
   }
 }
 ?>
