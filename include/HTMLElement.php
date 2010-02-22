@@ -1,22 +1,32 @@
 <?php
 abstract class HTMLElement {
   public $HTMLElement;
-  function __construct($HTMLDocument,$parentElement,$tagName,$innerHTML=NULL) {
-    $this->createElement($HTMLDocument,$tagName,$innerHTML);
-    $this->appendChild($parentElement);
+  function __construct($HTMLDOMDocument,$parentDOMElement,$tagName=NULL,$innerHTML=NULL) {
+    if (!empty($tagName)) {
+      $this->createElement($HTMLDOMDocument,$tagName,$innerHTML);
+      $this->appendChild($parentDOMElement);
+    }
   }
-  function appendChild($parentElement) { return $parentElement->appendChild( $this->HTMLElement ); }
-  function createElement($HTMLDocument,$tagName,$innerHTML=NULL) {
-    if ($innerHTML==NULL) { return $this->HTMLElement = $HTMLDocument->createElement( $tagName ); } 
-    else { return $this->HTMLElement = $HTMLDocument->createElement( $tagName, $innerHTML ); }
+  function appendChild($parentDOMElement) { return $parentDOMElement->appendChild( $this->HTMLElement ); }
+  function createElement($HTMLDOMDocument,$tagName,$innerHTML=NULL) {
+    if ($innerHTML==NULL) { return $this->HTMLElement = $HTMLDOMDocument->createElement( $tagName ); }
+    else { return $this->HTMLElement = $HTMLDOMDocument->createElement( $tagName, $innerHTML ); }
   }
-  function createCDATASection($HTMLDocument,$content) { return $HTMLDocument->createCDATASection($content); }
-  function createComment($HTMLDocument,$data) { return $HTMLDocument->createComment( $data ); }
-  function createTextNode($HTMLDocument,$data) { return $HTMLDocument->createTextNode( $data ); }
+  function createCDATASection($HTMLDOMDocument,$content) { return $this->HTMLElement = $HTMLDOMDocument->createCDATASection($content); }
+  function createComment($HTMLDOMDocument,$data) { return $this->HTMLElement = $HTMLDOMDocument->createComment( $data ); }
+  function createTextNode($HTMLDOMDocument,$data) { return $this->HTMLElement = $HTMLDOMDocument->createTextNode( $data ); }
   function setAttribute($name,$value) { $this->HTMLElement->setAttribute( $name, $value ); }
   function setClass($className) { $this->setAttribute('class',$className); }
   function setId($idName) { $this->setAttribute('id',$idName); }
   function setStyle($styles) { $this->setAttribute('style',$styles); }
   function setTitle($classTitle) { $this->setAttribute('title',$classTitle); }
+  function setClassAndId($class,$id=NULL) {
+    if(!empty($class)) { $this->setClass( $class ); }
+    if(!empty($id)) {
+      $this->setId( $id );
+    } elseif($id===NULL) {
+      if(!empty($class)) { $this->setId( $class.'_'.$this->HTMLElement->nodeName ); }
+    }
+  }
 }
 ?>
