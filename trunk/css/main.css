@@ -61,7 +61,9 @@ div.logo {
 img {
     border: 0px;
 }
-
+.error {
+	color: red;
+}
 /*body {
  position: relative;
  margin: 5px;

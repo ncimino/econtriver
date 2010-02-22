@@ -1,17 +1,18 @@
 <?php
 require_once './include/autoload.php';
+try {
+  $DB = new DBCon();
+  $SiteInfo = new SiteInfo();
+  $User = new User($DB,$SiteInfo);
 
-$DB = new DBCon();
-$SiteInfo = new SiteInfo();
-$User = new User($DB);
+  $HTMLDocument = HTMLDocument::createHTMLDocument();
+  $DefaultHead = new DefaultHead($HTMLDocument,$SiteInfo);
+  $DefaultBody = new DefaultBody($HTMLDocument,$SiteInfo,$User,'Registration');
 
-$HTMLDocument = HTMLDocument::createHTMLDocument();
-$DefaultHead = new DefaultHead($HTMLDocument,$SiteInfo);
-$DefaultBody = new DefaultBody($HTMLDocument,$SiteInfo,$User,'Register');
+  $Registration = new Registration($DefaultBody->DivMid,$User);
 
-$Registration = new Registration();
-
-$TextMid = new HTMLText($DefaultBody->DivMid,$content);
-
-printf( '%s', $HTMLDocument->saveXML() );
+  printf( '%s', $HTMLDocument->saveXML() );
+} catch (Exception $err) {
+  echo $err;
+}
 ?>
