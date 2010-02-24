@@ -7,13 +7,13 @@ class Registration {
       if ($this->addUser($PReg,$User)) {
         new HTMLText($PReg,'Registration successful.');
       } else {
-        $this->buildTable($PReg);
+        $this->buildRegistrationTable($PReg);
       }
     } else {
-      $this->buildTable($PReg);
+      $this->buildRegistrationTable($PReg);
     }
   }
-  function buildTable($parentElement) {
+  function buildRegistrationTable($parentElement) {
     new HTMLInputHidden($parentElement,'register','1');
     $TableReg = new Table($parentElement,4,2,'register');
     new HTMLLabel($TableReg->cells[0][0],'Email*:','reg_email_input');
@@ -40,22 +40,23 @@ class Registration {
     if( !preg_match( "/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $_POST['reg_email'])) {
       new HTMLSpan($parentElement,'Error: ','error');
       new HTMLText($parentElement,'The user email address in invalid.');
-      new HTMLBr($parentElement);
       return FALSE;
     } elseif ($_POST['reg_pw'] != $_POST['ver_pw']){
       new HTMLSpan($parentElement,'Error: ','error');
       new HTMLText($parentElement,'The passwords to not match.');
-      new HTMLBr($parentElement);
       return FALSE;
     } elseif ($_POST['reg_pw'] == ''){
       new HTMLSpan($parentElement,'Error: ','error');
       new HTMLText($parentElement,'The passwords cannot be blank.');
-      new HTMLBr($parentElement);
       return FALSE;
     } elseif (!$User->commitUser()) {
+      new HTMLSpan($parentElement,'Error: ','error');
+      $msg = 'There was a problem creating a new user. This generally occurs if this email has already been registered';
+      new HTMLText($parentElement,$msg);
       return FALSE;
     } else {
       return TRUE;
     }
+      new HTMLBr($parentElement);
   }
 }

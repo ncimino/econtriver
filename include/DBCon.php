@@ -46,7 +46,7 @@ class DBCon {
       $this->sql = $sql;
       $this->result = mysql_query($sql,$this->link);
       if (! $this->result) {
-        throw new Exception("ERROR:DBCon:query - mysql_query - " . mysql_error() . " <br />\n");
+        throw new Exception("ERROR:DBCon:query - mysql_query - " . mysql_error() . " trying to execute " . $sql . " <br />\n");
       } else {
         return $this->result;
       }

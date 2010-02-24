@@ -9,10 +9,6 @@ class DefaultHead {
     new HTMLDescription($this->HTMLHead,$SiteInfo->getDescription());
     new HTMLStylesheet($this->HTMLHead,$SiteInfo->getCss());
     new HTMLScript($this->HTMLHead,'',$SiteInfo->getJs());
-    $style = "div.banner_shadow {
-    display: none;
-}";
-    new HTMLStyle($this->HTMLHead,$style,'lte','6');
   }
 }
 ?>
