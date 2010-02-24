@@ -4,6 +4,7 @@ try {
   $DB = new DBCon();
   $SiteInfo = new SiteInfo();
   $User = new User($DB,$SiteInfo);
+//  $Cookies = new Cookies($SiteInfo);
 
   $HTMLDocument = HTMLDocument::createHTMLDocument();
   $DefaultHead = new DefaultHead($HTMLDocument,$SiteInfo);

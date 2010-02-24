@@ -14,7 +14,7 @@ class Login {
       new HTMLLabel($PLogin,'Email:','email_input');
       new HTMLInputText($PLogin,'email');
       new HTMLLabel($PLogin,' Password:','password_input');
-      new HTMLInputText($PLogin,'password');
+      new HTMLInputPassword($PLogin,'password');
       new HTMLText($PLogin,' ');
       new HTMLAnchor($PLogin,'javascript:submitForm(\'login_form\')','Login');
       new HTMLText($PLogin,' - ');
