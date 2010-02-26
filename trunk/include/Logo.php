@@ -7,7 +7,7 @@ class Logo {
     $ImgLogo = new HTMLImage($AnchorLogo,$SiteInfo->getLogo(),$SiteInfo->getName(),$SiteInfo->getLogoWidth(),$SiteInfo->getLogoHeight(),'logo');
     $DivBannerShadow = new HTMLDiv($DivLogo,'banner_shadow');
     $DivBannerSiteName = new HTMLDiv($DivLogo,'banner_site_name');
-    $TextHyphen = new HTMLText($DivBannerSiteName,strtolower($SiteInfo->getSubname()));
+    $AnchorSiteName = new HTMLAnchor($DivBannerSiteName,$SiteInfo->getSiteHTTP(),strtolower($SiteInfo->getSubname()),'','sitename_anchor');
   }
 }
 ?>

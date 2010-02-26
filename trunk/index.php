@@ -4,11 +4,10 @@ try {
   $DB = new DBCon();
   $SiteInfo = new SiteInfo();
   $User = new User($DB,$SiteInfo);
-  $Cookies = new Cookies($SiteInfo);
 
   $HTMLDocument = HTMLDocument::createHTMLDocument();
   $DefaultHead = new DefaultHead($HTMLDocument,$SiteInfo);
-  $DefaultBody = new DefaultBody($HTMLDocument,$SiteInfo,$User,$Cookies,'Free Multi-User Account and Investment Management');
+  $DefaultBody = new DefaultBody($HTMLDocument,$SiteInfo,$User,'Free Multi-User Account and Investment Management');
 
   $H4Mid = new HTMLHeading($DefaultBody->DivMid,4,'Welcome to '.$SiteInfo->getName().'!');
 
