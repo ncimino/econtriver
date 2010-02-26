@@ -1,8 +1,16 @@
+a:link, a:visited, a:hover, a:active {
+    color: gray;
+}
+
+a {
+    border: none 0px;
+}
+
 body {
     position: relative;
     min-width: 1000px;
     font-family: Verdana, Arial, Helvetica, sans-serif;
-	margin: 8px;
+    margin: 8px;
 }
 
 form, div, p, a, h1 {
@@ -16,31 +24,36 @@ h1, h2, h3, h4, h5, h6 {
 
 div.banner_ie_limiter {
     width: 1000px;
-	height: 0px;
+    height: 0px;
 }
 
 div.banner {
     position: relative;
-	background-color: white;
+    background-color: white;
 }
 
 div.banner_site_name {
-	position: absolute;
-	bottom: 2px;
-	right: 200px;
-	color: gray;
-	font-size: x-large;
+    position: absolute;
+    bottom: 2px;
+    right: 200px;
+    color: gray;
+    font-size: x-large;
 }
+
+#sitename_anchor {
+	text-decoration: none;
+}
+
 div.banner_shadow {
     position: absolute;
     background-color: lightgray;
     border: gray 1px solid;
-	padding: 2px;
-	width: 371px;
-	height: 80px;
-	top: 1px;
-	right: -3px;
-	 z-index: -1;
+    padding: 2px;
+    width: 371px;
+    height: 80px;
+    top: 1px;
+    right: -3px;
+    z-index: -1;
 }
 
 div.login {
@@ -53,17 +66,19 @@ div.logo {
     position: absolute;
     background-color: white;
     border: #D2D200 1px solid;
-	padding: 2px;
-	top: -6px;
-	right: 0px;
+    padding: 2px;
+    top: -6px;
+    right: 0px;
 }
 
 img {
     border: 0px;
 }
+
 .error {
-	color: red;
+    color: red;
 }
+
 /*body {
  position: relative;
  margin: 5px;

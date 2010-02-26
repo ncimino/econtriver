@@ -1,26 +1,36 @@
 <?php
 class User {
   private $user_arr = array();
-  private $result;
+  //private $result;
   private $DB;
-  private $Cookies;
+  private $cookies;
+  private $userVerified = false;
   private $salt;
-  private $userExists;
 
   public function __construct ($DB,$SiteInfo) {
     $this->DB = $DB;
     $this->salt = $SiteInfo->getSalt();
-    $this->Cookies = new Cookies($this->salt);
-    if($this->getUserById($this->Cookies->getUserId())) {
-      $this->userExists = true;
+    $this->cookies = new Cookies();
+    if (isset($_POST['email'])) { // if true then user is trying to login
+      if ($this->getUserByEmail($_POST['email'])) { // if true, then the emails was found
+        $this->cookies->setCookies($this->user_arr['user_id'],$this->user_arr['password']); // set cookies with id and pw
+        if ($this->user_arr['password']==crypt($_POST['password'],$this->salt)) { // if pw is right log them in
+          $this->userVerified = true; 
+        } else {
+          echo "This password is incorrect.";
+        }
+      } else {
+        echo "This email was not found in the database.";
+      }
     } else {
-      $this->userExists = false;
+      $this->getUserById($this->cookies->getUserId());
     }
   }
 
   public function getUserById($user_id_int) {
     try {
-      $this->result = $this->DB->query("SELECT * FROM user WHERE user_id='".$user_id_int."';");
+      //$this->result = 
+      $this->DB->query("SELECT * FROM user WHERE user_id='".$user_id_int."';");
       $this->user_arr = $this->DB->fetch();
       return $this->user_arr;
     } catch (Exception $err) {
@@ -30,7 +40,8 @@ class User {
 
   public function getUserByHandle($handle_str) {
     try {
-      $this->result = $this->DB->query("SELECT * FROM user WHERE handle='".strtolower($handle_str)."';");
+      //$this->result = 
+      $this->DB->query("SELECT * FROM user WHERE handle='".strtolower($handle_str)."';");
       $this->user_arr = $this->DB->fetch();
       return $this->user_arr;
     } catch (Exception $err) {
@@ -40,7 +51,8 @@ class User {
 
   public function getUserByEmail($user_email_str) {
     try {
-      $this->result = $this->DB->query("SELECT * FROM user WHERE email='".strtolower($user_email_str)."';");
+      //$this->result = 
+      $this->DB->query("SELECT * FROM user WHERE email='".strtolower($user_email_str)."';");
       $this->user_arr = $this->DB->fetch();
       return $this->user_arr;
     } catch (Exception $err) {
@@ -74,8 +86,9 @@ class User {
         $this->user_arr['date_format']."',".
         $this->user_arr['subcat_first'].",".
         $this->user_arr['active'].");";
-        $this->result = $this->DB->query($sql);
-        return $this->result;
+        //$this->result = 
+        return $this->DB->query($sql);
+        //return $this->result;
       } else {
         return false;
       }
@@ -88,9 +101,10 @@ class User {
     (isset($this->user_arr['user_id'])) ? $user_id = $this->user_arr['user_id'] : $user_id = "";
     (isset($this->user_arr['password'])) ? $password = $this->user_arr['password'] : $password = "";
     (isset($this->user_arr['active'])) ? $active = $this->user_arr['active'] : $active = 0;
-    if (($user_id == $this->Cookies->getUserId()) and
-    ($password == $this->Cookies->getPassword()) and
-    ($active)) {
+    if ((($user_id == $this->cookies->getUserId()) and
+    ($password == $this->cookies->getPassword()) and
+    ($active)) or 
+    ($this->userVerified)) {
       return true;
     } else {
       return false;

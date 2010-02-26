@@ -1,8 +1,6 @@
 <?php
 class HTMLDocument extends DOMImplementation {
-  function __construct() {
-    $this->siteInfo = new SiteInfo();
-  }
+  function __construct() { }
   static function createHTMLDocument($qualifiedName = "html",
   $publicId = "-//W3C//DTD XHTML 1.0 Transitional//EN",
   //$publicId = "-//W3C//DTD XHTML 1.0 Strict//EN",
