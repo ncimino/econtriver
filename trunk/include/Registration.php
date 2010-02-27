@@ -1,30 +1,33 @@
 <?php
 class Registration {
   private $focusId = 'reg_email_input';
-  function __construct($parentElement,$user) {
+  function __construct($parentElement,$infoMsg,$user) {
     $FormReg = new HTMLForm($parentElement,'register.php','register');
     $FormReg->setAttribute( 'name', 'register' );
     $PReg = new HTMLParagraph($FormReg);
-    if ($_POST['register']=='1') {
-      if ($this->addUser($PReg,$user)) {
+    if ($_POST['register']=='1') { // if true the user submitted a registration form
+      
+      if ($this->addUser($PReg,$infoMsg,$user)) {
         new HTMLText($PReg,'Registration successful.');
         new HTMLScript($FormReg,"document.getElementById(\"email_input\").value=\"" . $_POST['reg_email'] . "\";");
-        new HTMLScript($FormReg,"document.getElementById(\"password_input\").focus();");
+        $this->focusId='password_input';
+        //new HTMLScript($FormReg,"document.getElementById(\"password_input\").focus();");
       } else {
-        $this->buildRegistrationTable($FormReg);
+        $this->buildRegistrationForm($FormReg);
       }
+      
     } else {
-      $this->buildRegistrationTable($FormReg);
+      $this->buildRegistrationForm($FormReg);
     }
     if (!empty($this->focusId)) {
       new HTMLScript($FormReg,"document.getElementById(\"" . $this->focusId . "\").focus();");
     }
   }
   
-  function buildRegistrationTable($parentElement) {
+  function buildRegistrationForm($parentElement) {
     new HTMLInputHidden($parentElement,'register','1');
     $TableReg = new Table($parentElement,7,2,'register');
-    $TableReg->table->setAttribute( 'width', '50%' );
+    $TableReg->table->setAttribute( 'width', '500px' );
 
     new HTMLLabel($TableReg->cells[0][0],'Email*:','reg_email_input');
     new HTMLInputText($TableReg->cells[0][1],'reg_email',$_POST['reg_email']);
@@ -53,9 +56,7 @@ class Registration {
 
     new HTMLLabel($TableReg->cells[6][0],'Timezone:','timezone_select');
     $selectTimeZone = new HTMLSelect($TableReg->cells[6][1],'timezone');
-    //$timezone_identifiers = DateTimeZone::listIdentifiers(DateTimeZone::PER_COUNTRY,'US');
     $timezone_identifiers = DateTimeZone::listIdentifiers();
-
     foreach( $timezone_identifiers as $value ){
       if ( preg_match( '/^(America|Antartica|Arctic|Asia|Atlantic|Europe|Indian|Pacific)\//', $value ) ){
         $ex=explode("/",$value);
@@ -73,7 +74,7 @@ class Registration {
     new HTMLInputSubmit($parentElement,'reg_submit','Register');
   }
   
-  function addUser($parentElement,$user) {
+  function addUser($parentElement,$infoMsg,$user) {
     ($user->getUserByEmail($_POST['reg_email'])) ? $emailExists = TRUE : $emailExists = FALSE;
     ($user->getUserByHandle($_POST['handle'])) ? $handleExists = TRUE : $handleExists = FALSE;
     $user->setPassword($_POST['reg_pw']);
@@ -83,32 +84,30 @@ class Registration {
     $user->setDateFormat($_POST['format']);
     $user->setSubcatFirst(1);
     $user->setActive(1);
-    if( !preg_match( "/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $_POST['reg_email'])) {
-      new HTMLSpan($parentElement,'Error: ','error');
-      new HTMLText($parentElement,'The user email address in invalid.');
+    if( !preg_match( "/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $user->getEmail())) {
+      $infoMsg->addMessage(2,'The user email address in invalid.');
+      return FALSE;
+    } elseif( !preg_match( "/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*$/", $user->getHandle())) {
+      $infoMsg->addMessage(1,'This User Name in invalid. You must use only letters, numbers, periods, underscores, and hyphens.');
+      $this->focusId = "handle_input";
       return FALSE;
     } elseif ($_POST['reg_pw'] != $_POST['ver_pw']){
-      new HTMLSpan($parentElement,'Error: ','error');
-      new HTMLText($parentElement,'The passwords to not match.');
+      $infoMsg->addMessage(0,'The passwords to not match.');
       $this->focusId = "reg_pw_input";
       return FALSE;
     } elseif ($_POST['reg_pw'] == ''){
-      new HTMLSpan($parentElement,'Error: ','error');
-      new HTMLText($parentElement,'The passwords cannot be blank.');
+      $infoMsg->addMessage(0,'The passwords cannot be blank.');
       $this->focusId = "reg_pw_input";
       return FALSE;
     } elseif ($emailExists) {
-      new HTMLSpan($parentElement,'Error: ','error');
-      new HTMLText($parentElement,'This email has already been registered');
+      $infoMsg->addMessage(0,'This email has already been registered.');
       return FALSE;
     } elseif ($handleExists) {
-      new HTMLSpan($parentElement,'Error: ','error');
-      new HTMLText($parentElement,'This User Name has already been used');
+      $infoMsg->addMessage(0,'This User Name has already been used.');
       $this->focusId = "handle_input";
       return FALSE;
     } elseif (!$user->commitUser()) {
-      new HTMLSpan($parentElement,'Error: ','error');
-      new HTMLText($parentElement,'An unexpected error occured while adding the user');
+      $infoMsg->addMessage(0,'An unexpected error occurred while adding the user.');
       return FALSE;
     } else {
       $this->focusId = NULL;
