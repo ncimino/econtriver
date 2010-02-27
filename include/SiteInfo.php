@@ -1,10 +1,9 @@
 <?php
 class SiteInfo {
-  private $ini_file;
+  private $ini_file = "site.ini";
   private $ini_arr;
 
   public function __construct($parse_now = true) {
-    $this->setINIFile("site.ini");
     if ($parse_now) {
       $this->parseINIFile();
     }

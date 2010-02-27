@@ -1,5 +1,5 @@
 <?php
-class DefaultHead {
+class Head {
   public $HTMLHead;
   function __construct($HTMLDocument,$SiteInfo) {
     $this->HTMLHead = new HTMLHead($HTMLDocument);

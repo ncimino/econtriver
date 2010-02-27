@@ -8,6 +8,7 @@ abstract class HTMLElement {
     }
   }
   function appendChild($parentDOMElement) { return $parentDOMElement->appendChild( $this->HTMLElement ); }
+  function remove() { return $this->HTMLElement->parentNode->removeChild( $this->HTMLElement ); }
   function createElement($HTMLDOMDocument,$tagName,$innerHTML=NULL) {
     if ($innerHTML==NULL) { return $this->HTMLElement = $HTMLDOMDocument->createElement( $tagName ); }
     else { return $this->HTMLElement = $HTMLDOMDocument->createElement( $tagName, $innerHTML ); }

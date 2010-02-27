@@ -1,23 +1,14 @@
 <?php
 require_once './include/autoload.php';
 try {
-  $DB = new DBCon();
-  $SiteInfo = new SiteInfo();
-  $User = new User($DB,$SiteInfo);
+  $site = new Site('Free Multi-User Account and Investment Management');
 
-  $HTMLDocument = HTMLDocument::createHTMLDocument();
-  $DefaultHead = new DefaultHead($HTMLDocument,$SiteInfo);
-  $DefaultBody = new DefaultBody($HTMLDocument,$SiteInfo,$User,'Free Multi-User Account and Investment Management');
-
-  $H4Mid = new HTMLHeading($DefaultBody->DivMid,4,'Welcome to '.$SiteInfo->getName().'!');
-
+  new HTMLHeading($site->content,4,'Welcome to '.$site->siteInfo->getName().'!');
   $content = "This site was created to help manage investment and account transactions.
 These account tracking pages allow you share accounts and grant privileges to other 
-users so that they can ";
-  $TextMid = new HTMLText($DefaultBody->DivMid,$content);
-
-  printf( '%s', $HTMLDocument->saveXML() );
-} catch (Exception $err) {
-  echo $err;
-}
+users so that they can add, remove, and change ";
+  new HTMLText($site->content,$content);
+  
+  $site->printPage();
+} catch (Exception $err) { echo $err; }
 ?>

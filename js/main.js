@@ -4,7 +4,7 @@ function submitForm(thisfield)
 	document.getElementById(thisfield).submit();
 }
 
-//OnKeyPress='return enterSubmit(this,event);'
+//onkeypress='return enterSubmit(this,event);'
 function enterSubmit(thisfield,thisevent)
 {
     var keycode;
@@ -19,4 +19,13 @@ function enterSubmit(thisfield,thisevent)
     }
     else
         return true;
+}
+
+//onfocus='clearField(this,"Some Value")'
+function clearField(obj,initialvalue)
+{
+if (obj.value==initialvalue)
+	{
+	obj.value="";
+	}
 }

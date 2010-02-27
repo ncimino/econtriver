@@ -3,12 +3,11 @@ class DBCon {
   private $database;
   private $link;
   private $result;
-  private $ini_file;
+  private $ini_file = "db.ini";
+  private $ini_arr = array();
   public $sql;
 
   function __construct($connect_bool=true) {
-    //$this->setDB("econtriver_db");
-    $this->setINIFile("db.ini");
     if ($connect_bool)
     {
       try {
