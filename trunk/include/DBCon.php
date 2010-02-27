@@ -7,7 +7,7 @@ class DBCon {
   public $sql;
 
   function __construct($connect_bool=true) {
-    $this->setDB("econtriver_db");
+    //$this->setDB("econtriver_db");
     $this->setINIFile("db.ini");
     if ($connect_bool)
     {
@@ -34,7 +34,11 @@ class DBCon {
   }
 
   public function selectDB() {
-    if (! mysql_select_db($this->database,$this->link)) {
+    if (! $ini_arr = parse_ini_file($this->ini_file)) {
+      throw new Exception("ERROR:DBCon:selectDB - parse_ini_file - Failed to parse '{$this->ini_file}' <br />\n");
+    //} elseif (! $this->setDB($ini_arr['dbinfo.db'])) {
+//      throw new Exception("ERROR:DBCon:selectDB - setDB - Failed to set database '".$ini_arr['dbinfo.db']."' <br />\n");
+    } elseif (! mysql_select_db($ini_arr['dbinfo.db'],$this->link)) {
       throw new Exception("ERROR:DBCon:selectDB - mysql_select_db - " . mysql_error() . " <br />\n");
     } else {
       return true;

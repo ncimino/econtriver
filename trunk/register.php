@@ -1,15 +1,20 @@
 <?php
 require_once './include/autoload.php';
 try {
-  $DB = new DBCon();
-  $SiteInfo = new SiteInfo();
-  $User = new User($DB,$SiteInfo);
-
   $HTMLDocument = HTMLDocument::createHTMLDocument();
-  $DefaultHead = new DefaultHead($HTMLDocument,$SiteInfo);
-  $DefaultBody = new DefaultBody($HTMLDocument,$SiteInfo,$User,'Registration');
 
-  $Registration = new Registration($DefaultBody->DivMid,$User);
+  $DB = new DBCon();
+  $siteInfo = new SiteInfo();
+  $user = new User($DB,$siteInfo);
+
+  $DefaultHead = new DefaultHead($HTMLDocument,$siteInfo);
+  $DefaultBody = new DefaultBody($HTMLDocument,$siteInfo,$user,'Registration');
+
+  if ($user->verifyUser()) {
+    new HTMLHeading($DefaultBody->DivMid,4,'You are already registered.');
+  } else {
+    $Registration = new Registration($DefaultBody->DivMid,$user);
+  }
 
   printf( '%s', $HTMLDocument->saveXML() );
 } catch (Exception $err) {
