@@ -1,6 +1,6 @@
 <?php
 class HTMLScript extends HTMLElement {
-  function __construct($parentElement,$content=NULL,$URL=NULL) {
+  function __construct($parentElement,$content=NULL,$URL=NULL,$defer=TRUE) {
     parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'script','');
     if(!empty($content)) {
       $textNode[0] = $parentElement->HTMLElement->ownerDocument->createTextNode("\n/*");
@@ -11,6 +11,7 @@ class HTMLScript extends HTMLElement {
       $this->HTMLElement->appendChild($textNode[1]);
     }
     $this->setAttribute( 'type' , 'text/javascript' );
+    if($defer) { $this->setAttribute( 'defer', 'defer' ); }
     if(!empty($URL)) { $this->setAttribute( 'src' , $URL ); }
   }
 }

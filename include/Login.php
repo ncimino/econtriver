@@ -19,6 +19,7 @@ class Login {
       new HTMLAnchor($PLogin,'javascript:submitForm(\'login_form\')','Login');
       new HTMLText($PLogin,' - ');
       new HTMLAnchor($PLogin,'register.php','Register');
+      new HTMLScript($PLogin,"document.getElementById(\"email_input\").focus();");
     }
   }
 }
