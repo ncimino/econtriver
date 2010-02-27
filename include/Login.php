@@ -9,7 +9,7 @@ class Login {
       new HTMLText($DivLogin,' - ');
       new HTMLAnchor($DivLogin,'index.php?logout=1','Logout');
     } else {
-      $FormLogin = new HTMLForm($DivLogin,'login');
+      $FormLogin = new HTMLForm($DivLogin,'index.php','login');
       $PLogin = new HTMLParagraph($FormLogin);
       new HTMLLabel($PLogin,'Email:','email_input');
       new HTMLInputText($PLogin,'email');

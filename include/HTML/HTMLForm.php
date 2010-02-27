@@ -1,9 +1,9 @@
 <?php
 class HTMLForm extends HTMLElement {
-  function __construct($parentElement,$class=NULL,$id=NULL) {
+  function __construct($parentElement,$action='',$class=NULL,$id=NULL,$method='post') {
     parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'form','');
-    $this->setAttribute( 'method', 'post' );
-    $this->setAttribute( 'action', '');
+    $this->setAttribute( 'method', $method );
+    $this->setAttribute( 'action', $action);
     $this->setClassAndId($class,$id);
   }
 }

@@ -2,12 +2,14 @@
 class Registration {
   private $focusId = 'reg_email_input';
   function __construct($parentElement,$user) {
-    $FormReg = new HTMLForm($parentElement,'register');
+    $FormReg = new HTMLForm($parentElement,'register.php','register');
     $FormReg->setAttribute( 'name', 'register' );
     $PReg = new HTMLParagraph($FormReg);
     if ($_POST['register']=='1') {
       if ($this->addUser($PReg,$user)) {
         new HTMLText($PReg,'Registration successful.');
+        new HTMLScript($FormReg,"document.getElementById(\"email_input\").value=\"" . $_POST['reg_email'] . "\";");
+        new HTMLScript($FormReg,"document.getElementById(\"password_input\").focus();");
       } else {
         $this->buildRegistrationTable($FormReg);
       }
@@ -15,8 +17,7 @@ class Registration {
       $this->buildRegistrationTable($FormReg);
     }
     if (!empty($this->focusId)) {
-      $script = "document.getElementById(\"" . $this->focusId . "\").focus();";
-      $highlightError = new HTMLScript($FormReg,$script);
+      new HTMLScript($FormReg,"document.getElementById(\"" . $this->focusId . "\").focus();");
     }
   }
   
@@ -52,20 +53,22 @@ class Registration {
 
     new HTMLLabel($TableReg->cells[6][0],'Timezone:','timezone_select');
     $selectTimeZone = new HTMLSelect($TableReg->cells[6][1],'timezone');
-    $timezone_identifiers = DateTimeZone::listIdentifiers(DateTimeZone::PER_COUNTRY,'US');
+    //$timezone_identifiers = DateTimeZone::listIdentifiers(DateTimeZone::PER_COUNTRY,'US');
+    $timezone_identifiers = DateTimeZone::listIdentifiers();
+
     foreach( $timezone_identifiers as $value ){
       if ( preg_match( '/^(America|Antartica|Arctic|Asia|Atlantic|Europe|Indian|Pacific)\//', $value ) ){
-        $ex=explode("/",$value);//obtain continent,city
+        $ex=explode("/",$value);
         if ($continent!=$ex[0]){
           $optgroup = new HTMLOptGroup($selectTimeZone,$ex[0]);
         }
-        $city=$ex[1];
-        if (!empty($ex[2])) { $city.=" - ".$ex[2]; }
         $continent=$ex[0];
-        new HTMLOption($optgroup,$city,$value);
+        (!empty($ex[2])) ? $city=$ex[1]." - ".$ex[2] : $city=$ex[1];
+        ($value==$_POST['timezone']) ? $selected = TRUE : $selected = FALSE;
+        new HTMLOption($optgroup,$city,$value,$selected);
       }
     }
-    new HTMLBr($parentElement);
+    
     new HTMLBr($parentElement);
     new HTMLInputSubmit($parentElement,'reg_submit','Register');
   }
@@ -108,6 +111,7 @@ class Registration {
       new HTMLText($parentElement,'An unexpected error occured while adding the user');
       return FALSE;
     } else {
+      $this->focusId = NULL;
       return TRUE;
     }
     new HTMLBr($parentElement);
