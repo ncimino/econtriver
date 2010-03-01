@@ -22,7 +22,12 @@ class InfoMsg {
     if (count($this->messages) > 0 ) {
       foreach ($this->messages as $index=>$value) {
         if ($index != 0) { new HTMLBr($this->DivInfoMsg); }
-        if ($value['level']==0) {
+        if ($value['level']==-1) {
+          new HTMLText($this->DivInfoMsg,"This should not have occurred. Please report this problem: ");
+          new HTMLAnchor($this->DivInfoMsg,'bugs.php','Report Bug');
+          new HTMLBr($this->DivInfoMsg);
+          new HTMLSpan($this->DivInfoMsg,'Fatal Error: ','error');
+        } elseif ($value['level']==0) {
           new HTMLSpan($this->DivInfoMsg,'Error: ','error');
         } elseif ($value['level']==1) {
           new HTMLSpan($this->DivInfoMsg,'Warning: ','warning');

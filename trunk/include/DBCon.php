@@ -3,7 +3,7 @@ class DBCon {
   private $database;
   private $link;
   private $result;
-  private $ini_file = "db.ini";
+  private $ini_file = "vars/db.ini";
   private $ini_arr = array();
   public $sql;
 

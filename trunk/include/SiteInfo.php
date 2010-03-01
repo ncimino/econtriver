@@ -1,6 +1,6 @@
 <?php
 class SiteInfo {
-  private $ini_file = "site.ini";
+  private $ini_file = "vars/site.ini";
   private $ini_arr;
 
   public function __construct($parse_now = true) {
