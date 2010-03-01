@@ -29,5 +29,6 @@ abstract class HTMLElement {
       if(!empty($class)) { $this->setId( $class.'_'.$this->HTMLElement->nodeName ); }
     }
   }
+  function getAttribute($name) { return $this->HTMLElement->getAttribute( $name ); }
 }
 ?>

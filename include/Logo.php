@@ -1,7 +1,7 @@
 <?php
 class Logo {
-  function __construct($DivBanner,$SiteInfo) {
-    $DivLogo = new HTMLDiv($DivBanner,'logo');
+  function __construct($parentElement,$SiteInfo) {
+    $DivLogo = new HTMLDiv($parentElement,'logo');
     $H1Logo = new HTMLHeading($DivLogo,1);
     $AnchorLogo = new HTMLAnchor($H1Logo,$SiteInfo->getSiteHTTP(),'','','logo_anchor');
     $ImgLogo = new HTMLImage($AnchorLogo,$SiteInfo->getLogo(),$SiteInfo->getName(),$SiteInfo->getLogoWidth(),$SiteInfo->getLogoHeight(),'logo');
