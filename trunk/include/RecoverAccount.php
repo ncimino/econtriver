@@ -56,7 +56,7 @@ class RecoverAccount {
         $this->user->setUserById($_POST['reset']);
         $this->user->setPassword($_POST['reset_password']);
         $this->user->setVerPassword($_POST['reset_ver_password']);
-        if ($this->user->updateUser()) { // Check if password was valid
+        if ($this->user->updateUser()) { // Check if password was valid and updates the user if it was
           new HTMLText($parentElement,'Password reset successful.');
           $this->focusId = NULL;
         } else {
@@ -73,12 +73,7 @@ class RecoverAccount {
       if ($this->user->getUserByEmail(false) or $this->user->setUserByHandle()) {
         $this->user->setUserByEmail();
         $this->focusId = NULL;
-        //if ($this->sendRecoveryEmail()) {
-        if (1) {
-          $cipher = new Cipher($this->siteInfo->getSalt());
-          $verify2 = $cipher->encrypt($this->user->getTime());
-          $msg =  $this->siteInfo->getSiteHTTP().'/recover.php?recover_id='.$this->user->getUserId().'&verify1='.$this->user->getPassword().'&verify2='.$verify2;
-          $this->infoMsg->addMessage(1,'click here: ','recover',$msg);
+        if ($this->sendRecoveryEmail()) {
           $this->infoMsg->addMessage(2,'An email has been sent to the email on file.');
         } else {
           $this->infoMsg->addMessage(-1,'The user was found, but we were unable to send a recovery email.');

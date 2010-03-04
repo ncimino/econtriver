@@ -1,5 +1,8 @@
 <?php
-$start = microtime();
+$starttime = microtime();
+$startarray = explode(" ", $starttime);
+$starttime = $startarray[1] + $startarray[0];
+
 require_once './include/autoload.php';
 try {
   $site = new Site('Free Multi-User Account and Investment Management');
@@ -12,5 +15,11 @@ users so that they can add, remove, and change ";
   
   $site->printPage();
 } catch (Exception $err) { echo $err; }
-echo microtime() - $start;
+
+$endtime = microtime();
+$endarray = explode(" ", $endtime);
+$endtime = $endarray[1] + $endarray[0];
+$totaltime = $endtime - $starttime; 
+$totaltime = round($totaltime,5);
+echo "<br/>This page loaded in $totaltime seconds.";
 ?>
