@@ -1,4 +1,5 @@
 <?php
+$start = microtime();
 require_once './include/autoload.php';
 try {
   $site = new Site('Free Multi-User Account and Investment Management');
@@ -11,4 +12,5 @@ users so that they can add, remove, and change ";
   
   $site->printPage();
 } catch (Exception $err) { echo $err; }
+echo microtime() - $start;
 ?>
