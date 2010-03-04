@@ -1,4 +1,5 @@
 <?php
+$start = microtime();
 require_once './include/autoload.php';
 try {
   $site = new Site('Registration');
@@ -11,4 +12,5 @@ try {
 
   $site->printPage();
 } catch (Exception $err) { echo $err; }
+echo microtime() - $start;
 ?>

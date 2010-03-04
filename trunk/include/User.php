@@ -115,6 +115,7 @@ class User {
   public function setTimezoneId($value) { $this->currentUserIds['timezone'] = $value; }
   public function setDateFormatId($value) { $this->currentUserIds['date_format'] = $value; }
 
+  public function getUserId() { return $this->currentUser['user_id']; }
   public function getPassword() { return $this->currentUser['password']; }
   public function getVerPassword() { return $this->currentUser['ver_password']; }
   public function getHandle() { return $this->currentUser['handle']; }
@@ -123,6 +124,7 @@ class User {
   public function getDateFormat() { return $this->currentUser['date_format']; }
   public function getSubcatFirst() { return $this->currentUser['subcat_first']; }
   public function getActive() { return $this->currentUser['active']; }
+  public function getTime() { return time(); }
 
   public function getPasswordName() { return $this->currentUserNames['password']; }
   public function getVerPasswordName() { return $this->currentUserNames['ver_password']; }
@@ -163,6 +165,29 @@ class User {
     }
   }
 
+  public function updateUser() {
+    try {
+      if ($this->validateUserInfo(false,false)) {
+        $sql = "UPDATE user
+				SET password='".$this->currentUser['password']."', 
+					handle='".$this->currentUser['handle']."',
+					email='".$this->currentUser['email']."',
+					timezone='".$this->currentUser['timezone']."',
+					date_format='".$this->currentUser['date_format']."',
+					subcat_first=".$this->currentUser['subcat_first'].",
+					active=".$this->currentUser['active']."
+				WHERE user_id=".$this->currentUser['user_id'].";";
+        $result = $this->DB->query($sql);
+        if (!$result) { $this->infoMsg->addMessage(-1,'An unexpected error occurred while updating the user.'); }
+        return $result;
+      } else {
+        return false;
+      }
+    } catch (Exception $err) {
+      echo $err;
+    }
+  }
+  
   public function setFromPost($emailName=NULL,$handleName=NULL,$passwordName=NULL,$verPasswordName=NULL,$timezoneName=NULL,$formatName=NULL) {
     if (!empty($emailName)) {
       $this->setEmailName($emailName);
@@ -243,17 +268,17 @@ class User {
     return $check;
   }
 
-  public function validateUserInfo() {
+  public function validateUserInfo($dupEmailCheck=TRUE,$dupHandleCheck=TRUE) {
     if(!$this->validateEmail() ) {
       $this->errorId = $this->getEmailId();
       return FALSE;
-    } elseif ($this->getUserByEmail()) {
+    } elseif ($this->getUserByEmail($dupEmailCheck) and $dupEmailCheck) {
       $this->errorId = $this->getEmailId();
       return FALSE;
     } elseif(!$this->validateHandle()) {
       $this->errorId = $this->getHandleId();
       return FALSE;
-    } elseif ($this->getUserByHandle()) {
+    } elseif ($this->getUserByHandle($dupHandleCheck) and $dupHandleCheck) {
       $this->errorId = $this->getHandleId();
       return FALSE;
     } elseif (!$this->validateVerPassword()){

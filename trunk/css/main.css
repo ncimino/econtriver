@@ -48,9 +48,9 @@ div.banner_shadow {
     position: absolute;
     background-color: lightgray;
     border: gray 1px solid;
-    padding: 2px;
+    padding: 2px;/*
     width: 371px;
-    height: 80px;
+    height: 80px;*/
     top: 1px;
     right: -3px;
     z-index: -1;
