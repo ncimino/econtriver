@@ -11,7 +11,7 @@ class Body {
     $DivIELimiter = new HTMLDiv($DivPage,'banner_ie_limiter');
     $DivBanner = new HTMLDiv($DivPage,'banner');
     
-    $Login = new Login($DivBanner,$user);
+    $Login = new Login($DivBanner,$siteInfo,$user);
     $Logo = new Logo($DivBanner,$siteInfo);
 
     $this->DivMid = new HTMLDiv($DivPage,'mid');
