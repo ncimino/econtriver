@@ -1,7 +1,8 @@
 <?php
 class Login {
-  function __construct($DivBanner,$user) {
-    $DivLogin = new HTMLDiv($DivBanner,'login');
+  function __construct($parentElement,$siteInfo,$user) {
+    $DivLogin = new HTMLDiv($parentElement,'login');
+    $DivLogin->setAttribute('style','right: '.$siteInfo->getLogoWidth().';');
     if ($user->verifyUser()) {
       new HTMLText($DivLogin,$user->getEmail());
       new HTMLText($DivLogin,' - ');

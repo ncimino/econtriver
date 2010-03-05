@@ -141,6 +141,9 @@ class User {
   public function getDateFormatId() { return $this->currentUserIds['date_format']; }
 
   public function getLoginFail() { return $this->loginFailed; }
+  
+  // Ids are set when UserInputs are built, this means that the inputs must be added to the HTML Document,
+  // before the errorId can be used correctly.
   public function getErrorId() { return $this->errorId; }
 
   public function commitUser() {

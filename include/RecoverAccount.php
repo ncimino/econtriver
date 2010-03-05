@@ -13,65 +13,36 @@ class RecoverAccount {
     if (isset($_GET['recover_id'])) { // User has used a link to reset password
 
       if ($this->verifyRecoveryLink($parentElement,$_GET['recover_id'],$_GET['verify1'],$_GET['verify2'])) {
-        $this->user->setFromPost('','','reset_password','reset_ver_password');
         $this->buildResetForm($parentElement);
         $this->focusId = $this->user->getPasswordId();
       } else {
-        $this->user->setFromPost('recover_email','recover_email');
         $this->buildRecoveryForm($parentElement);
       }
-      /*
-       if (!$this->user->getUserById($_GET['recover_id'])) { // Check if User ID exists
-       $this->infoMsg->addMessage(0,'The user verification information is incorrect. Resubmit the information.');
-       $this->user->setFromPost('recover_email','recover_email');
-       $recoveryForm = $this->buildRecoveryForm($parentElement);
-       } else {
-       $this->user->setUserById($_GET['recover_id']);
-       if ($_GET['verify1'] != $this->user->getPassword()) { // Check if verify1 = user password
-       $this->infoMsg->addMessage(0,'The user verification information is incorrect. Resubmit the information.');
-       $this->user->setFromPost('recover_email','recover_email');
-       $recoveryForm = $this->buildRecoveryForm($parentElement);
-       } else {
-       $cipher = new Cipher($this->siteInfo->getSalt());
-       $verify2 = $cipher->decrypt($_GET['verify2']);
-       $verify2 += 3600*24*5;
-       if ($this->user->getTime() > $verify2) { // Check that the link is not older than 5 days
-       $this->infoMsg->addMessage(0,'This link is no longer valid. Resubmit the information.');
-       $this->user->setFromPost('recover_email','recover_email');
-       $recoveryForm = $this->buildRecoveryForm($parentElement);
-       } else {
-       $this->user->setFromPost('','','reset_password','reset_ver_password');
-       $this->buildResetForm($parentElement);
-       }
-       }
-       }*/
 
     } elseif (isset($_POST['reset'])) { // User has used entered new passwords
 
       if (!$this->user->getUserById($_POST['reset'])) { // Check if User ID exists
-        $this->infoMsg->addMessage(0,'The user verification information is incorrect. Resubmit the information.');
-        $this->user->setFromPost('recover_email','recover_email');
+        $this->infoMsg->addMessage(0,'This link is not valid. Resubmit the information.');
         $recoveryForm = $this->buildRecoveryForm($parentElement);
       } else {
         $this->user->setUserById($_POST['reset']);
         $this->user->setPassword($_POST['reset_password']);
         $this->user->setVerPassword($_POST['reset_ver_password']);
+        $resetForm = $this->buildResetForm($parentElement); // Must be set before user methods for errorIds to work
         if ($this->user->updateUser()) { // Check if password was valid and updates the user if it was
+          $resetForm->remove();
           new HTMLText($parentElement,'Password reset successful.');
           $this->focusId = NULL;
         } else {
-          $this->user->setFromPost('','','reset_password','reset_ver_password');
-          $this->buildResetForm($parentElement);
-          $this->focusId = $this->user->focusId;
+          $this->focusId = $this->user->getErrorId();
         }
       }
 
     } elseif ($_POST['recover']=='1') { // User has submitted a user name or email for recovery
 
-      $this->user->setFromPost('recover_email','recover_email');
       $recoveryForm = $this->buildRecoveryForm($parentElement);
       if ($this->user->getUserByEmail(false) or $this->user->setUserByHandle()) {
-        $this->user->setUserByEmail();
+        $this->user->setUserByEmail(); // two sets in the top would overwrite, once we know we have found the user we can set the other
         $this->focusId = NULL;
         if ($this->sendRecoveryEmail()) {
           $this->infoMsg->addMessage(2,'An email has been sent to the email on file.');
@@ -83,10 +54,7 @@ class RecoverAccount {
       }
 
     } else { // No information has been entered yet
-
-      $this->user->setFromPost('recover_email','recover_email');
       $recoveryForm = $this->buildRecoveryForm($parentElement);
-
     }
 
     if (!empty($this->focusId)) {
@@ -95,17 +63,20 @@ class RecoverAccount {
   }
 
   function buildResetForm($parentElement) {
+    $this->user->setFromPost('','','reset_password','reset_ver_password');
     $userInputs = new UserInputs($this->user);
-    $FormRecover = new HTMLForm($parentElement,'recover.php','reset_password');
-    new HTMLInputHidden($FormRecover,'reset',$this->user->getUserId());
-    new HTMLText($FormRecover,'Enter the new password here.');
-    $TableRecover = new Table($FormRecover,2,2,'recover_email');
-    $userInputs->inputPassword($TableRecover->cells[0][1],$TableRecover->cells[0][0]);
-    $userInputs->inputVerPassword($TableRecover->cells[1][1],$TableRecover->cells[1][0]);
-    new HTMLInputSubmit($FormRecover,'reset_password_submit','Reset');
+    $formRecover = new HTMLForm($parentElement,'recover.php','reset_password');
+    new HTMLInputHidden($formRecover,'reset',$this->user->getUserId());
+    new HTMLText($formRecover,'Enter the new password here.');
+    $tableRecover = new Table($formRecover,2,2,'recover_email');
+    $userInputs->inputPassword($tableRecover->cells[0][1],$tableRecover->cells[0][0]);
+    $userInputs->inputVerPassword($tableRecover->cells[1][1],$tableRecover->cells[1][0]);
+    new HTMLInputSubmit($formRecover,'reset_password_submit','Reset');
+    return $formRecover;
   }
 
   function buildRecoveryForm($parentElement) {
+    $this->user->setFromPost('recover_email','recover_email');
     $userInputs = new UserInputs($this->user);
     $FormRecover = new HTMLForm($parentElement,'recover.php','recover_email');
     new HTMLInputHidden($FormRecover,'recover','1');
@@ -127,7 +98,8 @@ class RecoverAccount {
 
     $cipher = new Cipher($this->siteInfo->getSalt());
     $verify2 = $cipher->encrypt($this->user->getTime());
-    new HTMLAnchor($email->content,$this->siteInfo->getSiteHTTP().'/recover.php?recover_id='.$this->user->getUserId().'&verify1='.$this->user->getPassword().'&verify2='.$verify2,'Recover My Account');
+    $recoveryLink = $this->siteInfo->getSiteHTTP().'/recover.php?recover_id='.$this->user->getUserId().'&verify1='.$this->user->getPassword().'&verify2='.$verify2;
+    new HTMLAnchor($email->content,$recoveryLink,'Recover My Account');
     new HTMLParagraph($email->content,'Once you follow this link, then enter and verify a new password.  This new password will then be used to login.');
 
     $sendEmail = new SendEmail();
@@ -142,15 +114,11 @@ class RecoverAccount {
     if (!$this->user->getUserById($recoverId)) { // Check if User ID exists
       $this->infoMsg->addMessage(0,'The user verification information is incorrect. Resubmit the information.');
       return false;
-      //$this->user->setFromPost('recover_email','recover_email');
-      //$recoveryForm = $this->buildRecoveryForm($parentElement);
     } else {
       $this->user->setUserById($recoverId);
       if ($verify1 != $this->user->getPassword()) { // Check if verify1 = user password
         $this->infoMsg->addMessage(0,'The user verification information is incorrect. Resubmit the information.');
         return false;
-        //$this->user->setFromPost('recover_email','recover_email');
-        //$recoveryForm = $this->buildRecoveryForm($parentElement);
       } else {
         $cipher = new Cipher($this->siteInfo->getSalt());
         $verify2Decrypted = $cipher->decrypt($verify2);
@@ -158,12 +126,8 @@ class RecoverAccount {
         if ($this->user->getTime() > $verify2Decrypted) { // Check that the link is not older than 5 days
           $this->infoMsg->addMessage(0,'This link is no longer valid. Resubmit the information.');
           return false;
-          //$this->user->setFromPost('recover_email','recover_email');
-          //$recoveryForm = $this->buildRecoveryForm($parentElement);
         } else {
           return true;
-          //$this->user->setFromPost('','','reset_password','reset_ver_password');
-          //$this->buildResetForm($parentElement);
         }
       }
     }
