@@ -24,7 +24,7 @@ class User {
       }
     }
   }
-  
+
   public function setCookies() {
     $this->cookies->setCookies($this->currentUser['user_id'],$this->currentUser['password']);
   }
@@ -54,7 +54,7 @@ class User {
       $this->DB->query("SELECT * FROM user WHERE handle='".mysql_real_escape_string($handle)."';");
       $fetch = $this->DB->fetch();
       if ($reportMsg and $fetch) {
-        $this->infoMsg->addMessage(0,'This User Name has already been used.');
+        $this->infoMsg->addMessage(0,'This User Name has already been used. Please try a different one.');
       }
       return $fetch;
     } catch (Exception $err) {
@@ -147,9 +147,16 @@ class User {
 
   public function getLoginFail() { return $this->loginFailed; }
 
+  public function clearNames() { unset($this->currentUserNames); }
+  public function clearIds() { unset($this->currentUserIds); }
+  public function clearUser() { unset($this->currentUser); }
+
   // Ids are set when UserInputs are built, this means that the inputs must be added to the HTML Document,
   // before the errorId can be used correctly.
-  public function getErrorId() { return $this->errorId; }
+  public function getErrorId() {
+    $this->setErrorId();
+    return $this->errorId;
+  }
 
   public function commitUser() {
     try {
@@ -197,50 +204,25 @@ class User {
   }
 
   public function setInputNames($emailName=NULL,$handleName=NULL,$passwordName=NULL,$verPasswordName=NULL,$timezoneName=NULL,$formatName=NULL) {
-    unset($this->currentUserNames);
-    if (!empty($emailName)) {
-      $this->setEmailName($emailName);
-    }
-    if (!empty($handleName)) {
-      $this->setHandleName($handleName);
-    }
-    if (!empty($passwordName)) {
-      $this->setPasswordName($passwordName);
-    }
-    if (!empty($verPasswordName)) {
-      $this->setVerPasswordName($verPasswordName);
-    }
-    if (!empty($timezoneName)) {
-      $this->setTimezoneName($timezoneName);
-    }
-    if (!empty($formatName)) {
-      $this->setDateFormatName($formatName);
-    }
+    $this->clearNames();
+    if (!empty($emailName)) { $this->setEmailName($emailName); }
+    if (!empty($handleName)) { $this->setHandleName($handleName); }
+    if (!empty($passwordName)) { $this->setPasswordName($passwordName); }
+    if (!empty($verPasswordName)) { $this->setVerPasswordName($verPasswordName); }
+    if (!empty($timezoneName)) { $this->setTimezoneName($timezoneName); }
+    if (!empty($formatName)) { $this->setDateFormatName($formatName); }
   }
 
   public function setFromPost() {
-    if (!empty($this->currentUserNames['email'])) {
-      $this->setEmail($_POST[$this->currentUserNames['email']]);
-    }
-    if (!empty($this->currentUserNames['handle'])) {
-      $this->setHandle($_POST[$this->currentUserNames['handle']]);
-    }
-    if (!empty($this->currentUserNames['password'])) {
-      $this->setPassword($_POST[$this->currentUserNames['password']]);
-    }
-    if (!empty($this->currentUserNames['ver_password'])) {
-      $this->setVerPassword($_POST[$this->currentUserNames['ver_password']]);
-    }
-    if (!empty($this->currentUserNames['timezone'])) {
-      $this->setTimezone($_POST[$this->currentUserNames['timezone']]);
-    }
-    if (!empty($this->currentUserNames['date_format'])) {
-      $this->setDateFormat($_POST[$this->currentUserNames['date_format']]);
-    }
+    if (!empty($this->currentUserNames['email'])) { $this->setEmail($_POST[$this->currentUserNames['email']]); }
+    if (!empty($this->currentUserNames['handle'])) { $this->setHandle($_POST[$this->currentUserNames['handle']]); }
+    if (!empty($this->currentUserNames['password'])) { $this->setPassword($_POST[$this->currentUserNames['password']]); }
+    if (!empty($this->currentUserNames['ver_password'])) { $this->setVerPassword($_POST[$this->currentUserNames['ver_password']]); }
+    if (!empty($this->currentUserNames['timezone'])) { $this->setTimezone($_POST[$this->currentUserNames['timezone']]); }
+    if (!empty($this->currentUserNames['date_format'])) { $this->setDateFormat($_POST[$this->currentUserNames['date_format']]); }
     if (!empty($this->currentUserNames['ver_password'])) { $this->setSubcatFirst(1); } // only set if $verPasswordName is, means user is registering
     if (!empty($this->currentUserNames['ver_password'])) { $this->setActive(1); } // only set if $verPasswordName is, means user is registering
-
-    return isset($_POST[$this->currentUserNames['email']]);
+    return isset($_POST[$this->currentUserNames['email']]) or isset($_POST[$this->currentUserNames['password']]);
   }
 
   public function verifyUser() {
@@ -292,28 +274,26 @@ class User {
   }
 
   public function validateUserInfo($dupEmailCheck=TRUE,$dupHandleCheck=TRUE,$passwordCheck=TRUE) {
-    if(!$this->validateEmail() ) {
-      $this->errorId = $this->getEmailId();
-      return FALSE;
-    } elseif ($dupEmailCheck and $this->getUserByEmail($dupEmailCheck)) {
-      $this->errorId = $this->getEmailId();
-      return FALSE;
-    } elseif(!$this->validateHandle()) {
-      $this->errorId = $this->getHandleId();
-      return FALSE;
-    } elseif ($dupHandleCheck and $this->getUserByHandle($dupHandleCheck)) {
-      $this->errorId = $this->getHandleId();
-      return FALSE;
-    } elseif ($passwordCheck and !$this->validatePassword($passwordCheck)){
-      $this->errorId = $this->getPasswordId();
-      return FALSE;
-    } elseif ($passwordCheck and !$this->validateVerPassword($passwordCheck)){
-      $this->errorId = $this->getPasswordId();
-      return FALSE;
-    } else {
-      $this->errorId = NULL;
-      return TRUE;
-    }
+    $this->dupEmailCheck = $dupEmailCheck;
+    $this->dupHandleCheck = $dupHandleCheck;
+    $this->passwordCheck = $passwordCheck;
+    if(!$this->validateEmail() ) { return FALSE; }
+    elseif ($dupEmailCheck and $this->getUserByEmail($dupEmailCheck)) { return FALSE; }
+    elseif(!$this->validateHandle()) { return FALSE; }
+    elseif ($dupHandleCheck and $this->getUserByHandle($dupHandleCheck)) { return FALSE; }
+    elseif ($passwordCheck and !$this->validatePassword($passwordCheck)){ return FALSE; }
+    elseif ($passwordCheck and !$this->validateVerPassword($passwordCheck)){ return FALSE; }
+    else {return TRUE;}
+  }
+
+  public function setErrorId() {
+    if(!$this->validateEmail(false)) { $this->errorId = $this->getEmailId(); }
+    elseif ($this->dupEmailCheck and $this->getUserByEmail(false)) { $this->errorId = $this->getEmailId(); }
+    elseif (!$this->validateHandle(false)) { $this->errorId = $this->getHandleId(); }
+    elseif ($this->dupHandleCheck and $this->getUserByHandle(false)) { $this->errorId = $this->getHandleId(); }
+    elseif ($this->passwordCheck and !$this->validatePassword(false)){ $this->errorId = $this->getPasswordId(); }
+    elseif ($this->passwordCheck and !$this->validateVerPassword(false)){ $this->errorId = $this->getPasswordId(); }
+    else { $this->errorId = NULL; }
   }
 }
 ?>
