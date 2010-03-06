@@ -17,7 +17,7 @@ class Site {
     $this->document = HTMLDocument::createHTMLDocument();
     $this->head = new Head($this->document,$this->siteInfo);
     $this->body = new Body($this->document,$this->infoMsg,$this->siteInfo,$this->user,$title);
-    $this->content = $this->body->DivMid;
+    $this->content = $this->body->divMid;
   }
 
   function printPage() {

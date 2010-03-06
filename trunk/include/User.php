@@ -15,13 +15,18 @@ class User {
     $this->siteInfo = $siteInfo;
     $this->infoMsg = $infoMsg;
     $this->cookies = new Cookies();
-    if ($this->setFromPost('email','email','password')) { // if true then user is trying to login
-      if ($this->verifyUser()) { // the email was found with a matching password, and currentUser was updated
-        $this->cookies->setCookies($this->currentUser['user_id'],$this->currentUser['password']);
+    $this->setInputNames('email','email','password');
+    if ($this->setFromPost()) { // if true then user is trying to login
+      if ($this->verifyUser()) { // the email was found with a matching password, currentUser was updated
+        $this->setCookies();
       } else { // the email was not found with a matching password
         $this->infoMsg->addMessage(0,'Login info is incorrect.','Forgot Info?','recover.php');
       }
     }
+  }
+  
+  public function setCookies() {
+    $this->cookies->setCookies($this->currentUser['user_id'],$this->currentUser['password']);
   }
 
   public function getUserById($id=NULL) {
@@ -141,7 +146,7 @@ class User {
   public function getDateFormatId() { return $this->currentUserIds['date_format']; }
 
   public function getLoginFail() { return $this->loginFailed; }
-  
+
   // Ids are set when UserInputs are built, this means that the inputs must be added to the HTML Document,
   // before the errorId can be used correctly.
   public function getErrorId() { return $this->errorId; }
@@ -168,9 +173,9 @@ class User {
     }
   }
 
-  public function updateUser() {
+  public function updateUser($dupEmailCheck=TRUE,$dupHandleCheck=TRUE,$passwordCheck=TRUE) {
     try {
-      if ($this->validateUserInfo(false,false)) {
+      if ($this->validateUserInfo($dupEmailCheck,$dupHandleCheck,$passwordCheck)) {
         $sql = "UPDATE user
 				SET password='".$this->currentUser['password']."', 
 					handle='".$this->currentUser['handle']."',
@@ -190,36 +195,52 @@ class User {
       echo $err;
     }
   }
-  
-  public function setFromPost($emailName=NULL,$handleName=NULL,$passwordName=NULL,$verPasswordName=NULL,$timezoneName=NULL,$formatName=NULL) {
+
+  public function setInputNames($emailName=NULL,$handleName=NULL,$passwordName=NULL,$verPasswordName=NULL,$timezoneName=NULL,$formatName=NULL) {
+    unset($this->currentUserNames);
     if (!empty($emailName)) {
       $this->setEmailName($emailName);
-      $this->setEmail($_POST[$emailName]);
     }
     if (!empty($handleName)) {
       $this->setHandleName($handleName);
-      $this->setHandle($_POST[$handleName]);
     }
     if (!empty($passwordName)) {
-      $this->setPassword($_POST[$passwordName]);
       $this->setPasswordName($passwordName);
     }
     if (!empty($verPasswordName)) {
       $this->setVerPasswordName($verPasswordName);
-      $this->setVerPassword($_POST[$verPasswordName]);
     }
     if (!empty($timezoneName)) {
       $this->setTimezoneName($timezoneName);
-      $this->setTimezone($_POST[$timezoneName]);
     }
     if (!empty($formatName)) {
       $this->setDateFormatName($formatName);
-      $this->setDateFormat($_POST[$formatName]);
     }
-    if (!empty($verPasswordName)) { $this->setSubcatFirst(1); } // only set if $verPasswordName is, means user is registering
-    if (!empty($verPasswordName)) { $this->setActive(1); } // only set if $verPasswordName is, means user is registering
+  }
 
-    return isset($_POST[$emailName]);
+  public function setFromPost() {
+    if (!empty($this->currentUserNames['email'])) {
+      $this->setEmail($_POST[$this->currentUserNames['email']]);
+    }
+    if (!empty($this->currentUserNames['handle'])) {
+      $this->setHandle($_POST[$this->currentUserNames['handle']]);
+    }
+    if (!empty($this->currentUserNames['password'])) {
+      $this->setPassword($_POST[$this->currentUserNames['password']]);
+    }
+    if (!empty($this->currentUserNames['ver_password'])) {
+      $this->setVerPassword($_POST[$this->currentUserNames['ver_password']]);
+    }
+    if (!empty($this->currentUserNames['timezone'])) {
+      $this->setTimezone($_POST[$this->currentUserNames['timezone']]);
+    }
+    if (!empty($this->currentUserNames['date_format'])) {
+      $this->setDateFormat($_POST[$this->currentUserNames['date_format']]);
+    }
+    if (!empty($this->currentUserNames['ver_password'])) { $this->setSubcatFirst(1); } // only set if $verPasswordName is, means user is registering
+    if (!empty($this->currentUserNames['ver_password'])) { $this->setActive(1); } // only set if $verPasswordName is, means user is registering
+
+    return isset($_POST[$this->currentUserNames['email']]);
   }
 
   public function verifyUser() {
@@ -258,7 +279,6 @@ class User {
 
   public function validateEmail($reportMsg=TRUE,$value=NULL) {
     if(empty($value)) { $value = $this->currentUser['email']; }
-    //$check = preg_match( "/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $value);
     $check = preg_match( "/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/", $value);
     if($reportMsg and !$check) { $this->infoMsg->addMessage(0,'The user email address in invalid.'); }
     return $check;
@@ -271,23 +291,23 @@ class User {
     return $check;
   }
 
-  public function validateUserInfo($dupEmailCheck=TRUE,$dupHandleCheck=TRUE) {
+  public function validateUserInfo($dupEmailCheck=TRUE,$dupHandleCheck=TRUE,$passwordCheck=TRUE) {
     if(!$this->validateEmail() ) {
       $this->errorId = $this->getEmailId();
       return FALSE;
-    } elseif ($this->getUserByEmail($dupEmailCheck) and $dupEmailCheck) {
+    } elseif ($dupEmailCheck and $this->getUserByEmail($dupEmailCheck)) {
       $this->errorId = $this->getEmailId();
       return FALSE;
     } elseif(!$this->validateHandle()) {
       $this->errorId = $this->getHandleId();
       return FALSE;
-    } elseif ($this->getUserByHandle($dupHandleCheck) and $dupHandleCheck) {
+    } elseif ($dupHandleCheck and $this->getUserByHandle($dupHandleCheck)) {
       $this->errorId = $this->getHandleId();
       return FALSE;
-    } elseif (!$this->validateVerPassword()){
+    } elseif ($passwordCheck and !$this->validatePassword($passwordCheck)){
       $this->errorId = $this->getPasswordId();
       return FALSE;
-    } elseif (!$this->validatePassword()){
+    } elseif ($passwordCheck and !$this->validateVerPassword($passwordCheck)){
       $this->errorId = $this->getPasswordId();
       return FALSE;
     } else {

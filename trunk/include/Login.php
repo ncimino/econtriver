@@ -1,12 +1,16 @@
 <?php
 class Login {
+  private $email;
+  private $user;
+
   function __construct($parentElement,$siteInfo,$user) {
+    $this->user = $user;
     $DivLogin = new HTMLDiv($parentElement,'login');
     $DivLogin->setAttribute('style','right: '.$siteInfo->getLogoWidth().';');
     if ($user->verifyUser()) {
-      new HTMLText($DivLogin,$user->getEmail());
+      $this->email = new HTMLText($DivLogin,$user->getEmail());
       new HTMLText($DivLogin,' - ');
-      new HTMLAnchor($DivLogin,'profile.php','Manage Account');
+      new HTMLAnchor($DivLogin,'manage.php','Manage Account');
       new HTMLText($DivLogin,' - ');
       new HTMLAnchor($DivLogin,'index.php?logout=1','Logout');
     } else {
@@ -26,6 +30,10 @@ class Login {
       new HTMLScript($PLogin,"document.getElementById(\"password_input\").focus();");  
       }
     }
+  }
+  
+  public function updateEmail() {
+    $this->email->replaceData($this->user->getEmail());
   }
 }
 ?>

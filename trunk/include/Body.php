@@ -1,21 +1,23 @@
 <?php
 class Body {
   public $HTMLBody;
-  public $DivMid;
+  public $divMid;
+  public $login;
+  
   function __construct($HTMLDocument,$infoMsg,$siteInfo,$user,$title) {
     $this->HTMLBody = new HTMLBody($HTMLDocument);
-    $DivPage = new HTMLDiv($this->HTMLBody,'page');
+    $divPage = new HTMLDiv($this->HTMLBody,'page');
 
-    $infoMsg->commitDiv($DivPage);
+    $infoMsg->commitDiv($divPage);
     
-    $DivIELimiter = new HTMLDiv($DivPage,'banner_ie_limiter');
-    $DivBanner = new HTMLDiv($DivPage,'banner');
+    new HTMLDiv($divPage,'banner_ie_limiter');
+    $divBanner = new HTMLDiv($divPage,'banner');
     
-    $Login = new Login($DivBanner,$siteInfo,$user);
-    $Logo = new Logo($DivBanner,$siteInfo);
+    $this->login = new Login($divBanner,$siteInfo,$user);
+    new Logo($divBanner,$siteInfo);
 
-    $this->DivMid = new HTMLDiv($DivPage,'mid');
-    $H3Title = new HTMLHeading($this->DivMid,3,$title);
+    $this->divMid = new HTMLDiv($divPage,'mid');
+    new HTMLHeading($this->divMid,3,$title);
   }
 }
 ?>

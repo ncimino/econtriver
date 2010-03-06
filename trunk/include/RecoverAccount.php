@@ -19,7 +19,7 @@ class RecoverAccount {
         $this->buildRecoveryForm($parentElement);
       }
 
-    } elseif (isset($_POST['reset'])) { // User has used entered new passwords
+    } elseif (isset($_POST['reset']) and $this->siteInfo->verifyReferer()) { // User has used entered new passwords
 
       if (!$this->user->getUserById($_POST['reset'])) { // Check if User ID exists
         $this->infoMsg->addMessage(0,'This link is not valid. Resubmit the information.');
@@ -29,7 +29,7 @@ class RecoverAccount {
         $this->user->setPassword($_POST['reset_password']);
         $this->user->setVerPassword($_POST['reset_ver_password']);
         $resetForm = $this->buildResetForm($parentElement); // Must be set before user methods for errorIds to work
-        if ($this->user->updateUser()) { // Check if password was valid and updates the user if it was
+        if ($this->user->updateUser(false,false)) { // Check if password was valid and updates the user if it was
           $resetForm->remove();
           new HTMLText($parentElement,'Password reset successful.');
           $this->focusId = NULL;
@@ -38,7 +38,7 @@ class RecoverAccount {
         }
       }
 
-    } elseif ($_POST['recover']=='1') { // User has submitted a user name or email for recovery
+    } elseif (($_POST['recover']=='1') and $this->siteInfo->verifyReferer()) { // User has submitted a user name or email for recovery
 
       $recoveryForm = $this->buildRecoveryForm($parentElement);
       if ($this->user->getUserByEmail(false) or $this->user->setUserByHandle()) {
@@ -63,7 +63,8 @@ class RecoverAccount {
   }
 
   function buildResetForm($parentElement) {
-    $this->user->setFromPost('','','reset_password','reset_ver_password');
+    $this->user->setInputNames('','','reset_password','reset_ver_password');
+    $this->user->setFromPost();
     $userInputs = new UserInputs($this->user);
     $formRecover = new HTMLForm($parentElement,'recover.php','reset_password');
     new HTMLInputHidden($formRecover,'reset',$this->user->getUserId());
@@ -76,7 +77,8 @@ class RecoverAccount {
   }
 
   function buildRecoveryForm($parentElement) {
-    $this->user->setFromPost('recover_email','recover_email');
+    $this->user->setInputNames('recover_email','recover_email');
+    $this->user->setFromPost();
     $userInputs = new UserInputs($this->user);
     $FormRecover = new HTMLForm($parentElement,'recover.php','recover_email');
     new HTMLInputHidden($FormRecover,'recover','1');
@@ -99,6 +101,7 @@ class RecoverAccount {
     $cipher = new Cipher($this->siteInfo->getSalt());
     $verify2 = $cipher->encrypt($this->user->getTime());
     $recoveryLink = $this->siteInfo->getSiteHTTP().'/recover.php?recover_id='.$this->user->getUserId().'&verify1='.$this->user->getPassword().'&verify2='.$verify2;
+    echo "<a href='".$recoveryLink."' >RECOVER NOW</a>\n";
     new HTMLAnchor($email->content,$recoveryLink,'Recover My Account');
     new HTMLParagraph($email->content,'Once you follow this link, then enter and verify a new password.  This new password will then be used to login.');
 

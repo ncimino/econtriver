@@ -16,6 +16,7 @@ abstract class HTMLElement {
   function createCDATASection($HTMLDOMDocument,$content) { return $this->HTMLElement = $HTMLDOMDocument->createCDATASection($content); }
   function createComment($HTMLDOMDocument,$data) { return $this->HTMLElement = $HTMLDOMDocument->createComment( $data ); }
   function createTextNode($HTMLDOMDocument,$data) { return $this->HTMLElement = $HTMLDOMDocument->createTextNode( $data ); }
+  function replaceData($data) { $this->HTMLElement->replaceData( 0, $this->HTMLElement->length, $data ); }
   function setAttribute($name,$value) { $this->HTMLElement->setAttribute( $name, $value ); }
   function setClass($className) { $this->setAttribute('class',$className); }
   function setId($idName) { $this->setAttribute('id',$idName); }

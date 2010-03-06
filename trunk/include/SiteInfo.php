@@ -62,6 +62,8 @@ class SiteInfo {
   function getServerRootDir() { return $_SERVER['DOCUMENT_ROOT']; }
   function getServerDir() { return $this->getINIValue('siteinfo.rootdir'); }
   function getSelf() { return $_SERVER['PHP_SELF']; }
+  
+  function verifyReferer() { return preg_match('/^'.Escape::encodeFs($this->getSiteHTTP()).'/',$_SERVER['HTTP_REFERER']); }
 
   public function __toString() {
     foreach ($this->ini_arr as $key => $value) {
