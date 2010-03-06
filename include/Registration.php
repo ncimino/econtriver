@@ -5,7 +5,8 @@ class Registration {
   
   function __construct($parentElement,$infoMsg,$user) {
     $this->user = $user;
-    $this->user->setFromPost('reg_email','handle','reg_pw','ver_pw','timezone','format');
+    $this->user->setInputNames('reg_email','handle','reg_pw','ver_pw','timezone','format');
+    $this->user->setFromPost();
      
     $FormReg = new HTMLForm($parentElement,'register.php','register');
     $FormReg->setAttribute( 'name', 'register' );
