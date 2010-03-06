@@ -4,6 +4,7 @@ class UserInputs {
 
   function __construct($user) {
     $this->user = $user;
+    $this->user->clearIds();
   }
 
   function inputEmail ($inputParentElement,$labelParentElement=NULL,$label='Email:',$inputName=NULL,$value=NULL) {

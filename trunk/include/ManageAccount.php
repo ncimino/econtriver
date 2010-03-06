@@ -11,27 +11,39 @@ class ManageAccount {
     $this->siteInfo = $siteInfo;
 
     $this->user->setInputNames('manage_email','manage_handle','','','manage_timezone','manage_format');
-    $this->buildManagementForm($parentElement);
     if (isset($_POST['manage']) and $this->siteInfo->verifyReferer()) { // User has submitted management form
       $currentEmail = $this->user->getEmail();
       $currentHandle = $this->user->getHandle();
       $this->user->setFromPost();
       $dupEmailCheck = ($currentEmail == $this->user->getEmail()) ? FALSE : TRUE; // Only check for duplicate email if it changed
       $dupHandleCheck = ($currentHandle == $this->user->getHandle()) ? FALSE : TRUE; // Only check for duplicate handle if it changed
-      if ($this->updateUser($dupEmailCheck,$dupHandleCheck,false)) {
+      if ($this->user->updateUser($dupEmailCheck,$dupHandleCheck,false)) {
         $this->infoMsg->addMessage(2,'User info was updated.');
-        $body->login->updateEmail();
+        $body->login->updateEmail(); // Update the email displayed in the login section
+        $this->buildManagementForm($parentElement);
+        $this->focusId = NULL;
+      } else {
+        $this->buildManagementForm($parentElement);
+        $this->focusId = $this->user->getErrorId();
       }
+    } else { // User just landed on the Manage page, no info to check yet
+      $this->buildManagementForm($parentElement);
     }
 
     $this->user->setInputNames('','','new_password','new_ver_password');
-    $this->buildPasswordForm($parentElement);
-    if (isset($_POST['passwords']) and $this->siteInfo->verifyReferer()) { // User has submitted management form
+    if (isset($_POST['passwords']) and $this->siteInfo->verifyReferer()) { // User has submitted password form
       $this->user->setFromPost();
-      if ($this->updateUser(false,false)) {
+      if ($this->user->updateUser(false,false)) {
         $this->infoMsg->addMessage(2,'Password was updated.');
         $this->user->setCookies(); // Keep the user logged in after the password change
+        $this->buildPasswordForm($parentElement);
+        $this->focusId = NULL;
+      } else {
+        $this->buildPasswordForm($parentElement);
+        $this->focusId = $this->user->getErrorId();
       }
+    } else { // User just landed on the Manage page, no info to check yet
+      $this->buildPasswordForm($parentElement);
     }
 
     if (!empty($this->focusId)) {
@@ -69,15 +81,5 @@ class ManageAccount {
     new HTMLInputSubmit($formPassword,'passwords_submit','Change Password');
     new HTMLBr($formPassword);
     new HTMLBr($formPassword);
-  }
-  
-  function updateUser($dupEmailCheck=TRUE,$dupHandleCheck=TRUE,$passwordCheck=TRUE) {
-    if (!$this->user->updateUser($dupEmailCheck,$dupHandleCheck,$passwordCheck)) {
-      $this->focusId = $this->user->getErrorId();
-      return FALSE;
-    } else {
-      $this->focusId = NULL;
-      return TRUE;
-    }
   }
 }
