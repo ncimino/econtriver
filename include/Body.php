@@ -3,6 +3,7 @@ class Body {
   public $HTMLBody;
   public $divMid;
   public $login;
+  public $title;
   
   function __construct($HTMLDocument,$infoMsg,$siteInfo,$user,$title) {
     $this->HTMLBody = new HTMLBody($HTMLDocument);
@@ -17,7 +18,7 @@ class Body {
     new Logo($divBanner,$siteInfo);
 
     $this->divMid = new HTMLDiv($divPage,'mid');
-    new HTMLHeading($this->divMid,3,$title);
+    $this->title = new HTMLHeading($this->divMid,3,$title);
   }
 }
 ?>

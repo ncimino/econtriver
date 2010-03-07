@@ -16,7 +16,7 @@ class Registration {
     if ($_POST['register']=='1') { // if true the user submitted a registration form
       if ($this->addUser()) {
         new HTMLText($parentElement,'Registration successful.');
-        new HTMLScript($parentElement,"document.getElementById(\"email_input\").value=\"" . $user->getEmail() . "\";");
+        new HTMLScript($parentElement,"document.getElementById(\"email_input\").value=\"" . $user->getHandle() . "\";");
         $this->focusId='password_input';
         $FormReg->remove();
       }

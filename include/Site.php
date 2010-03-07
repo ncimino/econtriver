@@ -20,6 +20,19 @@ class Site {
     $this->content = $this->body->divMid;
   }
 
+  function replaceTitle($title) {
+    $this->body->title->HTMLElement->nodeValue = $title;
+  }
+
+  function landingPage() {
+    $this->replaceTitle('Free Multi-User Account and Investment Management');
+    new HTMLHeading($this->content,4,'Welcome to '.$this->siteInfo->getName().'!');
+    $content = "This site was created to help manage investment and account transactions.
+These account tracking pages allow you share accounts and grant privileges to other 
+users so that they can add, remove, and change ";
+    new HTMLText($this->content,$content);
+  }
+
   function printPage() {
     $this->infoMsg->commitMessages();
     printf( '%s', $this->document->saveXML() );

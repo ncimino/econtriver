@@ -14,8 +14,7 @@ email varchar(255) NOT NULL,
 UNIQUE (email),
 timezone varchar(255) NOT NULL,
 date_format varchar(255) NOT NULL,
-subcat_first varchar(255) NOT NULL,
-active varchar(255) NOT NULL
+active int(1) NOT NULL
 )";
   /*
    subcat_first bit NOT NULL,
