@@ -1,6 +1,6 @@
 <?php
-class ManageAccount {
-  private $focusId = 'manage_email_input';
+class ManageProfile {
+  private $focusId = 'profile_email_input';
   private $siteInfo;
   private $infoMsg;
   private $user;
@@ -10,8 +10,8 @@ class ManageAccount {
     $this->infoMsg = $infoMsg;
     $this->siteInfo = $siteInfo;
 
-    $this->user->setInputNames('manage_email','manage_handle','','','manage_timezone','manage_format');
-    if (isset($_POST['manage']) and $this->siteInfo->verifyReferer()) { // User has submitted management form
+    $this->user->setInputNames('profile_email','profile_handle','','','profile_timezone','profile_format');
+    if (isset($_POST['profile']) and $this->siteInfo->verifyReferer()) { // User has submitted management form
       $currentEmail = $this->user->getEmail();
       $currentHandle = $this->user->getHandle();
       $this->user->setFromPost();
@@ -52,9 +52,9 @@ class ManageAccount {
   }
 
   function buildManagementForm($parentElement) {
-    $formManage = new HTMLForm($parentElement,'manage.php','manage');
-    new HTMLInputHidden($formManage,'manage','1');
-    $TableReg = new Table($formManage,4,2,'manage');
+    $formManage = new HTMLForm($parentElement,'profile.php','profile');
+    new HTMLInputHidden($formManage,'profile','1');
+    $TableReg = new Table($formManage,4,2,'profile');
     $TableReg->table->setAttribute( 'width', '500px' );
 
     $userInputs = new UserInputs($this->user);
@@ -63,13 +63,13 @@ class ManageAccount {
     $userInputs->selectFormat($TableReg->cells[2][1],$TableReg->cells[2][0]);
     $userInputs->selectTimezone($TableReg->cells[3][1],$TableReg->cells[3][0]);
 
-    new HTMLInputSubmit($formManage,'manage_submit','Update');
+    new HTMLInputSubmit($formManage,'profile_submit','Update');
     new HTMLBr($formManage);
     new HTMLBr($formManage);
   }
 
   function buildPasswordForm($parentElement) {
-    $formPassword = new HTMLForm($parentElement,'manage.php','manage');
+    $formPassword = new HTMLForm($parentElement,'profile.php','profile');
     new HTMLInputHidden($formPassword,'passwords','1');
     $TablePas = new Table($formPassword,2,2,'passwords');
     $TablePas->table->setAttribute( 'width', '500px' );

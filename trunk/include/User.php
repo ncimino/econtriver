@@ -31,67 +31,43 @@ class User {
 
   public function getUserById($id=NULL) {
     if(empty($id)) { $id = $this->currentUser['user_id']; }
-    try {
-      $this->DB->query("SELECT * FROM user WHERE user_id='".mysql_real_escape_string($id)."';");
-      return $this->DB->fetch();
-    } catch (Exception $err) {
-      throw $err;
-    }
+    $this->DB->query("SELECT * FROM user WHERE user_id='".mysql_real_escape_string($id)."';");
+    return $this->DB->fetch();
   }
 
   public function setUserById($id) {
-    try {
-      $this->currentUser = $this->getUserById($id);
-      return $this->currentUser;
-    } catch (Exception $err) {
-      throw $err;
-    }
+    $this->currentUser = $this->getUserById($id);
+    return $this->currentUser;
   }
 
   public function getUserByHandle($reportMsg=true,$handle=NULL) {
     if(empty($handle)) { $handle = $this->currentUser['handle']; }
-    try {
-      $this->DB->query("SELECT * FROM user WHERE handle='".mysql_real_escape_string($handle)."';");
-      $fetch = $this->DB->fetch();
-      if ($reportMsg and $fetch) {
-        $this->infoMsg->addMessage(0,'This User Name has already been used. Please try a different one.');
-      }
-      return $fetch;
-    } catch (Exception $err) {
-      throw $err;
+    $this->DB->query("SELECT * FROM user WHERE handle='".mysql_real_escape_string($handle)."';");
+    $fetch = $this->DB->fetch();
+    if ($reportMsg and $fetch) {
+      $this->infoMsg->addMessage(0,'This User Name has already been used. Please try a different one.');
     }
+    return $fetch;
   }
 
   public function setUserByHandle($handle=NULL) {
-    try {
-      $this->currentUser = $this->getUserByHandle(false,$handle);
-      return $this->currentUser;
-    } catch (Exception $err) {
-      throw $err;
-    }
+    $this->currentUser = $this->getUserByHandle(false,$handle);
+    return $this->currentUser;
   }
 
   public function getUserByEmail($reportMsg=true,$email=NULL) {
     if(empty($email)) { $email = $this->currentUser['email']; }
-    try {
-      $this->DB->query("SELECT * FROM user WHERE email='".mysql_real_escape_string(strtolower($email))."';");
-      $fetch = $this->DB->fetch();
-      if ($reportMsg and $fetch) {
-        $this->infoMsg->addMessage(0,'This email has already been registered.','Forgot Info?','recover.php');
-      }
-      return $fetch;
-    } catch (Exception $err) {
-      throw $err;
+    $this->DB->query("SELECT * FROM user WHERE email='".mysql_real_escape_string(strtolower($email))."';");
+    $fetch = $this->DB->fetch();
+    if ($reportMsg and $fetch) {
+      $this->infoMsg->addMessage(0,'This email has already been registered.','Forgot Info?','recover.php');
     }
+    return $fetch;
   }
 
   public function setUserByEmail($email=NULL) {
-    try {
-      $this->currentUser = $this->getUserByEmail(false,$email);
-      return $this->currentUser;
-    } catch (Exception $err) {
-      throw $err;
-    }
+    $this->currentUser = $this->getUserByEmail(false,$email);
+    return $this->currentUser;
   }
 
   public function setPassword($value) {
@@ -103,7 +79,6 @@ class User {
   public function setEmail($value) { $this->currentUser['email'] = mysql_real_escape_string(strtolower($value)); }
   public function setTimezone($value) { $this->currentUser['timezone'] = $value; }
   public function setDateFormat($value) { $this->currentUser['date_format'] = $value; }
-  public function setSubcatFirst($value) { $this->currentUser['subcat_first'] = $value; }
   public function setActive($value) { $this->currentUser['active'] = $value; }
 
   public function setPasswordName($value) { $this->currentUserNames['password'] = $value; }
@@ -127,7 +102,6 @@ class User {
   public function getEmail() { return $this->currentUser['email']; }
   public function getTimezone() { return $this->currentUser['timezone']; }
   public function getDateFormat() { return $this->currentUser['date_format']; }
-  public function getSubcatFirst() { return $this->currentUser['subcat_first']; }
   public function getActive() { return $this->currentUser['active']; }
   public function getTime() { return time(); }
 
@@ -161,16 +135,14 @@ class User {
   public function commitUser() {
     try {
       if ($this->validateUserInfo()) {
-        $sql = "INSERT INTO user (password,handle,email,timezone,date_format,subcat_first,active)
+        $sql = "INSERT INTO user (password,handle,email,timezone,date_format,active)
                         VALUES ('".$this->currentUser['password']."','".
         $this->currentUser['handle']."','".
         $this->currentUser['email']."','".
         $this->currentUser['timezone']."','".
         $this->currentUser['date_format']."',".
-        $this->currentUser['subcat_first'].",".
         $this->currentUser['active'].");";
         $result = $this->DB->query($sql);
-        if (!$result) { $this->infoMsg->addMessage(-1,'An unexpected error occurred while adding the user.'); }
         return $result;
       } else {
         return false;
@@ -189,11 +161,9 @@ class User {
 					email='".$this->currentUser['email']."',
 					timezone='".$this->currentUser['timezone']."',
 					date_format='".$this->currentUser['date_format']."',
-					subcat_first=".$this->currentUser['subcat_first'].",
 					active=".$this->currentUser['active']."
 				WHERE user_id=".$this->currentUser['user_id'].";";
         $result = $this->DB->query($sql);
-        if (!$result) { $this->infoMsg->addMessage(-1,'An unexpected error occurred while updating the user.'); }
         return $result;
       } else {
         return false;
@@ -220,7 +190,6 @@ class User {
     if (!empty($this->currentUserNames['ver_password'])) { $this->setVerPassword($_POST[$this->currentUserNames['ver_password']]); }
     if (!empty($this->currentUserNames['timezone'])) { $this->setTimezone($_POST[$this->currentUserNames['timezone']]); }
     if (!empty($this->currentUserNames['date_format'])) { $this->setDateFormat($_POST[$this->currentUserNames['date_format']]); }
-    if (!empty($this->currentUserNames['ver_password'])) { $this->setSubcatFirst(1); } // only set if $verPasswordName is, means user is registering
     if (!empty($this->currentUserNames['ver_password'])) { $this->setActive(1); } // only set if $verPasswordName is, means user is registering
     return isset($_POST[$this->currentUserNames['email']]) or isset($_POST[$this->currentUserNames['password']]);
   }

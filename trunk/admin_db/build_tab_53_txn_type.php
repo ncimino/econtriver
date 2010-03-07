@@ -11,6 +11,22 @@ txn_type_name varchar(255)
 )";
   $db_obj->query($sql);
   echo "COMPLETED:<BR>\n".$sql."<BR>\n";
+  
+  $sql = "INSERT INTO txn_type (txn_type_name)
+VALUES ('Deposit');";
+  $db_obj->query($sql);
+  echo "COMPLETED:<BR>\n".$sql."<BR>\n";
+  
+  $sql = "INSERT INTO txn_type (txn_type_name)
+VALUES ('Withdrawl');";
+  $db_obj->query($sql);
+  echo "COMPLETED:<BR>\n".$sql."<BR>\n";
+  
+  $sql = "INSERT INTO txn_type (txn_type_name)
+VALUES ('Transfer');";
+  $db_obj->query($sql);
+  echo "COMPLETED:<BR>\n".$sql."<BR>\n";
+  
 } catch (Exception $err) {
   echo 'Caught exception: ',  $err->getMessage(), "\n";
 }
