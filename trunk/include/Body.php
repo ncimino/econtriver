@@ -19,6 +19,16 @@ class Body {
 
     $this->divMid = new HTMLDiv($divPage,'mid');
     $this->title = new HTMLHeading($this->divMid,3,$title);
+    
+    $this->divFooter = new HTMLDiv($divPage,'footer');
+    $scriptGoogleAnalyticsSet = "var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
+document.write(unescape(\"%3Cscript src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));";
+    new HTMLScript($this->divFooter,$scriptGoogleAnalyticsSet,null,false);
+    $scriptGoogleAnalyticsRun = "try {
+var pageTracker = _gat._getTracker(\"UA-2516211-1\");
+pageTracker._trackPageview();
+} catch(err) {}";
+    new HTMLScript($this->divFooter,$scriptGoogleAnalyticsRun,null,false);
   }
 }
 ?>

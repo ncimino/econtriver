@@ -35,8 +35,8 @@ class DBCon {
   public function selectDB() {
     if (! $ini_arr = parse_ini_file($this->ini_file)) {
       throw new Exception("ERROR:DBCon:selectDB - parse_ini_file - Failed to parse '{$this->ini_file}' <br />\n");
-    //} elseif (! $this->setDB($ini_arr['dbinfo.db'])) {
-//      throw new Exception("ERROR:DBCon:selectDB - setDB - Failed to set database '".$ini_arr['dbinfo.db']."' <br />\n");
+      //} elseif (! $this->setDB($ini_arr['dbinfo.db'])) {
+      //      throw new Exception("ERROR:DBCon:selectDB - setDB - Failed to set database '".$ini_arr['dbinfo.db']."' <br />\n");
     } elseif (! mysql_select_db($ini_arr['dbinfo.db'],$this->link)) {
       throw new Exception("ERROR:DBCon:selectDB - mysql_select_db - " . mysql_error() . " <br />\n");
     } else {
@@ -56,6 +56,15 @@ class DBCon {
     } else {
       return false;
     }
+  }
+
+  public function num($result="") {
+    if (empty($result)){ $result = $this->result; }
+    return mysql_num_rows($result);
+  }
+
+  public function lastId() {
+    return mysql_insert_id($this->link);
   }
 
   public function fetch($result="") {

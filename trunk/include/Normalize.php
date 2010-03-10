@@ -1,0 +1,29 @@
+<?php
+class Normalize {
+
+  static function encodeBs($value) { return addcslashes($value,'\\'); }
+  static function encodeFs($value) { return addcslashes($value,'\/'); }
+  static function mysql($value) { return mysql_real_escape_string($value); }
+  static function tags($value) { return strip_tags($value); }
+  static function accountNames($value,$infoMsg) {
+    if (preg_match('/^[a-zA-Z]+[a-zA-Z0-9_]+$/',$value)) {
+      return true;
+    } else {
+      $infoMsg->addMessage(0,'Account names must start with a letter, and contain only numbers, letters, and underscores.');
+      return false;
+    }
+  }
+  static function sanitize($value,$infoMsg,$siteInfo) {
+    $value = htmlentities($value);
+    if (empty($value)) {
+      return false;
+    } elseif (!($siteInfo->verifyReferer())) {
+      $infoMsg->addMessage(0,'You cannot enter data using another website.');
+      return false;
+    } else {
+      return $value;
+    }
+  }
+
+
+}
