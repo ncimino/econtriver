@@ -12,7 +12,8 @@ date int NOT NULL,
 description varchar(255),
 credit decimal(38,2),
 debit decimal(38,2),
-attachment mediumblob
+attachment mediumblob,
+active int(1) NOT NULL
 )";
 
   $db_obj->query($sql);

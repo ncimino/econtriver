@@ -22,6 +22,10 @@ h1, h2, h3, h4, h5, h6 {
     color: gray;
 }
 
+h2, h4, h6 {
+    text-decoration: underline;
+}
+
 div.banner_ie_limiter {
     width: 1000px;
     height: 0px;
@@ -42,18 +46,6 @@ div.banner_site_name {
 
 #sitename_anchor {
 	text-decoration: none;
-}
-
-div.banner_shadow {
-    position: absolute;
-    background-color: lightgray;
-    border: gray 1px solid;
-    padding: 2px;/*
-    width: 371px;
-    height: 80px;*/
-    top: 1px;
-    right: -3px;
-    z-index: -1;
 }
 
 div.info_messages {
@@ -92,4 +84,10 @@ img {
 
 .info {
     color: #008;
+}
+
+.quick_groups, .quick_accounts {
+	border: #DD0 1px solid;
+	padding: 8px;
+	margin: 8px;
 }
