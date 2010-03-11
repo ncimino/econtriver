@@ -7,7 +7,8 @@ try {
 (
 id int NOT NULL AUTO_INCREMENT, 
 CONSTRAINT q_acct_id PRIMARY KEY(id),
-name varchar(255) NOT NULL
+name varchar(255) NOT NULL,
+active int(1) NOT NULL
 )";
 
   $db_obj->query($sql);

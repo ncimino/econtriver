@@ -29,3 +29,13 @@ if (obj.value==initialvalue)
 	obj.value="";
 	}
 }
+
+//onclick='return confirmSubmit("Are you sure?")'
+function confirmSubmit(msg)
+{
+var agree=confirm(msg);
+if (agree)
+	return true ;
+else
+	return false ;
+}
