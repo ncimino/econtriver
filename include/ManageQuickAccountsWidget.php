@@ -131,7 +131,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
     $sql = "UPDATE q_acct SET active = 0 WHERE id = {$this->getDropAcctId()};";
     return $this->DB->query($sql);
   }
-  
+
   function updateAccount() {
     $accountNameEscaped = Normalize::mysql($this->getEditAcctName());
     $sql = "UPDATE q_acct SET name = '{$accountNameEscaped}' WHERE id = {$this->getEditAcctId()};";
@@ -165,16 +165,16 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
 
 
   function addOwnedAccountsTable($parentElement) {
-    $divOwnedAccounts = new HTMLDiv($parentElement,self::ownedAccDiv);
     if ($this->DB->num($this->ownedAccounts)>0) {
+      $divOwnedAccounts = new HTMLDiv($parentElement,self::ownedAccDiv);
       $this->accountFound = true;
       $this->addAccountsTable($divOwnedAccounts,'Owned Accounts:',$this->ownedAccounts,self::ownedAccTable);
     }
   }
 
   function addSharedAccountsTable($parentElement) {
-    $divSharedAccounts = new HTMLDiv($parentElement,self::sharedAccDiv);
     if ($this->DB->num($this->sharedAccounts)>0) {
+      $divSharedAccounts = new HTMLDiv($parentElement,self::sharedAccDiv);
       $this->accountFound = true;
       $this->addAccountsTable($divSharedAccounts,'Shared Accounts:',$this->sharedAccounts,self::sharedAccTable);
     }
