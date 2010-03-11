@@ -91,3 +91,16 @@ img {
 	padding: 8px;
 	margin: 8px;
 }
+
+.edit_name, .edit_group_name {
+	background-color: #FFE;
+	border: #DD0 1px solid;
+	padding: 4px;
+	margin: 4px;
+}
+
+table.groups, table.owned_accounts, table.shared_accounts {
+	border: #CCC 1px solid;
+	padding: 4px;
+	margin: 4px;
+}
