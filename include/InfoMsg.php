@@ -15,7 +15,9 @@ class InfoMsg {
   }
 
   public function commitDiv($parentElement) {
-    $this->DivInfoMsg = new HTMLDiv($parentElement,'info_messages');
+    $name = 'info_messages';
+    $this->DivInfoMsg = new HTMLDiv($parentElement,$name);
+    $this->DivInfoMsg->setAttribute('onclick',"new Effect.BlindUp('{$this->DivInfoMsg->getId()}')");
   }
 
   public function commitMessages() {

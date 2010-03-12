@@ -9,6 +9,8 @@ class Head {
     new HTMLDescription($this->HTMLHead,$siteInfo->getDescription());
     new HTMLStylesheet($this->HTMLHead,$siteInfo->getCss());
     new HTMLScript($this->HTMLHead,'',$siteInfo->getJs());
+    new HTMLScript($this->HTMLHead,'',$siteInfo->getPrototype());
+    new HTMLScript($this->HTMLHead,'',$siteInfo->getScriptaculous());
   }
 }
 ?>
