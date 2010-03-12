@@ -8,18 +8,19 @@ class MainPage {
     
     $aManageAccounts = new HTMLAnchor($divMenu,'#','Manage Accounts');
     $ManageQuickAccountsWidget = new ManageQuickAccountsWidget($parentElement,$DB,$siteInfo,$infoMsg,$user);
-    $aManageAccounts->setAttribute('onclick',"Effect.toggle('{$ManageQuickAccountsWidget->getContainerId()}','blind'); return false;");
-    
+    //*
     new HTMLText($divMenu,' | ');
-    
     $aManageGroups = new HTMLAnchor($divMenu,'#','Manage Groups');
     $ManageQuickGroupsWidget = new ManageQuickGroupsWidget($parentElement,$DB,$siteInfo,$infoMsg,$user);
-    $aManageGroups->setAttribute('onclick',"Effect.toggle('{$ManageQuickGroupsWidget->getContainerId()}','blind'); return false;");
-    
-    new HTMLText($divMenu,' | ');
-    
-    $ManageQuickSharesWidget = new ManageQuickSharesWidget($parentElement,$DB,$siteInfo,$infoMsg,$user);
 
+    $aManageGroups->setAttribute('onclick',"Effect.toggle('{$ManageQuickGroupsWidget->getContainerId()}','blind');Effect.BlindUp('{$ManageQuickAccountsWidget->getContainerId()}'); return false;");
+    $aManageAccounts->setAttribute('onclick',"Effect.toggle('{$ManageQuickAccountsWidget->getContainerId()}','blind');Effect.BlindUp('{$ManageQuickGroupsWidget->getContainerId()}'); return false;");
+    /*
+    new HTMLText($divMenu,' | ');
+    $aManageShares = new HTMLAnchor($divMenu,'#','Account Sharing');
+    $ManageQuickSharesWidget = new ManageQuickSharesWidget($parentElement,$DB,$siteInfo,$infoMsg,$user);
+    $aManageShares->setAttribute('onclick',"Effect.toggle('{$ManageQuickSharesWidget->getContainerId()}','blind'); return false;");
+    //*/
     $this->focusId = $ManageQuickAccountsWidget->getFocusId();
     if(empty($this->focusId)) { $this->focusId = $ManageQuickGroupsWidget->getFocusId(); }
     if(empty($this->focusId)) { $this->focusId = $ManageQuickSharesWidget->getFocusId(); }

@@ -24,10 +24,8 @@ function enterSubmit(thisfield,thisevent)
 //onfocus='clearField(this,"Some Value")'
 function clearField(obj,initialvalue)
 {
-if (obj.value==initialvalue)
-	{
-	obj.value="";
-	}
+if (initialvalue=='') obj.value="";
+else if (obj.value==initialvalue) obj.value="";
 }
 
 //onclick='return confirmSubmit("Are you sure?")'
@@ -38,4 +36,14 @@ if (agree)
 	return true ;
 else
 	return false ;
+}
+
+//<body onload='timedHide(3500,'info_messages_div')'>
+function timedHide(time,id)
+{
+	setTimeout("new Effect.BlindUp("+id+")",time);
+}
+function hide(id)
+{
+	new Effect.BlindUp(id);
 }

@@ -1,20 +1,14 @@
 <?php
-class ManageQuickAccountsWidget {
-  private $focusId = '';
-  private $infoMsg;
-  private $parentElement;
-  private $DB;
-  private $siteInfo;
-  private $user;
+class ManageQuickAccountsWidget extends Widget {
   private $ownedAccounts; // MySQL result
   private $sharedAccounts; // MySQL result
 
-  private $createAcctName = '';
+  private $displayStatus = 'none';
+  private $createAcctName = false;
   private $dropAcctId = false;
   private $editAcctId = false;
   private $editAcctName = false;
   private $accountFound = false;
-  private $containerId = false;
 
   const createAccDiv = 'create_account';
   const createAccForm = 'create_account';
@@ -46,24 +40,31 @@ class ManageQuickAccountsWidget {
   const ownedAccTable = 'owned_accounts';
 
   function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
-    $this->infoMsg = $infoMsg;
-    $this->parentElement = $parentElement;
-    $this->DB = $DB;
-    $this->siteInfo = $siteInfo;
-    $this->user = $user;
+    parent::__construct($parentElement,$DB,$siteInfo,$infoMsg,$user);
     $this->setFromPost();
     if ($this->checkAccountName($this->getCreateAcctName())) {
-      $this->insertAccount();
-      $this->insertOwner();
+      if ($this->insertAccount() and $this->insertOwner()) {
+        $this->infoMsg->addMessage(2,'Account was successfully created.');
+        $this->setCreateAcctName('');
+        $this->displayStatus = 'block';
+      }
+    } elseif ($this->getCreateAcctName()) {
+      $this->displayStatus = 'block';
+      $this->setFocusId(self::createAccTextId);
     }
     if ($this->getEditAcctId() and $this->getEditAcctName() and $this->checkAccountName($this->getEditAcctName())) {
       if ($this->updateAccount()) {
-        $this->infoMsg->addMessage(2,'Account was successsfully updated.');
+        $this->infoMsg->addMessage(2,'Account was successfully updated.');
+        $this->displayStatus = 'block';
       }
+    } elseif ($this->getEditAcctId() or $this->getEditAcctName()) {
+      $this->displayStatus = 'block';
+      $this->setFocusId(self::editAccNameTextId);
     }
     if ($this->getDropAcctId()) {
       if ($this->dropAccount()) {
-        $this->infoMsg->addMessage(2,'Account was successsfully deleted.');
+        $this->infoMsg->addMessage(2,'Account was successfully deleted.');
+        $this->displayStatus = 'block';
       }
     }
     $this->getOwnedAccounts();
@@ -74,6 +75,7 @@ class ManageQuickAccountsWidget {
   function buildWidget() {
     $divQuickAccounts = new HTMLDiv($this->parentElement,'quick_accounts');
     $this->setContainerId($divQuickAccounts->getId());
+
     new HTMLHeading($divQuickAccounts,4,'Account Management');
     if ($this->getEditAcctId()) {
       $this->addEditAccountForm($divQuickAccounts);
@@ -83,22 +85,21 @@ class ManageQuickAccountsWidget {
     $this->addSharedAccountsTable($divQuickAccounts);
     if (!($this->accountFound)) {
       $this->infoMsg->addMessage(3,'You don\'t belong to any accounts.  Add an account to get started.');
-      $this->focusId = self::createAccTextId;
+      $this->displayStatus = 'block';
+      $this->setFocusId(self::createAccTextId);
     }
+    $divQuickAccounts->setAttribute('style','display:'.$this->displayStatus);
   }
 
-  function getFocusId() { return $this->focusId; }
   function getCreateAcctName() { return $this->createAcctName; }
   function getDropAcctId() { return $this->dropAcctId; }
   function getEditAcctId() { return $this->editAcctId; }
   function getEditAcctName() { return $this->editAcctName; }
-  function getContainerId() { return $this->containerId; }
 
   function setCreateAcctName($name) { $this->createAcctName = $name; }
   function setDropAcctId($id) { $this->dropAcctId = $id; }
   function setEditAcctId($id) { $this->editAcctId = $id; }
   function setEditAcctName($id) { $this->editAcctName = $id; }
-  function setContainerId($id) { $this->containerId = $id; }
 
   function setFromPost() {
     if(isset($_POST[self::editAccHidden])) { $this->setEditAcctId($_POST[self::editAccHidden]); }
