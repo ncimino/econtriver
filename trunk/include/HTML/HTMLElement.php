@@ -31,5 +31,6 @@ abstract class HTMLElement {
     }
   }
   function getAttribute($name) { return $this->HTMLElement->getAttribute( $name ); }
+  function getId() { return $this->HTMLElement->getAttribute( 'id' ); }
 }
 ?>

@@ -57,13 +57,19 @@ class SiteInfo {
   function getJsFile() { return $this->getINIValue('siteinfo.jsfile'); }
   function getJs() { return $this->getSiteHTTP().$this->getJsDir().$this->getJsFile(); }
 
+  function getScriptaculousDir() { return $this->getINIValue('siteinfo.scriptaculousdir'); }
+  function getPrototypeFile() { return $this->getINIValue('siteinfo.prototypefile'); }
+  function getScriptaculousFile() { return $this->getINIValue('siteinfo.scriptaculousfile'); }
+  function getPrototype() { return $this->getSiteHTTP().$this->getJsDir().$this->getScriptaculousDir().$this->getPrototypeFile(); }
+  function getScriptaculous() { return $this->getSiteHTTP().$this->getJsDir().$this->getScriptaculousDir().$this->getScriptaculousFile(); }
+
   function getDomain() { return $_SERVER['HTTP_HOST']; }
   function getSiteHTTP() { return "http://".$this->getDomain().$this->getServerDir(); }
   function getServerRootDir() { return $_SERVER['DOCUMENT_ROOT']; }
   function getServerDir() { return $this->getINIValue('siteinfo.rootdir'); }
   function getSelf() { return $_SERVER['PHP_SELF']; }
   function getSelfFileName() { return basename($_SERVER['PHP_SELF']); }
-  
+
   function verifyReferer() { return preg_match('/^'.Normalize::encodeFs($this->getSiteHTTP()).'/',$_SERVER['HTTP_REFERER']); }
 
   public function __toString() {

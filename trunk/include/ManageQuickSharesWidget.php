@@ -1,5 +1,5 @@
 <?php
-class ManageQuickGroupsWidget {
+class ManageQuickSharesWidget {
   private $focusId = '';
   private $infoMsg;
   private $parentElement;
@@ -12,7 +12,6 @@ class ManageQuickGroupsWidget {
   private $dropGrpId = false;
   private $editGrpId = false;
   private $editGrpName = false;
-  private $containerId = false;
 
   const createGrpDiv = 'create_group';
   const createGrpForm = 'create_group';
@@ -69,7 +68,6 @@ class ManageQuickGroupsWidget {
 
   function buildWidget() {
     $divQuickGroups = new HTMLDiv($this->parentElement,'quick_groups');
-    $this->setContainerId($divQuickGroups->getId());
     new HTMLHeading($divQuickGroups,4,'Group Management');
     if ($this->getEditGrpId()) {
       $this->addEditGroupForm($divQuickGroups);
@@ -83,13 +81,11 @@ class ManageQuickGroupsWidget {
   function getDropGrpId() { return $this->dropGrpId; }
   function getEditGrpId() { return $this->editGrpId; }
   function getEditGrpName() { return $this->editGrpName; }
-  function getContainerId() { return $this->containerId; }
 
   function setCreateGrpName($name) { $this->createGrpName = $name; }
   function setDropGrpId($id) { $this->dropGrpId = $id; }
   function setEditGrpId($id) { $this->editGrpId = $id; }
   function setEditGrpName($id) { $this->editGrpName = $id; }
-  function setContainerId($id) { $this->containerId = $id; }
 
   function setFromPost() {
     if(isset($_POST[self::editGrpHidden])) { $this->setEditGrpId($_POST[self::editGrpHidden]); }

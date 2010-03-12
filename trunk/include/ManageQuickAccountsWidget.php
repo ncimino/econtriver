@@ -14,6 +14,7 @@ class ManageQuickAccountsWidget {
   private $editAcctId = false;
   private $editAcctName = false;
   private $accountFound = false;
+  private $containerId = false;
 
   const createAccDiv = 'create_account';
   const createAccForm = 'create_account';
@@ -72,6 +73,7 @@ class ManageQuickAccountsWidget {
 
   function buildWidget() {
     $divQuickAccounts = new HTMLDiv($this->parentElement,'quick_accounts');
+    $this->setContainerId($divQuickAccounts->getId());
     new HTMLHeading($divQuickAccounts,4,'Account Management');
     if ($this->getEditAcctId()) {
       $this->addEditAccountForm($divQuickAccounts);
@@ -80,7 +82,7 @@ class ManageQuickAccountsWidget {
     $this->addOwnedAccountsTable($divQuickAccounts);
     $this->addSharedAccountsTable($divQuickAccounts);
     if (!($this->accountFound)) {
-      $this->infoMsg->addMessage(2,'You don\'t belong to any accounts.  Add an account to get started.');
+      $this->infoMsg->addMessage(3,'You don\'t belong to any accounts.  Add an account to get started.');
       $this->focusId = self::createAccTextId;
     }
   }
@@ -90,11 +92,13 @@ class ManageQuickAccountsWidget {
   function getDropAcctId() { return $this->dropAcctId; }
   function getEditAcctId() { return $this->editAcctId; }
   function getEditAcctName() { return $this->editAcctName; }
+  function getContainerId() { return $this->containerId; }
 
   function setCreateAcctName($name) { $this->createAcctName = $name; }
   function setDropAcctId($id) { $this->dropAcctId = $id; }
   function setEditAcctId($id) { $this->editAcctId = $id; }
   function setEditAcctName($id) { $this->editAcctName = $id; }
+  function setContainerId($id) { $this->containerId = $id; }
 
   function setFromPost() {
     if(isset($_POST[self::editAccHidden])) { $this->setEditAcctId($_POST[self::editAccHidden]); }
