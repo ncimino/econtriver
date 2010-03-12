@@ -16,6 +16,7 @@ class Body {
     new Logo($divBanner,$siteInfo);
 
     $infoMsg->commitDiv($divPage);
+    $infoMsg->setBody($this->HTMLBody);
     
     $this->divMid = new HTMLDiv($divPage,'mid');
     $this->title = new HTMLHeading($this->divMid,3,$title);

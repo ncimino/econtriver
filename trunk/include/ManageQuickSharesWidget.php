@@ -1,11 +1,5 @@
 <?php
-class ManageQuickSharesWidget {
-  private $focusId = '';
-  private $infoMsg;
-  private $parentElement;
-  private $DB;
-  private $siteInfo;
-  private $user;
+class ManageQuickSharesWidget extends Widget {
   private $groups; // MySQL result
 
   private $createGrpName = '';
@@ -40,26 +34,22 @@ class ManageQuickSharesWidget {
   const grpTable = 'groups';
 
   function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
-    $this->infoMsg = $infoMsg;
-    $this->parentElement = $parentElement;
-    $this->DB = $DB;
-    $this->siteInfo = $siteInfo;
-    $this->user = $user;
+    parent::__construct($parentElement,$DB,$siteInfo,$infoMsg,$user);
     $this->setFromPost();
     if ($this->checkGroupName($this->getCreateGrpName())) {
       $this->insertGroup();
       $this->insertGroupUser();
     } else {
-      $this->focusId = self::createGrpTextId;
+      $this->setFocusId(self::createGrpTextId);
     }
     if ($this->getEditGrpId() and $this->getEditGrpName() and $this->checkGroupName($this->getEditGrpName())) {
       if ($this->updateGroup()) {
-        $this->infoMsg->addMessage(2,'Group was successsfully updated.');
+        $this->infoMsg->addMessage(2,'Group was successfully updated.');
       }
     }
     if ($this->getDropGrpId()) {
       if ($this->dropGroup()) {
-        $this->infoMsg->addMessage(2,'Group was successsfully deleted.');
+        $this->infoMsg->addMessage(2,'Group was successfully deleted.');
       }
     }
     $this->getGroups();
@@ -68,6 +58,7 @@ class ManageQuickSharesWidget {
 
   function buildWidget() {
     $divQuickGroups = new HTMLDiv($this->parentElement,'quick_groups');
+    $this->setContainerId($divQuickGroups->getId());
     new HTMLHeading($divQuickGroups,4,'Group Management');
     if ($this->getEditGrpId()) {
       $this->addEditGroupForm($divQuickGroups);
@@ -76,7 +67,6 @@ class ManageQuickSharesWidget {
     $this->addGroupsTable($divQuickGroups);
   }
 
-  function getFocusId() { return $this->focusId; }
   function getCreateGrpName() { return $this->createGrpName; }
   function getDropGrpId() { return $this->dropGrpId; }
   function getEditGrpId() { return $this->editGrpId; }
@@ -133,7 +123,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
 
   function getGroupNameById($id) {
     $sql = "SELECT name FROM q_group
-    		WHERE id = {$id};";
+        WHERE id = {$id};";
     $this->DB->query($sql);
     $return = $this->DB->fetch();
     return $return['name'];
@@ -141,8 +131,8 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
 
   function getGroups() {
     $sql = "SELECT * FROM q_group,q_user_groups
-    		WHERE q_group.id = group_id 
-    		  AND user_id = {$this->user->getUserId()};";
+        WHERE q_group.id = group_id 
+          AND user_id = {$this->user->getUserId()};";
     $this->groups = $this->DB->query($sql);
   }
 
@@ -165,7 +155,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
         $inputDelete->setAttribute('onclick','return confirmSubmit("Are you sure you want to delete the \''.$group['name'].'\' group?")');
       }
     } else {
-      $this->infoMsg->addMessage(2,'You don\'t belong to any groups.  Add a group to get started with shared accounts.');
+      //$this->infoMsg->addMessage(3,'You don\'t belong to any groups.  Add a group to get started with shared accounts.');
     }
   }
 
@@ -178,7 +168,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
     $groupName = (empty($editGroupName)) ? $this->getGroupNameById($this->getEditGrpId()) : $this->getEditGrpName();
     new HTMLInputText($formEditGroup,self::editGrpNameText,$groupName);
     new HTMLInputSubmit($formEditGroup,self::editGrpNameButton,'Edit Group');
-    $this->focusId = self::editGrpNameTextId;
+    $this->setFocusId(self::editGrpNameTextId);
   }
 
   function addCreateGroupForm($parentElement) {

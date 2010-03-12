@@ -1,7 +1,8 @@
 <?php
 class InfoMsg {
   private $messages = array();
-  public $DivInfoMsg;
+  private $body;
+  public $divInfoMsg;
 
   public function __construct() {
   }
@@ -16,31 +17,34 @@ class InfoMsg {
 
   public function commitDiv($parentElement) {
     $name = 'info_messages';
-    $this->DivInfoMsg = new HTMLDiv($parentElement,$name);
-    $this->DivInfoMsg->setAttribute('onclick',"new Effect.BlindUp('{$this->DivInfoMsg->getId()}')");
+    $this->divInfoMsg = new HTMLDiv($parentElement,$name);
+    $this->divInfoMsg->setAttribute('onclick',"new Effect.BlindUp('{$this->divInfoMsg->getId()}')");
   }
 
   public function commitMessages() {
     if (count($this->messages) > 0 ) {
       foreach ($this->messages as $index=>$value) {
-        if ($index != 0) { new HTMLBr($this->DivInfoMsg); }
+        if ($index != 0) { new HTMLBr($this->divInfoMsg); }
         if ($value['level']==-1) {
-          new HTMLText($this->DivInfoMsg,"This should not have occurred. Please report this problem: ");
-          new HTMLAnchor($this->DivInfoMsg,'bugs.php','Report Bug');
-          new HTMLBr($this->DivInfoMsg);
-          new HTMLSpan($this->DivInfoMsg,'Fatal Error: ','error');
+          new HTMLText($this->divInfoMsg,"This should not have occurred. Please report this problem: ");
+          new HTMLAnchor($this->divInfoMsg,'bugs.php','Report Bug');
+          new HTMLBr($this->divInfoMsg);
+          new HTMLSpan($this->divInfoMsg,'Fatal Error: ','error');
         } elseif ($value['level']==0) {
-          new HTMLSpan($this->DivInfoMsg,'Error: ','error');
+          new HTMLSpan($this->divInfoMsg,'Error: ','error');
         } elseif ($value['level']==1) {
-          new HTMLSpan($this->DivInfoMsg,'Warning: ','warning');
+          new HTMLSpan($this->divInfoMsg,'Warning: ','warning');
         } elseif ($value['level']==2) {
-          new HTMLSpan($this->DivInfoMsg,'Info: ','info');
+          new HTMLSpan($this->divInfoMsg,'Info: ','info');
         }
-        new HTMLText($this->DivInfoMsg,$value['message']." ");
-        if(!empty($value['link_text'])) { new HTMLAnchor($this->DivInfoMsg,$value['link'],$value['link_text']); }
+        new HTMLText($this->divInfoMsg,$value['message']." ");
+        if(!empty($value['link_text'])) { new HTMLAnchor($this->divInfoMsg,$value['link'],$value['link_text']); }
+        $this->body->setAttribute('onload',"timedHide(10000,'{$this->divInfoMsg->getId()}')");
       }
     } else {
-      $this->DivInfoMsg->remove();
+      $this->divInfoMsg->remove();
     }
   }
+  
+  public function setBody($body) { $this->body = $body; }
 }
