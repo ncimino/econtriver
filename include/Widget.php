@@ -18,7 +18,7 @@ class Widget {
 
   function getFocusId() { return $this->focusId; }
   function getContainerId() { return $this->containerId; }
-  
+
   function setFocusId($id) { $this->focusId = $id; }
   function setContainerId($id) { $this->containerId = $id; }
 }

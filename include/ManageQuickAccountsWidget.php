@@ -11,7 +11,7 @@ class ManageQuickAccountsWidget extends Widget {
   private $accountFound = false;
 
   const createAccDiv = 'create_account';
-  const createAccForm = 'create_account';
+  const createAccForm = self::createAccDiv;
   const createAccText = 'account_name';
   const createAccTextId = 'account_name_input';
   const createAccButton = 'account_button';
@@ -42,31 +42,9 @@ class ManageQuickAccountsWidget extends Widget {
   function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
     parent::__construct($parentElement,$DB,$siteInfo,$infoMsg,$user);
     $this->setFromPost();
-    if ($this->checkAccountName($this->getCreateAcctName())) {
-      if ($this->insertAccount() and $this->insertOwner()) {
-        $this->infoMsg->addMessage(2,'Account was successfully created.');
-        $this->setCreateAcctName('');
-        $this->displayStatus = 'block';
-      }
-    } elseif ($this->getCreateAcctName()) {
-      $this->displayStatus = 'block';
-      $this->setFocusId(self::createAccTextId);
-    }
-    if ($this->getEditAcctId() and $this->getEditAcctName() and $this->checkAccountName($this->getEditAcctName())) {
-      if ($this->updateAccount()) {
-        $this->infoMsg->addMessage(2,'Account was successfully updated.');
-        $this->displayStatus = 'block';
-      }
-    } elseif ($this->getEditAcctId() or $this->getEditAcctName()) {
-      $this->displayStatus = 'block';
-      $this->setFocusId(self::editAccNameTextId);
-    }
-    if ($this->getDropAcctId()) {
-      if ($this->dropAccount()) {
-        $this->infoMsg->addMessage(2,'Account was successfully deleted.');
-        $this->displayStatus = 'block';
-      }
-    }
+    $this->addEntries();
+    $this->updateEntries();
+    $this->deleteEntries();
     $this->getOwnedAccounts();
     $this->getSharedAccounts();
     $this->buildWidget();
@@ -107,6 +85,40 @@ class ManageQuickAccountsWidget extends Widget {
     if(isset($_POST[self::createAccText])) { $this->setCreateAcctName($_POST[self::createAccText]); }
     if(isset($_POST[self::editAccNameText])) { $this->setEditAcctName($_POST[self::editAccNameText]); }
     if(isset($_POST[self::dropAccHidden])) { $this->setDropAcctId($_POST[self::dropAccHidden]); }
+  }
+
+  function addEntries() {
+    if ($this->checkAccountName($this->getCreateAcctName())) {
+      if ($this->insertAccount() and $this->insertOwner()) {
+        $this->infoMsg->addMessage(2,'Account was successfully created.');
+        $this->setCreateAcctName('');
+        $this->displayStatus = 'block';
+      }
+    } elseif ($this->getCreateAcctName()) {
+      $this->displayStatus = 'block';
+      $this->setFocusId(self::createAccTextId);
+    }
+  }
+
+  function updateEntries() {
+    if ($this->getEditAcctId() and $this->getEditAcctName() and $this->checkAccountName($this->getEditAcctName())) {
+      if ($this->updateAccount()) {
+        $this->infoMsg->addMessage(2,'Account was successfully updated.');
+        $this->displayStatus = 'block';
+      }
+    } elseif ($this->getEditAcctId() or $this->getEditAcctName()) {
+      $this->displayStatus = 'block';
+      $this->setFocusId(self::editAccNameTextId);
+    }
+  }
+
+  function deleteEntries() {
+    if ($this->getDropAcctId()) {
+      if ($this->dropAccount()) {
+        $this->infoMsg->addMessage(2,'Account was successfully deleted.');
+        $this->displayStatus = 'block';
+      }
+    }
   }
 
   function checkAccountName($name) {
