@@ -1,43 +1,23 @@
 <?php
 class ManageQuickAccountsWidget extends Widget {
+  // Stores Get Data
   private $ownedAccounts; // MySQL result
   private $sharedAccounts; // MySQL result
 
-  private $displayStatus = 'none';
   private $createAcctName = false;
   private $dropAcctId = false;
   private $editAcctId = false;
   private $editAcctName = false;
+
+  private $displayStatus = 'none';
   private $accountFound = false;
 
-  const createAccDiv = 'create_account';
-  const createAccForm = self::createAccDiv;
-  const createAccText = 'account_name';
-  const createAccTextId = 'account_name_input';
-  const createAccButton = 'account_button';
-
-  const editAccNameDiv = 'edit_name';
-  const editAccNameForm = 'edit_name';
-  const editAccNameHidden = 'edit_account_id';
-  const editAccNameText = 'new_account_name';
-  const editAccNameTextId = 'new_account_name_input';
-  const editAccNameButton = 'edit_button';
-
-  const editAccForm = 'edit_account';
-  const editAccHidden = 'edit_account';
-  const editAccHiddenId = 'edit_account_input';
-  const editAccButton = 'edit_account_submit';
-
-  const dropAccForm = 'drop_account';
-  const dropAccHidden = 'drop_account';
-  const dropAccHiddenId = 'drop_account_input';
-  const dropAccButton = 'drop_account_submit';
-
-  const sharedAccDiv = 'shared_accounts';
-  const sharedAccTable = 'shared_accounts';
-
-  const ownedAccDiv = 'owned_accounts';
-  const ownedAccTable = 'owned_accounts';
+  const createAcct = 'create_acct';
+  const editAcctName = 'edit_acct_name';
+  const editAcct = 'edit_acct';
+  const dropAcct = 'drop_acct';
+  const sharedAcct = 'shared_accounts';
+  const ownedAcct = 'owned_accounts';
 
   function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
     parent::__construct($parentElement,$DB,$siteInfo,$infoMsg,$user);
@@ -45,8 +25,7 @@ class ManageQuickAccountsWidget extends Widget {
     $this->addEntries();
     $this->updateEntries();
     $this->deleteEntries();
-    $this->getOwnedAccounts();
-    $this->getSharedAccounts();
+    $this->getEntries();
     $this->buildWidget();
   }
 
@@ -119,6 +98,11 @@ class ManageQuickAccountsWidget extends Widget {
         $this->displayStatus = 'block';
       }
     }
+  }
+
+  function getEntries() {
+    $this->getOwnedAccounts();
+    $this->getSharedAccounts();
   }
 
   function checkAccountName($name) {
