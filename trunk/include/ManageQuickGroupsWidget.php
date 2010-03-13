@@ -36,23 +36,9 @@ class ManageQuickGroupsWidget extends Widget {
   function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
     parent::__construct($parentElement,$DB,$siteInfo,$infoMsg,$user);
     $this->setFromPost();
-    if ($this->checkGroupName($this->getCreateGrpName())) {
-      $this->insertGroup();
-      $this->insertGroupUser();
-      $this->infoMsg->addMessage(2,'Group was successfully created.');
-    } else {
-      $this->setFocusId(self::createGrpTextId);
-    }
-    if ($this->getEditGrpId() and $this->getEditGrpName() and $this->checkGroupName($this->getEditGrpName())) {
-      if ($this->updateGroup()) {
-        $this->infoMsg->addMessage(2,'Group was successfully updated.');
-      }
-    }
-    if ($this->getDropGrpId()) {
-      if ($this->dropGroup()) {
-        $this->infoMsg->addMessage(2,'Group was successfully deleted.');
-      }
-    }
+    $this->addGroups();
+    $this->updateGroups();
+    $this->deleteGroups();
     $this->getGroups();
     $this->buildWidget();
   }
@@ -85,6 +71,32 @@ class ManageQuickGroupsWidget extends Widget {
     if(isset($_POST[self::createGrpText])) { $this->setCreateGrpName($_POST[self::createGrpText]); }
     if(isset($_POST[self::editGrpNameText])) { $this->setEditGrpName($_POST[self::editGrpNameText]); }
     if(isset($_POST[self::dropGrpHidden])) { $this->setDropGrpId($_POST[self::dropGrpHidden]); }
+  }
+
+  function addGroups() {
+    if ($this->checkGroupName($this->getCreateGrpName())) {
+      $this->insertGroup();
+      $this->insertGroupUser();
+      $this->infoMsg->addMessage(2,'Group was successfully created.');
+    } else {
+      $this->setFocusId(self::createGrpTextId);
+    }
+  }
+
+  function updateGroups() {
+    if ($this->getEditGrpId() and $this->getEditGrpName() and $this->checkGroupName($this->getEditGrpName())) {
+      if ($this->updateGroup()) {
+        $this->infoMsg->addMessage(2,'Group was successfully updated.');
+      }
+    }
+  }
+
+  function deleteGroups() {
+    if ($this->getDropGrpId()) {
+      if ($this->dropGroup()) {
+        $this->infoMsg->addMessage(2,'Group was successfully deleted.');
+      }
+    }
   }
 
   function checkGroupName($name) {

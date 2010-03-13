@@ -18,7 +18,6 @@ class UserInputs {
 
   function inputPassword ($inputParentElement,$labelParentElement,$label='Password:',$inputName=NULL,$value=NULL) {
     if (empty($inputName)) { $inputName = $this->user->getPasswordName(); }
-    //if (empty($value)) { $value = $this->user->getPassword(); }
     $inputPassword = new HTMLInputPassword($inputParentElement,$inputName,$value);
     $this->user->setPasswordId($inputPassword->getAttribute('id'));
     new HTMLLabel($labelParentElement,$label,$inputPassword->getAttribute('id'));
@@ -26,7 +25,6 @@ class UserInputs {
 
   function inputVerPassword ($inputParentElement,$labelParentElement,$label='Verify Password:',$inputName=NULL,$value=NULL) {
     if (empty($inputName)) { $inputName = $this->user->getVerPasswordName(); }
-    //if (empty($value)) { $value = $this->user->getVerPassword(); }
     $inputVerPassword = new HTMLInputPassword($inputParentElement,$inputName,$value);
     $this->user->setVerPasswordId($inputVerPassword->getAttribute('id'));
     new HTMLLabel($labelParentElement,$label,$inputVerPassword->getAttribute('id'));
@@ -67,7 +65,7 @@ class UserInputs {
     foreach( $timezone_identifiers as $entry ){
       if ( preg_match( '/^(America|Antartica|Arctic|Asia|Atlantic|Europe|Indian|Pacific)\//', $entry ) ){
         $ex=explode("/",$entry);
-        if ($continent!=$ex[0]){
+        if (!isset($continent) or $continent!=$ex[0]){
           $optgroup = new HTMLOptGroup($selectTimezone,$ex[0]);
         }
         $continent=$ex[0];

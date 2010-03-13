@@ -41,7 +41,7 @@ class User {
   }
 
   public function getUserByHandle($reportMsg=true,$handle=NULL) {
-    if(empty($handle)) { $handle = $this->currentUser['handle']; }
+    if(empty($handle) and isset($this->currentUser['handle'])) { $handle = $this->currentUser['handle']; }
     $this->DB->query("SELECT * FROM user WHERE handle='".mysql_real_escape_string($handle)."';");
     $fetch = $this->DB->fetch();
     if ($reportMsg and $fetch) {
@@ -56,7 +56,7 @@ class User {
   }
 
   public function getUserByEmail($reportMsg=true,$email=NULL) {
-    if(empty($email)) { $email = $this->currentUser['email']; }
+    if(empty($email) and isset($this->currentUser['email'])) { $email = $this->currentUser['email']; }
     $this->DB->query("SELECT * FROM user WHERE email='".mysql_real_escape_string(strtolower($email))."';");
     $fetch = $this->DB->fetch();
     if ($reportMsg and $fetch) {
@@ -184,13 +184,13 @@ class User {
   }
 
   public function setFromPost() {
-    if (!empty($this->currentUserNames['email'])) { $this->setEmail($_POST[$this->currentUserNames['email']]); }
-    if (!empty($this->currentUserNames['handle'])) { $this->setHandle($_POST[$this->currentUserNames['handle']]); }
-    if (!empty($this->currentUserNames['password'])) { $this->setPassword($_POST[$this->currentUserNames['password']]); }
-    if (!empty($this->currentUserNames['ver_password'])) { $this->setVerPassword($_POST[$this->currentUserNames['ver_password']]); }
-    if (!empty($this->currentUserNames['timezone'])) { $this->setTimezone($_POST[$this->currentUserNames['timezone']]); }
-    if (!empty($this->currentUserNames['date_format'])) { $this->setDateFormat($_POST[$this->currentUserNames['date_format']]); }
-    if (!empty($this->currentUserNames['ver_password'])) { $this->setActive(1); } // only set if $verPasswordName is, means user is registering
+    if (!empty($this->currentUserNames['email']) and isset($_POST[$this->currentUserNames['email']])) { $this->setEmail($_POST[$this->currentUserNames['email']]); }
+    if (!empty($this->currentUserNames['handle']) and isset($_POST[$this->currentUserNames['handle']])) { $this->setHandle($_POST[$this->currentUserNames['handle']]); }
+    if (!empty($this->currentUserNames['password']) and isset($_POST[$this->currentUserNames['password']])) { $this->setPassword($_POST[$this->currentUserNames['password']]); }
+    if (!empty($this->currentUserNames['ver_password']) and isset($_POST[$this->currentUserNames['ver_password']])) { $this->setVerPassword($_POST[$this->currentUserNames['ver_password']]); }
+    if (!empty($this->currentUserNames['timezone']) and isset($_POST[$this->currentUserNames['timezone']])) { $this->setTimezone($_POST[$this->currentUserNames['timezone']]); }
+    if (!empty($this->currentUserNames['date_format']) and isset($_POST[$this->currentUserNames['date_format']])) { $this->setDateFormat($_POST[$this->currentUserNames['date_format']]); }
+    if (!empty($this->currentUserNames['ver_password']) and isset($_POST[$this->currentUserNames['ver_password']])) { $this->setActive(1); } // only set if $verPasswordName is, means user is registering
     return isset($_POST[$this->currentUserNames['email']]) or isset($_POST[$this->currentUserNames['password']]);
   }
 
@@ -199,7 +199,7 @@ class User {
     $userByHandle = $this->getUserByHandle(false);
     $userById = $this->getUserById($this->cookies->getUserId());
 
-    if ($_GET['logout']==1) {
+    if (isset($_GET['logout']) and $_GET['logout']==1) {
       $this->cookies->destroyPassword();
       return false;
     } elseif ($userByEmail and $userByEmail['password']==$this->getPassword()) {
