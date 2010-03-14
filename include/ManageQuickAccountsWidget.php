@@ -12,13 +12,46 @@ class ManageQuickAccountsWidget extends Widget {
   private $displayStatus = 'none';
   private $accountFound = false;
 
+<<<<<<< .mine
+  const main = 'quick_accts';
+=======
   const createAcct = 'create_acct';
   const editAcctName = 'edit_acct_name';
   const editAcct = 'edit_acct';
   const dropAcct = 'drop_acct';
   const sharedAcct = 'shared_accounts';
   const ownedAcct = 'owned_accounts';
+>>>>>>> .r35
 
+<<<<<<< .mine
+  const createAcct = 'add_acct';
+  function getCreateAcctClass() { return self::createAcct; }
+  function getCreateAcctInName() { return self::getCreateAcctClass().'_name'; }
+  function getCreateAcctInId() { return self::getCreateAcctClass().'_text'; }
+
+  const editAccName = 'edit_name';
+  function getEditAcctNameClass() { return self::editAccName; }
+  function getEditAcctNameInName() { return self::getEditAcctNameClass().'_name'; }
+  function getEditAcctNameInId() { return self::getEditAcctNameClass().'_text'; }
+  function getEditAcctNameHiddenName() { return self::getEditAcctNameClass().'_hidden'; }
+
+  const editAcct = 'edit_account';
+  function getEditAcctClass() { return self::editAcct; }
+  function getEditAcctHiddenName() { return self::getEditAcctClass().'_hidden'; }
+
+  const dropAccForm = 'drop_account';
+  const dropAccHidden = 'drop_account';
+  const dropAccHiddenId = 'drop_account_input';
+  const dropAccButton = 'drop_account_submit';
+
+  const sharedAccDiv = 'shared_accts';
+  const sharedAccTable = 'shared_accts';
+
+  const ownedAccDiv = 'owned_accts';
+  const ownedAccTable = 'owned_accts';
+
+=======
+>>>>>>> .r35
   function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
     parent::__construct($parentElement,$DB,$siteInfo,$infoMsg,$user);
     $this->setFromPost();
@@ -30,20 +63,21 @@ class ManageQuickAccountsWidget extends Widget {
   }
 
   function buildWidget() {
-    $divQuickAccounts = new HTMLDiv($this->parentElement,'quick_accounts');
+    $divQuickAccounts = new HTMLDiv($this->parentElement,self::main);
     $this->setContainerId($divQuickAccounts->getId());
 
     new HTMLHeading($divQuickAccounts,4,'Account Management');
     if ($this->getEditAcctId()) {
-      $this->addEditAccountForm($divQuickAccounts);
+      $this->buildEditAccountForm($divQuickAccounts);
+    } else {
+      $this->buildCreateAccountForm($divQuickAccounts);
     }
-    $this->addCreateAccountForm($divQuickAccounts);
-    $this->addOwnedAccountsTable($divQuickAccounts);
-    $this->addSharedAccountsTable($divQuickAccounts);
+    $this->buildOwnedAccountsTable($divQuickAccounts);
+    $this->buildSharedAccountsTable($divQuickAccounts);
     if (!($this->accountFound)) {
       $this->infoMsg->addMessage(3,'You don\'t belong to any accounts.  Add an account to get started.');
       $this->displayStatus = 'block';
-      $this->setFocusId(self::createAccTextId);
+      $this->setFocusId($this->getCreateAcctInId());
     }
     $divQuickAccounts->setAttribute('style','display:'.$this->displayStatus);
   }
@@ -59,10 +93,10 @@ class ManageQuickAccountsWidget extends Widget {
   function setEditAcctName($id) { $this->editAcctName = $id; }
 
   function setFromPost() {
-    if(isset($_POST[self::editAccHidden])) { $this->setEditAcctId($_POST[self::editAccHidden]); }
-    elseif(isset($_POST[self::editAccNameHidden])) { $this->setEditAcctId($_POST[self::editAccNameHidden]); }
-    if(isset($_POST[self::createAccText])) { $this->setCreateAcctName($_POST[self::createAccText]); }
-    if(isset($_POST[self::editAccNameText])) { $this->setEditAcctName($_POST[self::editAccNameText]); }
+    if(isset($_POST[$this->getEditAcctHiddenName()])) { $this->setEditAcctId($_POST[$this->getEditAcctHiddenName()]); }
+    elseif(isset($_POST[$this->getEditAcctNameHiddenName()])) { $this->setEditAcctId($_POST[$this->getEditAcctNameHiddenName()]); }
+    if(isset($_POST[$this->getCreateAcctInName()])) { $this->setCreateAcctName($_POST[$this->getCreateAcctInName()]); }
+    if(isset($_POST[$this->getEditAcctNameInName()])) { $this->setEditAcctName($_POST[$this->getEditAcctNameInName()]); }
     if(isset($_POST[self::dropAccHidden])) { $this->setDropAcctId($_POST[self::dropAccHidden]); }
   }
 
@@ -75,7 +109,7 @@ class ManageQuickAccountsWidget extends Widget {
       }
     } elseif ($this->getCreateAcctName()) {
       $this->displayStatus = 'block';
-      $this->setFocusId(self::createAccTextId);
+      $this->setFocusId($this->getCreateAcctInId());
     }
   }
 
@@ -87,7 +121,7 @@ class ManageQuickAccountsWidget extends Widget {
       }
     } elseif ($this->getEditAcctId() or $this->getEditAcctName()) {
       $this->displayStatus = 'block';
-      $this->setFocusId(self::editAccNameTextId);
+      $this->setFocusId($this->getEditAcctNameInId());
     }
   }
 
@@ -165,32 +199,32 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
   }
 
 
-  function addOwnedAccountsTable($parentElement) {
+  function buildOwnedAccountsTable($parentElement) {
     if ($this->DB->num($this->ownedAccounts)>0) {
       $divOwnedAccounts = new HTMLDiv($parentElement,self::ownedAccDiv);
       $this->accountFound = true;
-      $this->addAccountsTable($divOwnedAccounts,'Owned Accounts:',$this->ownedAccounts,self::ownedAccTable);
+      $this->buildAccountsTable($divOwnedAccounts,'Owned Accounts:',$this->ownedAccounts,self::ownedAccTable);
     }
   }
 
-  function addSharedAccountsTable($parentElement) {
+  function buildSharedAccountsTable($parentElement) {
     if ($this->DB->num($this->sharedAccounts)>0) {
       $divSharedAccounts = new HTMLDiv($parentElement,self::sharedAccDiv);
       $this->accountFound = true;
-      $this->addAccountsTable($divSharedAccounts,'Shared Accounts:',$this->sharedAccounts,self::sharedAccTable);
+      $this->buildAccountsTable($divSharedAccounts,'Shared Accounts:',$this->sharedAccounts,self::sharedAccTable);
     }
   }
 
-  function addAccountsTable($parentElement,$title,$queryResult,$tableName) {
+  function buildAccountsTable($parentElement,$title,$queryResult,$tableName) {
     new HTMLHeading($parentElement,5,$title);
     $tableListAccounts = new Table($parentElement,$this->DB->num($queryResult),3,$tableName);
     $i = 0;
     while ($account = $this->DB->fetch($queryResult)) {
       new HTMLText($tableListAccounts->cells[$i][0],$account['name']);
 
-      $formEditAccount = new HTMLForm($tableListAccounts->cells[$i][1],$this->siteInfo->getSelfFileName(),self::editAccForm);
-      new HTMLInputHidden($formEditAccount,self::editAccHidden,$account['acct_id']);
-      new HTMLInputSubmit($formEditAccount,self::editAccButton,'Edit');
+      $formEditAccount = new HTMLForm($tableListAccounts->cells[$i][1],$this->siteInfo->getSelfFileName(),self::editAcct);
+      new HTMLInputHidden($formEditAccount,$this->getEditAcctHiddenName(),$account['acct_id']);
+      new HTMLInputSubmit($formEditAccount,$this->getEditAcctClass(),'Edit');
 
       $formDropAccount = new HTMLForm($tableListAccounts->cells[$i++][2],$this->siteInfo->getSelfFileName(),self::dropAccForm);
       new HTMLInputHidden($formDropAccount,self::dropAccHidden,$account['acct_id']);
@@ -199,24 +233,24 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
     }
   }
 
-  function addEditAccountForm($parentElement) {
-    $divEditAccount = new HTMLDiv($parentElement,self::editAccNameDiv);
-    new HTMLHeading($divEditAccount,5,'Edit Account:');
-    $formEditAccount = new HTMLForm($divEditAccount,$this->siteInfo->getSelfFileName(),self::editAccNameForm);
-    new HTMLInputHidden($formEditAccount,self::editAccNameHidden,$this->getEditAcctId());
+  function buildEditAccountForm($parentElement) {
+    $fsEditAccount = new HTMLFieldset($parentElement,$this->getEditAcctNameClass());
+    new HTMLLegend($fsEditAccount,'Edit Account');
+    $formEditAccount = new HTMLForm($fsEditAccount,$this->siteInfo->getSelfFileName(),$this->getEditAcctNameClass());
+    new HTMLInputHidden($formEditAccount,$this->getEditAcctNameHiddenName(),$this->getEditAcctId());
     $editAccountName = $this->getEditAcctName();
     $accountName = (empty($editAccountName)) ? $this->getAccountNameById($this->getEditAcctId()) : $this->getEditAcctName();
-    new HTMLInputText($formEditAccount,self::editAccNameText,$accountName);
-    new HTMLInputSubmit($formEditAccount,self::editAccNameButton,'Edit Account');
-    $this->focusId = self::editAccNameTextId;
+    new HTMLInputText($formEditAccount,$this->getEditAcctNameInName(),$accountName,$this->getEditAcctNameClass(),$this->getEditAcctNameInId());
+    new HTMLInputSubmit($formEditAccount,$this->getEditAcctNameClass(),'Edit Account');
+    $this->focusId = $this->getEditAcctNameInId();
   }
 
-  function addCreateAccountForm($parentElement) {
-    $divAddAccount = new HTMLDiv($parentElement,self::createAccDiv);
+  function buildCreateAccountForm($parentElement) {
+    $divAddAccount = new HTMLDiv($parentElement,$this->getCreateAcctClass());
     new HTMLHeading($divAddAccount,5,'Add Account:');
-    $formAddAccount = new HTMLForm($divAddAccount,$this->siteInfo->getSelfFileName(),self::createAccForm);
-    new HTMLInputText($formAddAccount,self::createAccText,$this->getCreateAcctName());
-    new HTMLInputSubmit($formAddAccount,self::createAccButton,'Add Account');
+    $formAddAccount = new HTMLForm($divAddAccount,$this->siteInfo->getSelfFileName(),$this->getCreateAcctClass());
+    new HTMLInputText($formAddAccount,$this->getCreateAcctInName(),$this->getCreateAcctName(),$this->getCreateAcctClass(),$this->getCreateAcctInId());
+    new HTMLInputSubmit($formAddAccount,$this->getCreateAcctClass(),'Add Account');
   }
 }
 ?>
