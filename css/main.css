@@ -48,7 +48,7 @@ div.banner_site_name {
     text-decoration: none;
 }
 
-div.info_messages {
+div.info_messages, div.qa_messages {
     border: #060 1px solid;
     background-color: #EFE;
     padding: 2px;
@@ -86,7 +86,12 @@ img {
     color: #008;
 }
 
-.quick_groups, .quick_accounts, .quick_shares {
+.quick_accounts_manage {
+    padding: 8px;
+    margin: 8px;
+}
+
+.quick_groups, .quick_accts, .quick_shares {
     border: #DD0 1px solid;
     padding: 8px;
     margin: 8px;

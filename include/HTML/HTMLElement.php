@@ -1,5 +1,5 @@
 <?php
-abstract class HTMLElement {
+class HTMLElement {
   public $HTMLElement;
   function __construct($HTMLDOMDocument,$parentDOMElement,$tagName=NULL,$innerHTML=NULL) {
     if (!empty($tagName)) {

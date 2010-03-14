@@ -15,8 +15,8 @@ class Body {
     $this->login = new Login($divBanner,$siteInfo,$user);
     new Logo($divBanner,$siteInfo);
 
-    $infoMsg->commitDiv($divPage);
-    $infoMsg->setBody($this->HTMLBody);
+    $divInfoMsg = new HTMLDiv($divPage,'info_messages');
+    $infoMsg->commitDiv($divInfoMsg);
     
     $this->divMid = new HTMLDiv($divPage,'mid');
     $this->title = new HTMLHeading($this->divMid,3,$title);

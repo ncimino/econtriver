@@ -30,7 +30,7 @@ class User {
   }
 
   public function getUserById($id=NULL) {
-    if(empty($id)) { $id = $this->currentUser['user_id']; }
+    if(empty($id) and isset($this->currentUser['user_id'])) { $id = $this->currentUser['user_id']; }
     $this->DB->query("SELECT * FROM user WHERE user_id='".mysql_real_escape_string($id)."';");
     return $this->DB->fetch();
   }

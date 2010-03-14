@@ -16,7 +16,6 @@ class Site {
     $this->siteInfo = new SiteInfo();
     $this->infoMsg = new InfoMsg();
     $this->user = new User($this->DB,$this->siteInfo,$this->infoMsg);
-    libxml_use_internal_errors(true);
     $this->document = HTMLDocument::createHTMLDocument();
     $this->head = new Head($this->document,$this->siteInfo);
     $this->body = new Body($this->document,$this->infoMsg,$this->siteInfo,$this->user,$title);

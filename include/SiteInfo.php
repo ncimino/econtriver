@@ -54,8 +54,13 @@ class SiteInfo {
   function getCss() { return $this->getSiteHTTP().$this->getCssDir().$this->getCssFile(); }
 
   function getJsDir() { return $this->getINIValue('siteinfo.jsdir'); }
-  function getJsFile() { return $this->getINIValue('siteinfo.jsfile'); }
-  function getJs() { return $this->getSiteHTTP().$this->getJsDir().$this->getJsFile(); }
+  function getJsFiles() { return $this->getINIValue('siteinfo.jsfile'); }
+  function getJs() {
+    foreach ($this->getJsFiles() as $file_name) {
+      $files[] = $this->getSiteHTTP().$this->getJsDir().$file_name;
+    }
+    return $files;
+  }
 
   function getScriptaculousDir() { return $this->getINIValue('siteinfo.scriptaculousdir'); }
   function getPrototypeFile() { return $this->getINIValue('siteinfo.prototypefile'); }

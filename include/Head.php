@@ -8,9 +8,11 @@ class Head {
     new HTMLKeywords($this->HTMLHead,$siteInfo->getKeywords());
     new HTMLDescription($this->HTMLHead,$siteInfo->getDescription());
     new HTMLStylesheet($this->HTMLHead,$siteInfo->getCss());
-    new HTMLScript($this->HTMLHead,'',$siteInfo->getJs());
-    new HTMLScript($this->HTMLHead,'',$siteInfo->getPrototype());
-    new HTMLScript($this->HTMLHead,'',$siteInfo->getScriptaculous());
+    foreach ($siteInfo->getJs() as $jsFile) {
+      new HTMLScript($this->HTMLHead,'',$jsFile);
+    }
+    //new HTMLScript($this->HTMLHead,'',$siteInfo->getPrototype());
+    //new HTMLScript($this->HTMLHead,'',$siteInfo->getScriptaculous());
   }
 }
 ?>

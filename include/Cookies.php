@@ -3,8 +3,10 @@ class Cookies {
   private $userId;
   private $password;
   function __construct() {
-    $this->setUserId($_COOKIE['user_id']);
-    $this->setPassword($_COOKIE['password']);
+    $userId = (isset($_COOKIE['user_id'])) ? $_COOKIE['user_id'] : '';
+    $this->setUserId($userId);
+    $password = (isset($_COOKIE['password'])) ? $_COOKIE['password'] : '';
+    $this->setPassword($password);
   }
   function setCookies($userId=NULL,$password=NULL) {
     ($userId===NULL) ? setcookie("user_id", $this->userId, time()+60*60*24*7) : setcookie("user_id", $userId, time()+60*60*24*7) ;
