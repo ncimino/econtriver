@@ -2,6 +2,14 @@
 class MainPage {
   private $focusId = '';
 
+  const qaMenu = 'quick_accounts_menu';
+  const qaManage = 'quick_accounts_manage';
+
+  function getQaMenuClass() { return self::qaMenu; }
+  function getQaMenuId() { return self::getQaMenuClass().'_div'; }
+  function getQaManageClass() { return self::qaManage; }
+  function getQaManageId() { return self::getQaManageClass().'_div'; }
+
   function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
 
     $divMenu = new HTMLDiv($parentElement,self::getQaMenuClass(),self::getQaMenuId());
@@ -14,14 +22,5 @@ class MainPage {
 
     new HTMLDiv($parentElement,self::getQaManageClass(),self::getQaManageId());
   }
-
-  const qaMenu = 'quick_accounts_menu';
-  const qaManage = 'quick_accounts_manage';
-  
-  function getQaMenuClass() { return self::qaMenu; }
-  function getQaMenuId() { return self::getQaMenuClass().'_div'; }
-  function getQaManageClass() { return self::qaManage; }
-  function getQaManageId() { return self::getQaManageClass().'_div'; }
-
 }
 ?>

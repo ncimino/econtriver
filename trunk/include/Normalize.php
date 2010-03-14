@@ -9,7 +9,7 @@ class Normalize {
     if (preg_match('/^[a-zA-Z0-9_ ]+$/',$value)) {
       return true;
     } else {
-      $infoMsg->addMessage(0,'Account names can contain only numbers, letters, spaces, and underscores.');
+      $infoMsg->addMessage(0,'Account names can only contain numbers, letters, spaces, and underscores.');
       return false;
     }
   }
@@ -32,6 +32,13 @@ class Normalize {
       return $value;
     }
   }
-
-
+  static function innerFragment($HTMLDocument) {
+    $htmlString = $HTMLDocument->saveXML();
+    $htmlString = explode('<fragment>',$htmlString);
+    $htmlString = explode('</fragment>',$htmlString[1]);
+    return $htmlString[0];
+  }
+  static function stripWhiteSpace($string) {
+    return preg_replace('/\s/','',$string);
+  }
 }

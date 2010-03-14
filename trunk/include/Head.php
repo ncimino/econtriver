@@ -11,6 +11,7 @@ class Head {
     foreach ($siteInfo->getJs() as $jsFile) {
       new HTMLScript($this->HTMLHead,'',$jsFile);
     }
+    // These are killing IE
     //new HTMLScript($this->HTMLHead,'',$siteInfo->getPrototype());
     //new HTMLScript($this->HTMLHead,'',$siteInfo->getScriptaculous());
   }

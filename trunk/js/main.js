@@ -8,8 +8,19 @@ function hideElement(id) {
 	document.getElementById(id).style.display = 'none';
 }
 
+// onclick='focus(id)'
+function focus(id) {
+	document.getElementById(id).focus();
+}
+
+// <body onload='timedHide('info_messages_div',3500)'>
+function timedHide(id, time) {
+	setTimeout("hideElement('" + id + "')", time);
+}
+// function hide(id) { new Effect.BlindUp(id); }
+
 // onkeypress='return enterSubmit(this,event);'
-function enterSubmit(thisfield, thisevent) {
+function enterSubmit(exec, thisevent) {
 	var keycode;
 	if (window.event)
 		keycode = window.event.keyCode;
@@ -19,7 +30,7 @@ function enterSubmit(thisfield, thisevent) {
 		return true;
 
 	if (keycode == 13) {
-		thisfield.form.submit();
+		exec;
 		return false;
 	} else
 		return true;
@@ -42,10 +53,17 @@ function confirmSubmit(msg) {
 		return false;
 }
 
-// <body onload='timedHide(3500,'info_messages_div')'>
-function timedHide(time, id) {
-	setTimeout("new Effect.BlindUp(" + id + ")", time);
-}
-function hide(id) {
-	new Effect.BlindUp(id);
+// AjaxIt(myfile.php?test=1);
+function AjaxIt(file) {
+	url = "include/ajax/" + file;
+
+	if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+		xmlhttp = new XMLHttpRequest();
+	} else {// code for IE6, IE5
+		xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+	}
+
+	xmlhttp.open("GET", url, false);
+	xmlhttp.send(null);
+	return xmlhttp.responseText;
 }
