@@ -12,18 +12,13 @@ class ManageQuickAccountsWidget extends Widget {
   private $displayStatus = 'none';
   private $accountFound = false;
 
-<<<<<<< .mine
-  const main = 'quick_accts';
-=======
   const createAcct = 'create_acct';
   const editAcctName = 'edit_acct_name';
   const editAcct = 'edit_acct';
   const dropAcct = 'drop_acct';
   const sharedAcct = 'shared_accounts';
   const ownedAcct = 'owned_accounts';
->>>>>>> .r35
 
-<<<<<<< .mine
   const createAcct = 'add_acct';
   function getCreateAcctClass() { return self::createAcct; }
   function getCreateAcctInName() { return self::getCreateAcctClass().'_name'; }
@@ -50,8 +45,6 @@ class ManageQuickAccountsWidget extends Widget {
   const ownedAccDiv = 'owned_accts';
   const ownedAccTable = 'owned_accts';
 
-=======
->>>>>>> .r35
   function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
     parent::__construct($parentElement,$DB,$siteInfo,$infoMsg,$user);
     $this->setFromPost();

@@ -4,33 +4,19 @@ class AjaxQaAccounts extends AjaxQaWidget {
   private $sharedAccounts; // MySQL result
   private $parentId;
 
-  const main = 'quick_accts';
-
   const createAcct = 'add_acct';
+  const editAcctName = 'edit_name';
+  const sharedAcct = 'shared_accts';
+  const ownedAcct = 'owned_accts';
+
   function getCreateAcctClass() { return self::createAcct; }
   function getCreateAcctInName() { return self::getCreateAcctClass().'_name'; }
   function getCreateAcctInId() { return self::getCreateAcctClass().'_text'; }
-
-  const editAccName = 'edit_name';
-  function getEditAcctNameClass() { return self::editAccName; }
+  function getEditAcctNameClass() { return self::editAcctName; }
   function getEditAcctNameInName() { return self::getEditAcctNameClass().'_name'; }
   function getEditAcctNameInId() { return self::getEditAcctNameClass().'_text'; }
-  function getEditAcctNameHiddenName() { return self::getEditAcctNameClass().'_hidden'; }
-
-  const editAcct = 'edit_account';
-  function getEditAcctClass() { return self::editAcct; }
-  function getEditAcctHiddenName() { return self::getEditAcctClass().'_hidden'; }
-
-  const dropAccForm = 'drop_account';
-  const dropAccHidden = 'drop_account';
-  const dropAccHiddenId = 'drop_account_input';
-  const dropAccButton = 'drop_account_submit';
-
-  const sharedAccDiv = 'shared_accts';
-  const sharedAccTable = 'shared_accts';
-
-  const ownedAccDiv = 'owned_accts';
-  const ownedAccTable = 'owned_accts';
+  function getSharedAcctClass() { return self::sharedAcct; }
+  function getOwnedAcctClass() { return self::ownedAcct; }
 
   function __construct($parentId) {
     ini_set('display_errors', 'On');
@@ -39,15 +25,29 @@ class AjaxQaAccounts extends AjaxQaWidget {
     parent::__construct();
     $this->parentId = $parentId;
     if (!$this->user->verifyUser()) {
-      echo "User info is invalid, please login!";
+      $this->infoMsg->addMessage(0,'User info is invalid, please login first.');
     }
   }
-  
+
   function addEntries($name) {
     if ($escapedName = $this->checkAccountName($name)) {
       if ($this->insertAccount($escapedName) and $this->insertOwner()) {
         $this->infoMsg->addMessage(2,'Account was successfully created.');
       }
+    }
+  }
+
+  function updateEntries($name,$acctId) {
+    if (!empty($acctId) and $sanitizedName = $this->checkAccountName($name)) {
+      if ($this->updateAccount($sanitizedName,$acctId)) {
+        $this->infoMsg->addMessage(2,'Account was successfully updated.');
+      }
+    }
+  }
+
+  function dropEntries($acctId) {
+    if (!empty($acctId) and $this->dropAccount($acctId)) {
+      $this->infoMsg->addMessage(2,'Account was successfully deleted.');
     }
   }
 
@@ -74,14 +74,14 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
     return $this->DB->query($sql);
   }
 
-  function dropAccount() {
-    $sql = "UPDATE q_acct SET active = 0 WHERE id = {$this->getDropAcctId()};";
+  function dropAccount($acctId) {
+    $sql = "UPDATE q_acct SET active = 0 WHERE id = {$acctId};";
     return $this->DB->query($sql);
   }
 
-  function updateAccount() {
-    $accountNameEscaped = Normalize::mysql($this->getEditAcctName());
-    $sql = "UPDATE q_acct SET name = '{$accountNameEscaped}' WHERE id = {$this->getEditAcctId()};";
+  function updateAccount($name,$id) {
+    $accountNameEscaped = Normalize::mysql($name);
+    $sql = "UPDATE q_acct SET name = '{$accountNameEscaped}' WHERE id = {$id};";
     return $this->DB->query($sql);
   }
 
@@ -121,20 +121,17 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
     $this->printHTML();
   }
 
-
   function buildOwnedAccountsTable($parentElement) {
     if ($this->DB->num($this->ownedAccounts)>0) {
-      $divOwnedAccounts = new HTMLDiv($parentElement,self::ownedAccDiv);
-      $this->accountFound = true;
-      $this->buildAccountsTable($divOwnedAccounts,'Owned Accounts:',$this->ownedAccounts,self::ownedAccTable);
+      $divOwnedAccounts = new HTMLDiv($parentElement,self::getOwnedAcctClass());
+      $this->buildAccountsTable($divOwnedAccounts,'Owned Accounts:',$this->ownedAccounts,self::getOwnedAcctClass());
     }
   }
 
   function buildSharedAccountsTable($parentElement) {
     if ($this->DB->num($this->sharedAccounts)>0) {
-      $divSharedAccounts = new HTMLDiv($parentElement,self::sharedAccDiv);
-      $this->accountFound = true;
-      $this->buildAccountsTable($divSharedAccounts,'Shared Accounts:',$this->sharedAccounts,self::sharedAccTable,false);
+      $divSharedAccounts = new HTMLDiv($parentElement,self::getSharedAcctClass());
+      $this->buildAccountsTable($divSharedAccounts,'Shared Accounts:',$this->sharedAccounts,self::getSharedAcctClass(),false);
     }
   }
 
@@ -145,28 +142,29 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
     $i = 0;
     while ($account = $this->DB->fetch($queryResult)) {
       $accountName = (empty($account['name'])) ? $this->getAccountNameById($this->getEditAcctId()) : $account['name'];
-      $inputAddAccount = new HTMLInputText($tableListAccounts->cells[$i][0],$this->getEditAcctNameInName(),$accountName,$this->getEditAcctNameClass(),$this->getEditAcctNameInId());
-      $inputAddAccount->setAttribute('onclick',"QaAddAccount('quick_accounts_manage_div');");
+      $inputId = $this->getEditAcctNameInId().'_'.$account['id'];
+      $inputName = $this->getEditAcctNameInName().'_'.$account['id'];
 
+      $inputEditAccount = new HTMLInputText($tableListAccounts->cells[$i][0],$inputName,$accountName,$this->getEditAcctNameClass(),$inputId);
       if ($editable) {
-        $formEditAccount = new HTMLForm($tableListAccounts->cells[$i][1],$this->siteInfo->getSelfFileName(),self::editAcct);
-        new HTMLInputHidden($formEditAccount,$this->getEditAcctHiddenName(),$account['acct_id']);
-        new HTMLInputSubmit($formEditAccount,$this->getEditAcctClass(),'Edit');
-
-        $formDropAccount = new HTMLForm($tableListAccounts->cells[$i++][2],$this->siteInfo->getSelfFileName(),self::dropAccForm);
-        new HTMLInputHidden($formDropAccount,self::dropAccHidden,$account['acct_id']);
-        $inputDelete = new HTMLInputSubmit($formDropAccount,self::dropAccButton,'Delete');
-        $inputDelete->setAttribute('onclick','return confirmSubmit("Are you sure you want to delete the \''.$account['name'].'\' account?")');
+        $jsEdit = "QaEditAccount('{$this->parentId}','{$inputId}','{$account['id']}');";
+        $inputEditAccount->setAttribute('onkeyup',$jsEdit);
+        $aEditAccount = new HTMLAnchor($tableListAccounts->cells[$i][1],'#','Edit');
+        $aEditAccount->setAttribute('onclick',$jsEdit);
+        $aDropAccount = new HTMLAnchor($tableListAccounts->cells[$i][2],'#','Delete');
+        $aDropAccount->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to delete the \'".$account['name']."\' account?')) { QaDropAccount('{$this->parentId}','{$account['id']}'); }");
+      } else {
+        $inputEditAccount->setAttribute('disabled',"disabled");
       }
+      $i++;
     }
   }
 
   function buildCreateAccountForm($parentElement) {
     $divAddAccount = new HTMLDiv($parentElement,$this->getCreateAcctClass());
     new HTMLHeading($divAddAccount,5,'Add Account:');
-    $formAddAccount = new HTMLForm($divAddAccount,$this->siteInfo->getSelfFileName(),$this->getCreateAcctClass());
-    new HTMLInputText($formAddAccount,$this->getCreateAcctInName(),'',$this->getCreateAcctClass(),$this->getCreateAcctInId());
-    $aAddAccount = new HTMLAnchor($formAddAccount,'#','Add Account');
+    new HTMLInputText($divAddAccount,$this->getCreateAcctInName(),'',$this->getCreateAcctClass(),$this->getCreateAcctInId());
+    $aAddAccount = new HTMLAnchor($divAddAccount,'#','Add Account');
     $aAddAccount->setAttribute('onclick',"QaAddAccount('{$this->parentId}','{$this->getCreateAcctInId()}');");
   }
 }

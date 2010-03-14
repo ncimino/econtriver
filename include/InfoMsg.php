@@ -18,7 +18,9 @@ class InfoMsg {
   public function commitDiv($parentElement) {
     $this->parentElement = $parentElement;
     $this->parentElement->setAttribute('style',"display:none;");
-    $this->parentElement->setAttribute('onclick',"new Effect.BlindUp('{$this->parentElement->getId()}')");
+    //$this->parentElement->setAttribute('onclick',"new Effect.BlindUp('{$this->parentElement->getId()}')");
+    $this->parentElement->setAttribute('onclick',"hideElement('{$this->parentElement->getId()}')");
+    $this->parentElement->setAttribute('title',"Click to hide");
   }
 
   public function commitMessages() {
