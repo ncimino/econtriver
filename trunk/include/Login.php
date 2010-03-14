@@ -16,8 +16,9 @@ class Login {
     } else {
       $FormLogin = new HTMLForm($DivLogin,'index.php','login');
       $PLogin = new HTMLParagraph($FormLogin);
-      new HTMLLabel($PLogin,'Email:','email_input');      
-      new HTMLInputText($PLogin,'email',$_POST['email']);
+      new HTMLLabel($PLogin,'Email:','email_input');
+      $value = (isset($_POST['email'])) ? $_POST['email'] : '';      
+      new HTMLInputText($PLogin,'email',$value);
       new HTMLLabel($PLogin,' Password:','password_input');
       new HTMLInputPassword($PLogin,'password');
       new HTMLText($PLogin,' ');

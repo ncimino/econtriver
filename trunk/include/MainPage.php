@@ -1,40 +1,27 @@
 <?php
 class MainPage {
   private $focusId = '';
-  
+
   function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
-    
-    $divMenu = new HTMLDiv($parentElement,'quick_accounts_menu');
-    
+
+    $divMenu = new HTMLDiv($parentElement,self::getQaMenuClass(),self::getQaMenuId());
+
     $aManageAccounts = new HTMLAnchor($divMenu,'#','Manage Accounts');
-    $ManageQuickAccountsWidget = new ManageQuickAccountsWidget($parentElement,$DB,$siteInfo,$infoMsg,$user);
-    //*
+    $aManageAccounts->setAttribute('onclick',"QaGetAccounts('".self::getQaManageId()."');");
     new HTMLText($divMenu,' | ');
     $aManageGroups = new HTMLAnchor($divMenu,'#','Manage Groups');
-    $ManageQuickGroupsWidget = new ManageQuickGroupsWidget($parentElement,$DB,$siteInfo,$infoMsg,$user);
+    $aManageGroups->setAttribute('onclick',"QaGetGroups('".self::getQaManageId()."');");
 
-    /*
-    new HTMLText($divMenu,' | ');
-    $aManageShares = new HTMLAnchor($divMenu,'#','Account Sharing');
-    $ManageQuickSharesWidget = new ManageQuickSharesWidget($parentElement,$DB,$siteInfo,$infoMsg,$user);
-    //*/
-    
-    $aManageGroups->setAttribute('onclick',"Effect.toggle('{$ManageQuickGroupsWidget->getContainerId()}','blind');Effect.BlindUp('{$ManageQuickAccountsWidget->getContainerId()}'); return false;");
-    $aManageAccounts->setAttribute('onclick',"Effect.toggle('{$ManageQuickAccountsWidget->getContainerId()}','blind');Effect.BlindUp('{$ManageQuickGroupsWidget->getContainerId()}'); return false;");
-    //$aManageShares->setAttribute('onclick',"Effect.toggle('{$ManageQuickSharesWidget->getContainerId()}','blind'); return false;");
-    
-    $this->focusId = $ManageQuickAccountsWidget->getFocusId();
-    if(empty($this->focusId)) { $this->focusId = $ManageQuickGroupsWidget->getFocusId(); }
-    if(empty($this->focusId)) { $this->focusId = $ManageQuickSharesWidget->getFocusId(); }
-
-    //new ManageAccountsWidget($parentElement,$DB,$siteInfo);
-    //new DataEntryWidget($parentElement);
-    //new ManageTagsWidget($parentElement);
-    //new ManagesWidget($parentElement);
-
-    if (!empty($this->focusId)) {
-      new HTMLScript($parentElement,"document.getElementById(\"" . $this->focusId . "\").focus();");
-    }
+    new HTMLDiv($parentElement,self::getQaManageClass(),self::getQaManageId());
   }
+
+  const qaMenu = 'quick_accounts_menu';
+  const qaManage = 'quick_accounts_manage';
+  
+  function getQaMenuClass() { return self::qaMenu; }
+  function getQaMenuId() { return self::getQaMenuClass().'_div'; }
+  function getQaManageClass() { return self::qaManage; }
+  function getQaManageId() { return self::getQaManageClass().'_div'; }
+
 }
 ?>
