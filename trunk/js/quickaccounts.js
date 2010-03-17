@@ -11,7 +11,8 @@ function QaAddAccount(content_id, name_id) {
 			+ "&content_id="
 			+ content_id);
 	focus(name_id);
-	timedHide('qa_messages_div',8000);
+	msg_class = AjaxIt('GetVar.php?var=getQaMsgsClass');
+	timedHide(msg_class,8000);
 }
 
 function QaEditAccount(content_id, name_id, acct_id) {
@@ -22,11 +23,13 @@ function QaEditAccount(content_id, name_id, acct_id) {
 			+ "&acct_id="
 			+ acct_id + "&content_id=" + content_id);
 	focus(name_id);
-	timedHide('qa_messages_div',8000);
+	msg_class = AjaxIt('GetVar.php?var=getQaMsgsId');
+	timedHide("'"+msg_class+"'",8000);
 }
 
 function QaDropAccount(content_id, acct_id) {
 	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
 			+ ".php" + "?acct_id=" + acct_id + "&content_id=" + content_id);
-	timedHide('qa_messages_div',8000);
+	msg_class = AjaxIt('GetVar\.php?var=getQaMsgsClass');
+	timedHide(msg_class,8000);
 }

@@ -3,9 +3,11 @@ class SiteInfo {
   private $ini_file = "vars/site.ini";
   private $ini_arr;
 
+
   public function __construct($parse_now = true) {
     if ($parse_now) {
       $this->parseINIFile();
+      $this->setPhpIniErrors();
     }
   }
 
@@ -29,32 +31,32 @@ class SiteInfo {
   }
 
   public function getINIValue($key) {
-    return $this->ini_arr[$key];
+    return $this->ini_arr['siteinfo.'.$key];
   }
 
-  function getSalt() { return $this->getINIValue('siteinfo.salt'); }
-  function getName() { return $this->getINIValue('siteinfo.sitename'); }
-  function getSubName() { return $this->getINIValue('siteinfo.subsitename'); }
-  function getFromEmail() { return $this->getINIValue('siteinfo.fromemail'); }
-  function getKeywords() { return $this->getINIValue('siteinfo.keywords'); }
-  function getDescription() { return $this->getINIValue('siteinfo.description'); }
-  function getImageDir() { return $this->getINIValue('siteinfo.imagedir'); }
+  function getSalt() { return $this->getINIValue('salt'); }
+  function getName() { return $this->getINIValue('site_name'); }
+  function getSubName() { return $this->getINIValue('site_subname'); }
+  function getFromEmail() { return $this->getINIValue('from_email'); }
+  function getKeywords() { return $this->getINIValue('keywords'); }
+  function getDescription() { return $this->getINIValue('description'); }
+  function getImageDir() { return $this->getINIValue('image_dir'); }
 
-  function getIconFile() { return $this->getINIValue('siteinfo.iconfile'); }
+  function getIconFile() { return $this->getINIValue('icon_file'); }
   function getIcon() { return $this->getSiteHTTP().$this->getImageDir().$this->getIconFile(); }
-  function getIconType() { return $this->getINIValue('siteinfo.icontype'); }
+  function getIconType() { return $this->getINIValue('icon_type'); }
 
-  function getLogoFile() { return $this->getINIValue('siteinfo.logofile'); }
-  function getLogoHeight() { return $this->getINIValue('siteinfo.logoheight'); }
-  function getLogoWidth() { return $this->getINIValue('siteinfo.logowidth'); }
+  function getLogoFile() { return $this->getINIValue('logo_file'); }
+  function getLogoHeight() { return $this->getINIValue('logo_height'); }
+  function getLogoWidth() { return $this->getINIValue('logo_width'); }
   function getLogo() { return $this->getSiteHTTP().$this->getImageDir().$this->getLogoFile(); }
 
-  function getCssDir() { return $this->getINIValue('siteinfo.cssdir'); }
-  function getCssFile() { return $this->getINIValue('siteinfo.cssfile'); }
+  function getCssDir() { return $this->getINIValue('css_dir'); }
+  function getCssFile() { return $this->getINIValue('css_file'); }
   function getCss() { return $this->getSiteHTTP().$this->getCssDir().$this->getCssFile(); }
 
-  function getJsDir() { return $this->getINIValue('siteinfo.jsdir'); }
-  function getJsFiles() { return $this->getINIValue('siteinfo.jsfile'); }
+  function getJsDir() { return $this->getINIValue('js_dir'); }
+  function getJsFiles() { return $this->getINIValue('js_file'); }
   function getJs() {
     foreach ($this->getJsFiles() as $file_name) {
       $files[] = $this->getSiteHTTP().$this->getJsDir().$file_name;
@@ -62,18 +64,26 @@ class SiteInfo {
     return $files;
   }
 
-  function getScriptaculousDir() { return $this->getINIValue('siteinfo.scriptaculousdir'); }
-  function getPrototypeFile() { return $this->getINIValue('siteinfo.prototypefile'); }
-  function getScriptaculousFile() { return $this->getINIValue('siteinfo.scriptaculousfile'); }
+  function getScriptaculousDir() { return $this->getINIValue('scriptaculous_dir'); }
+  function getPrototypeFile() { return $this->getINIValue('prototype_file'); }
+  function getScriptaculousFile() { return $this->getINIValue('scriptaculous_file'); }
   function getPrototype() { return $this->getSiteHTTP().$this->getJsDir().$this->getScriptaculousDir().$this->getPrototypeFile(); }
   function getScriptaculous() { return $this->getSiteHTTP().$this->getJsDir().$this->getScriptaculousDir().$this->getScriptaculousFile(); }
 
   function getDomain() { return $_SERVER['HTTP_HOST']; }
   function getSiteHTTP() { return "http://".$this->getDomain().$this->getServerDir(); }
   function getServerRootDir() { return $_SERVER['DOCUMENT_ROOT']; }
-  function getServerDir() { return $this->getINIValue('siteinfo.rootdir'); }
+  function getServerDir() { return $this->getINIValue('root_dir'); }
   function getSelf() { return $_SERVER['PHP_SELF']; }
   function getSelfFileName() { return basename($_SERVER['PHP_SELF']); }
+
+  function getDisplayErrors() { return $this->getINIValue('display_errors'); }
+  function getErrorReporting() { return $this->getINIValue('error_reporting'); }
+  
+  function setPhpIniErrors() {
+    ini_set('display_errors', self::getDisplayErrors());
+    error_reporting(getErrorReporting());
+  }
 
   function verifyReferer() { return preg_match('/^'.Normalize::encodeFs($this->getSiteHTTP()).'/',$_SERVER['HTTP_REFERER']); }
 

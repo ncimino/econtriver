@@ -15,7 +15,8 @@ function focus(id) {
 
 // <body onload='timedHide('info_messages_div',3500)'>
 function timedHide(id, time) {
-	setTimeout("hideElement('" + id + "')", time);
+	//alert(id);
+	setTimeout("hideElement(" + id + ")", time);
 }
 // function hide(id) { new Effect.BlindUp(id); }
 

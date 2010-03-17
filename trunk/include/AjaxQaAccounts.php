@@ -19,9 +19,6 @@ class AjaxQaAccounts extends AjaxQaWidget {
   function getOwnedAcctClass() { return self::ownedAcct; }
 
   function __construct($parentId) {
-    ini_set('display_errors', 'On');
-    error_reporting(E_ALL);
-
     parent::__construct();
     $this->parentId = $parentId;
     if (!$this->user->verifyUser()) {
