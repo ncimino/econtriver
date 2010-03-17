@@ -10,8 +10,6 @@ class Site {
   public $document;
 
   function __construct($title) {
-    ini_set('display_errors', 'On');
-    error_reporting(E_ALL);
     $this->DB = new DBCon();
     $this->siteInfo = new SiteInfo();
     $this->infoMsg = new InfoMsg();

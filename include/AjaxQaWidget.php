@@ -9,8 +9,9 @@ class AjaxQaWidget {
   
   const main = 'quick_accts';
   
-  function getMainClass() { return self::main; }
-  function getQaMsgsClass() { return self::main.'_msgs'; }
+  static function getMainClass() { return self::main; }
+  static function getQaMsgsClass() { return self::getMainClass().'_msgs'; }
+  static function getQaMsgsId() { return self::getQaMsgsClass().'_div'; }
 
   function __construct() {
     $this->DB = new DBCon();
@@ -19,7 +20,7 @@ class AjaxQaWidget {
     $this->user = new User($this->DB,'','');
     $this->document = HTMLDocument::createHTMLDocument();
     $this->container = new HTMLFragment($this->document);
-    $divInfoMsg = new HTMLDiv($this->container,self::getQaMsgsClass());
+    $divInfoMsg = new HTMLDiv($this->container,self::getQaMsgsClass(),self::getQaMsgsId());
     $this->infoMsg->commitDiv($divInfoMsg);
   }
   
