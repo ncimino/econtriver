@@ -13,7 +13,7 @@ class Registration {
     $PReg = new HTMLParagraph($FormReg);
     $this->buildRegistrationForm($FormReg);
 
-    if ($_POST['register']=='1') { // if true the user submitted a registration form
+    if (isset($_POST['register']) and $_POST['register']) { // if true the user submitted a registration form
       if ($this->addUser()) {
         new HTMLText($parentElement,'Registration successful.');
         new HTMLScript($parentElement,"document.getElementById(\"email_input\").value=\"" . $user->getHandle() . "\";");

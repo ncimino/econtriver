@@ -98,10 +98,10 @@ class User {
   public function getUserId() { return $this->currentUser['user_id']; }
   public function getPassword() { return $this->currentUser['password']; }
   public function getVerPassword() { return $this->currentUser['ver_password']; }
-  public function getHandle() { return $this->currentUser['handle']; }
-  public function getEmail() { return $this->currentUser['email']; }
-  public function getTimezone() { return $this->currentUser['timezone']; }
-  public function getDateFormat() { return $this->currentUser['date_format']; }
+  public function getHandle() { return (isset($this->currentUser['handle'])) ? $this->currentUser['handle'] : false; }
+  public function getEmail() { return (isset($this->currentUser['email'])) ? $this->currentUser['email'] : false; }
+  public function getTimezone() { return (isset($this->currentUser['timezone'])) ? $this->currentUser['timezone'] : false; }
+  public function getDateFormat() { return (isset($this->currentUser['date_format'])) ? $this->currentUser['date_format'] : false; }
   public function getActive() { return $this->currentUser['active']; }
   public function getTime() { return time(); }
 
@@ -191,7 +191,7 @@ class User {
     if (!empty($this->currentUserNames['timezone']) and isset($_POST[$this->currentUserNames['timezone']])) { $this->setTimezone($_POST[$this->currentUserNames['timezone']]); }
     if (!empty($this->currentUserNames['date_format']) and isset($_POST[$this->currentUserNames['date_format']])) { $this->setDateFormat($_POST[$this->currentUserNames['date_format']]); }
     if (!empty($this->currentUserNames['ver_password']) and isset($_POST[$this->currentUserNames['ver_password']])) { $this->setActive(1); } // only set if $verPasswordName is, means user is registering
-    return isset($_POST[$this->currentUserNames['email']]) or isset($_POST[$this->currentUserNames['password']]);
+    return isset($this->currentUserNames['email']) and isset($_POST[$this->currentUserNames['email']]);
   }
 
   public function verifyUser() {
@@ -235,10 +235,10 @@ class User {
     return $check;
   }
 
-  public function validateHandle($value = NULL) {
+  public function validateHandle($reportMsg=TRUE,$value = NULL) {
     if(empty($value)) { $value = $this->currentUser['handle']; }
     $check = preg_match( "/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*$/", $value);
-    if(!$check) { $this->infoMsg->addMessage(0,'This User Name in invalid. You must use only letters, numbers, periods, underscores, and hyphens.'); }
+    if($reportMsg and !$check) { $this->infoMsg->addMessage(0,'This User Name is invalid. You must use only letters, numbers, periods, underscores, and hyphens.'); }
     return $check;
   }
 

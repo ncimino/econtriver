@@ -9,14 +9,14 @@ class Body {
     $this->HTMLBody = new HTMLBody($HTMLDocument);
     $divPage = new HTMLDiv($this->HTMLBody,'page');
 
+    $divInfoMsg = new HTMLDiv($divPage,'info_messages');
+    $infoMsg->commitDiv($divInfoMsg);
+
     new HTMLDiv($divPage,'banner_ie_limiter');
     $divBanner = new HTMLDiv($divPage,'banner');
     
     $this->login = new Login($divBanner,$siteInfo,$user);
     new Logo($divBanner,$siteInfo);
-
-    $divInfoMsg = new HTMLDiv($divPage,'info_messages');
-    $infoMsg->commitDiv($divInfoMsg);
     
     $this->divMid = new HTMLDiv($divPage,'mid');
     $this->title = new HTMLHeading($this->divMid,3,$title);

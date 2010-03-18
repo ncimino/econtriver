@@ -38,7 +38,7 @@ class RecoverAccount {
         }
       }
 
-    } elseif (($_POST['recover']=='1') and $this->siteInfo->verifyReferer()) { // User has submitted a user name or email for recovery
+    } elseif (isset($_POST['recover']) and ($_POST['recover']=='1') and $this->siteInfo->verifyReferer()) { // User has submitted a user name or email for recovery
 
       $recoveryForm = $this->buildRecoveryForm($parentElement);
       if ($this->user->getUserByEmail(false) or $this->user->setUserByHandle()) {

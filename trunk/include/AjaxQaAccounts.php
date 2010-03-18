@@ -72,13 +72,13 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
   }
 
   function dropAccount($acctId) {
-    $sql = "UPDATE q_acct SET active = 0 WHERE id = {$acctId};";
+    $sql = "UPDATE q_acct,q_owners SET active = 0 WHERE q_acct.id = {$acctId} AND acct_id = q_acct.id AND owner_id = {$this->user->getUserId()};";
     return $this->DB->query($sql);
   }
 
-  function updateAccount($name,$id) {
+  function updateAccount($name,$acctId) {
     $accountNameEscaped = Normalize::mysql($name);
-    $sql = "UPDATE q_acct SET name = '{$accountNameEscaped}' WHERE id = {$id};";
+    $sql = "UPDATE q_acct,q_owners SET name = '{$accountNameEscaped}' WHERE q_acct.id = {$acctId} AND acct_id = q_acct.id AND owner_id = {$this->user->getUserId()};";
     return $this->DB->query($sql);
   }
 
@@ -145,7 +145,6 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
       $inputEditAccount = new HTMLInputText($tableListAccounts->cells[$i][0],$inputName,$accountName,$this->getEditAcctNameClass(),$inputId);
       if ($editable) {
         $jsEdit = "QaEditAccount('{$this->parentId}','{$inputId}','{$account['id']}');";
-        $inputEditAccount->setAttribute('onkeyup',$jsEdit);
         $aEditAccount = new HTMLAnchor($tableListAccounts->cells[$i][1],'#','Edit');
         $aEditAccount->setAttribute('onclick',$jsEdit);
         $aDropAccount = new HTMLAnchor($tableListAccounts->cells[$i][2],'#','Delete');
