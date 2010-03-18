@@ -10,7 +10,8 @@ CONSTRAINT q_user_groups_id PRIMARY KEY(id),
 group_id int NOT NULL,
 CONSTRAINT q_user_groups_group_id FOREIGN KEY (group_id) REFERENCES q_group(id),
 user_id int NOT NULL,
-CONSTRAINT q_user_groups_user_id FOREIGN KEY (user_id) REFERENCES user(user_id)
+CONSTRAINT q_user_groups_user_id FOREIGN KEY (user_id) REFERENCES user(user_id),
+active int(1) NOT NULL
 )";
 
   $db_obj->query($sql);
