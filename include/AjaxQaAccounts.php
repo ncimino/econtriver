@@ -103,7 +103,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
         WHERE q_share.acct_id=q_acct.id
           AND q_user_groups.group_id=q_share.group_id
           AND q_user_groups.user_id = {$this->user->getUserId()}
-          AND active = 1;";
+          AND q_acct.active = 1;";
     $this->sharedAccounts = $this->DB->query($sql);
   }
 

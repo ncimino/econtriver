@@ -17,7 +17,7 @@ class AjaxQaWidget {
     $this->DB = new DBCon();
     $this->siteInfo = new SiteInfo();
     $this->infoMsg = new InfoMsg();
-    $this->user = new User($this->DB,'','');
+    $this->user = new User($this->DB,$this->siteInfo,$this->infoMsg);
     $this->document = HTMLDocument::createHTMLDocument();
     $this->container = new HTMLFragment($this->document);
     $divInfoMsg = new HTMLDiv($this->container,self::getQaMsgsClass(),self::getQaMsgsId());

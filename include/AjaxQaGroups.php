@@ -1,13 +1,13 @@
 <?php
 class AjaxQaGroups extends AjaxQaWidget {
-  private $ownedGroups; // MySQL result
-  private $sharedGroups; // MySQL result
+  private $activeGroups; // MySQL result
+  private $inactiveGroups; // MySQL result
   private $parentId;
 
   const createGrp = 'add_grp';
   const editGrpName = 'edit_name';
-  const sharedGrp = 'shared_grps';
-  const ownedGrp = 'owned_grps';
+  const activeGrp = 'active_grps';
+  const inactiveGrp = 'inactive_grps';
 
   function getCreateGrpClass() { return self::createGrp; }
   function getCreateGrpInName() { return self::getCreateGrpClass().'_name'; }
@@ -15,8 +15,8 @@ class AjaxQaGroups extends AjaxQaWidget {
   function getEditGrpNameClass() { return self::editGrpName; }
   function getEditGrpNameInName() { return self::getEditGrpNameClass().'_name'; }
   function getEditGrpNameInId() { return self::getEditGrpNameClass().'_text'; }
-  function getSharedGrpClass() { return self::sharedGrp; }
-  function getOwnedGrpClass() { return self::ownedGrp; }
+  function getActiveGrpClass() { return self::activeGrp; }
+  function getInactiveGrpClass() { return self::inactiveGrp; }
 
   function __construct($parentId) {
     parent::__construct();
@@ -51,7 +51,7 @@ class AjaxQaGroups extends AjaxQaWidget {
   function checkGroupName($name) {
     if (!($sanitizedName = Normalize::sanitize($name,$this->infoMsg,$this->siteInfo))) {
       return false;
-    } elseif (!(Normalize::accountNames($sanitizedName,$this->infoMsg))) {
+    } elseif (!(Normalize::groupNames($sanitizedName,$this->infoMsg))) {
       return false;
     } else {
       return $sanitizedName;
@@ -66,19 +66,20 @@ VALUES ('{$grpNameEscaped}');";
   }
 
   function insertUserGroup() {
-    $sql = "INSERT INTO q_user_groups (group_id,user_id)
-VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
+    $sql = "INSERT INTO q_user_groups (group_id,user_id,active)
+VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
     return $this->DB->query($sql);
   }
 
-  function dropGroup($userId) {
-    $sql = "UPDATE q_user_groups SET active = 0 WHERE user_id = {$userId}; AND group_id = ";
+  function dropGroup($group_id) {
+    $sql = "UPDATE q_user_groups SET active = 0 WHERE user_id = {$this->user->getUserId()} AND group_id = {$group_id}";
     return $this->DB->query($sql);
   }
 
   function updateGroup($name,$id) {
-    $accountNameEscaped = Normalize::mysql($name);
-    $sql = "UPDATE q_group SET name = '{$accountNameEscaped}' WHERE id = {$id};";
+    $groupNameEscaped = Normalize::mysql($name);
+    $sql = "UPDATE q_group SET name = '{$groupNameEscaped}' WHERE id = {$id};";
+    echo $sql;
     return $this->DB->query($sql);
   }
 
@@ -90,45 +91,44 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
     return $return['name'];
   }
 
-  function getOwnedGroups() {
-    $sql = "SELECT * FROM q_group,q_owners
+  function getActiveGroups() {
+    $sql = "SELECT * FROM q_group,q_user_groups
         WHERE q_group.id = group_id 
-          AND owner_id = {$this->user->getUserId()}
+          AND user_id = {$this->user->getUserId()}
           AND active = 1;";
-    $this->ownedGroups = $this->DB->query($sql);
+    $this->activeGroups = $this->DB->query($sql);
   }
 
-  function getSharedGroups() {
-    $sql = "SELECT * FROM q_group,q_share,q_user_groups
-        WHERE q_share.group_id=q_group.id
-          AND q_user_groups.group_id=q_share.group_id
-          AND q_user_groups.user_id = {$this->user->getUserId()}
-          AND active = 1;";
-    $this->sharedGroups = $this->DB->query($sql);
+  function getInactiveGroups() {
+    $sql = "SELECT * FROM q_group,q_user_groups
+        WHERE q_group.id = group_id 
+          AND user_id = {$this->user->getUserId()}
+          AND active = 0;";
+    $this->inactiveGroups = $this->DB->query($sql);
   }
 
   function buildWidget() {
-    $this->getSharedGroups();
-    $this->getOwnedGroups();
+    $this->getActiveGroups();
+    $this->getInactiveGroups();
     $fsQuickGroups = new HTMLFieldset($this->container);
     new HTMLLegend($fsQuickGroups,'Group Management');
     $this->buildCreateGroupForm($fsQuickGroups);
-    $this->buildOwnedGroupsTable($fsQuickGroups);
-    $this->buildSharedGroupsTable($fsQuickGroups);
+    $this->buildActiveGroupsTable($fsQuickGroups);
+    $this->buildInactiveGroupsTable($fsQuickGroups);
     $this->printHTML();
   }
 
-  function buildOwnedGroupsTable($parentElement) {
-    if ($this->DB->num($this->ownedGroups)>0) {
-      $divOwnedGroups = new HTMLDiv($parentElement,self::getOwnedGrpClass());
-      $this->buildGroupsTable($divOwnedGroups,'Owned Groups:',$this->ownedGroups,self::getOwnedGrpClass());
+  function buildActiveGroupsTable($parentElement) {
+    if ($this->DB->num($this->activeGroups)>0) {
+      $divGroups = new HTMLDiv($parentElement,self::getActiveGrpClass());
+      $this->buildGroupsTable($divGroups,'Active Groups:',$this->activeGroups,self::getActiveGrpClass());
     }
   }
 
-  function buildSharedGroupsTable($parentElement) {
-    if ($this->DB->num($this->sharedGroups)>0) {
-      $divSharedGroups = new HTMLDiv($parentElement,self::getSharedGrpClass());
-      $this->buildGroupsTable($divSharedGroups,'Shared Groups:',$this->sharedGroups,self::getSharedGrpClass(),false);
+  function buildInactiveGroupsTable($parentElement) {
+    if ($this->DB->num($this->inactiveGroups)>0) {
+      $divGroups = new HTMLDiv($parentElement,self::getInactiveGrpClass());
+      $this->buildGroupsTable($divGroups,'Inactive Groups:',$this->inactiveGroups,self::getInactiveGrpClass(),false);
     }
   }
 
@@ -137,19 +137,18 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
     $cols = ($editable) ? 3 : 1;
     $tableListGroups = new Table($parentElement,$this->DB->num($queryResult),$cols,$tableName);
     $i = 0;
-    while ($account = $this->DB->fetch($queryResult)) {
-      $accountName = (empty($account['name'])) ? $this->getGroupNameById($this->getEditGrpId()) : $account['name'];
-      $inputId = $this->getEditGrpNameInId().'_'.$account['id'];
-      $inputName = $this->getEditGrpNameInName().'_'.$account['id'];
+    while ($group = $this->DB->fetch($queryResult)) {
+      $groupName = (empty($group['name'])) ? $this->getGroupNameById($this->getEditGrpId()) : $group['name'];
+      $inputId = $this->getEditGrpNameInId().'_'.$group['group_id'];
+      $inputName = $this->getEditGrpNameInName().'_'.$group['group_id'];
 
-      $inputEditGroup = new HTMLInputText($tableListGroups->cells[$i][0],$inputName,$accountName,$this->getEditGrpNameClass(),$inputId);
+      $inputEditGroup = new HTMLInputText($tableListGroups->cells[$i][0],$inputName,$groupName,$this->getEditGrpNameClass(),$inputId);
       if ($editable) {
-        $jsEdit = "QaEditGroup('{$this->parentId}','{$inputId}','{$account['id']}');";
-        $inputEditGroup->setAttribute('onkeyup',$jsEdit);
+        $jsEdit = "QaEditGroup('{$this->parentId}','{$inputId}','{$group['group_id']}');";
         $aEditGroup = new HTMLAnchor($tableListGroups->cells[$i][1],'#','Edit');
         $aEditGroup->setAttribute('onclick',$jsEdit);
         $aDropGroup = new HTMLAnchor($tableListGroups->cells[$i][2],'#','Delete');
-        $aDropGroup->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to delete the \'".$account['name']."\' account?')) { QaDropGroup('{$this->parentId}','{$account['id']}'); }");
+        $aDropGroup->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to delete the \'".$group['name']."\' group?')) { QaDropGroup('{$this->parentId}','{$group['group_id']}'); }");
       } else {
         $inputEditGroup->setAttribute('disabled',"disabled");
       }
