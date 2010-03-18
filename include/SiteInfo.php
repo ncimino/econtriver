@@ -82,7 +82,7 @@ class SiteInfo {
   
   function setPhpIniErrors() {
     ini_set('display_errors', self::getDisplayErrors());
-    error_reporting(getErrorReporting());
+    error_reporting(self::getErrorReporting());
   }
 
   function verifyReferer() { return preg_match('/^'.Normalize::encodeFs($this->getSiteHTTP()).'/',$_SERVER['HTTP_REFERER']); }
