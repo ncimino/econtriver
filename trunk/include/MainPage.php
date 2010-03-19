@@ -15,10 +15,13 @@ class MainPage {
     $divMenu = new HTMLDiv($parentElement,self::getQaMenuClass(),self::getQaMenuId());
 
     $aManageAccounts = new HTMLAnchor($divMenu,'#','Manage Accounts');
-    $aManageAccounts->setAttribute('onclick',"QaGetAccounts('".self::getQaManageId()."');");
+    $aManageAccounts->setAttribute('onclick',"QaAccountGet('".self::getQaManageId()."');");
     new HTMLText($divMenu,' | ');
     $aManageGroups = new HTMLAnchor($divMenu,'#','Manage Groups');
-    $aManageGroups->setAttribute('onclick',"QaGetGroups('".self::getQaManageId()."');");
+    $aManageGroups->setAttribute('onclick',"QaGroupGet('".self::getQaManageId()."');");
+    new HTMLText($divMenu,' | ');
+    $aManageGroups = new HTMLAnchor($divMenu,'#','Account Sharing');
+    $aManageGroups->setAttribute('onclick',"QaSharedAccountsGet('".self::getQaManageId()."');");
 
     new HTMLDiv($parentElement,self::getQaManageClass(),self::getQaManageId());
   }

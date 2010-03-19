@@ -1,14 +1,22 @@
+/*
+ * General
+ */
+
 function QaHideMsgs() {
 	msg_class = AjaxIt('GetVar.php?var=getQaMsgsId');
 	timedHide("'"+msg_class+"'",8000);
 }
 
-function QaGetAccounts(content_id) {
+/*
+ * Accounts
+ */
+
+function QaAccountGet(content_id) {
 	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
 			+ ".php?content_id=" + content_id);
 }
 
-function QaAddAccount(content_id, name_id) {
+function QaAccountAdd(content_id, name_id) {
 	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
 			+ ".php"
 			+ "?name="
@@ -19,7 +27,7 @@ function QaAddAccount(content_id, name_id) {
 	QaHideMsgs();
 }
 
-function QaEditAccount(content_id, name_id, acct_id) {
+function QaAccountEdit(content_id, name_id, acct_id) {
 	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
 			+ ".php"
 			+ "?name="
@@ -30,18 +38,22 @@ function QaEditAccount(content_id, name_id, acct_id) {
 	QaHideMsgs();
 }
 
-function QaDropAccount(content_id, group_id) {
+function QaAccountDrop(content_id, acct_id) {
 	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
-			+ ".php" + "?group_id=" + group_id + "&content_id=" + content_id);
+			+ ".php" + "?acct_id=" + acct_id + "&content_id=" + content_id);
 	QaHideMsgs();
 }
 
-function QaGetGroups(content_id) {
+/*
+ * Groups
+ */
+
+function QaGroupGet(content_id) {
 	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
 			+ ".php?content_id=" + content_id);
 }
 
-function QaAddGroup(content_id, name_id) {
+function QaGroupAdd(content_id, name_id) {
 	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
 			+ ".php"
 			+ "?name="
@@ -52,7 +64,7 @@ function QaAddGroup(content_id, name_id) {
 	QaHideMsgs();
 }
 
-function QaEditGroup(content_id, name_id, group_id) {
+function QaGroupEdit(content_id, name_id, group_id) {
 	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
 			+ ".php"
 			+ "?name="
@@ -63,8 +75,23 @@ function QaEditGroup(content_id, name_id, group_id) {
 	QaHideMsgs();
 }
 
-function QaDropGroup(content_id, group_id) {
+function QaGroupDrop(content_id, group_id) {
 	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
 			+ ".php" + "?group_id=" + group_id + "&content_id=" + content_id);
 	QaHideMsgs();
+}
+
+function QaGroupRejoin(content_id, group_id) {
+	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
+			+ ".php" + "?group_id=" + group_id + "&content_id=" + content_id);
+	QaHideMsgs();
+}
+
+/*
+ * Shared Accounts
+ */
+
+function QaSharedAccountsGet(content_id) {
+	document.getElementById(content_id).innerHTML = AjaxIt(arguments.callee.name
+			+ ".php?content_id=" + content_id);
 }

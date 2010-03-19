@@ -44,7 +44,13 @@ class AjaxQaGroups extends AjaxQaWidget {
 
   function dropEntries($grpId) {
     if (!empty($grpId) and $this->dropGroup($grpId)) {
-      $this->infoMsg->addMessage(2,'Group was successfully deleted.');
+      $this->infoMsg->addMessage(2,'Successfully left group.');
+    }
+  }
+  
+  function rejoinEntries($grpId) {
+    if (!empty($grpId) and $this->rejoinGroup($grpId)) {
+      $this->infoMsg->addMessage(2,'Successfully joined group.');
     }
   }
 
@@ -76,10 +82,14 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
     return $this->DB->query($sql);
   }
 
+  function rejoinGroup($group_id) {
+    $sql = "UPDATE q_user_groups SET active = 1 WHERE user_id = {$this->user->getUserId()} AND group_id = {$group_id}";
+    return $this->DB->query($sql);
+  }
+  
   function updateGroup($name,$id) {
     $groupNameEscaped = Normalize::mysql($name);
     $sql = "UPDATE q_group SET name = '{$groupNameEscaped}' WHERE id = {$id};";
-    echo $sql;
     return $this->DB->query($sql);
   }
 
@@ -134,7 +144,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 
   function buildGroupsTable($parentElement,$title,$queryResult,$tableName,$editable=true) {
     new HTMLHeading($parentElement,5,$title);
-    $cols = ($editable) ? 3 : 1;
+    $cols = ($editable) ? 3 : 2;
     $tableListGroups = new Table($parentElement,$this->DB->num($queryResult),$cols,$tableName);
     $i = 0;
     while ($group = $this->DB->fetch($queryResult)) {
@@ -144,13 +154,14 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 
       $inputEditGroup = new HTMLInputText($tableListGroups->cells[$i][0],$inputName,$groupName,$this->getEditGrpNameClass(),$inputId);
       if ($editable) {
-        $jsEdit = "QaEditGroup('{$this->parentId}','{$inputId}','{$group['group_id']}');";
         $aEditGroup = new HTMLAnchor($tableListGroups->cells[$i][1],'#','Edit');
-        $aEditGroup->setAttribute('onclick',$jsEdit);
-        $aDropGroup = new HTMLAnchor($tableListGroups->cells[$i][2],'#','Delete');
-        $aDropGroup->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to delete the \'".$group['name']."\' group?')) { QaDropGroup('{$this->parentId}','{$group['group_id']}'); }");
+        $aEditGroup->setAttribute('onclick',"QaEditGroup('{$this->parentId}','{$inputId}','{$group['group_id']}');");
+        $aDropGroup = new HTMLAnchor($tableListGroups->cells[$i][2],'#','Leave');
+        $aDropGroup->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to leave the \'".$group['name']."\' group?')) { QaDropGroup('{$this->parentId}','{$group['group_id']}'); }");
       } else {
         $inputEditGroup->setAttribute('disabled',"disabled");
+        $aRejoinGroup = new HTMLAnchor($tableListGroups->cells[$i][1],'#','Join');
+        $aRejoinGroup->setAttribute('onclick',"QaRejoinGroup('{$this->parentId}','{$group['group_id']}');");
       }
       $i++;
     }
