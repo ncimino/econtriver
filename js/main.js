@@ -37,6 +37,17 @@ function enterSubmit(exec, thisevent) {
 		return true;
 }
 
+// onkeyup="enterFocus(event,2)"
+function enterFocus(event,number)
+{
+    if( event.keyCode == 13 )
+    {
+        var wow = document.getElementById(number);
+        wow.focus();
+    	
+    }        
+}
+
 // onfocus='clearField(this,"Some Value")'
 function clearField(obj, initialvalue) {
 	if (initialvalue == '')

@@ -4,10 +4,10 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
   private $sharedAccounts; // MySQL result
   private $parentId;
 
-  const createSharedAcct = 'add_SharedAcct';
+  const createSharedAcct = 'add_shared_acct';
   const editSharedAcctName = 'edit_name';
-  const sharedAcct = 'shared_SharedAccts';
-  const ownedAcct = 'owned_SharedAccts';
+  const sharedAcct = 'shared_shared_acct';
+  const ownedAcct = 'owned_shared_acct';
 
   function getCreateSharedAcctClass() { return self::createSharedAcct; }
   function getCreateSharedAcctInName() { return self::getCreateSharedAcctClass().'_name'; }
@@ -60,30 +60,30 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 
   function insertAccount($SharedAcctName) {
     $accountNameEscaped = Normalize::mysql($SharedAcctName);
-    $sql = "INSERT INTO q_SharedAcct (name,active)
+    $sql = "INSERT INTO q_acct (name,active)
 VALUES ('{$accountNameEscaped}',1);";
     return $this->DB->query($sql);
   }
 
   function insertOwner() {
-    $sql = "INSERT INTO q_owners (SharedAcct_id,owner_id)
+    $sql = "INSERT INTO q_owners (acct_id,owner_id)
 VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
     return $this->DB->query($sql);
   }
 
   function dropAccount($SharedAcctId) {
-    $sql = "UPDATE q_SharedAcct,q_owners SET active = 0 WHERE q_SharedAcct.id = {$SharedAcctId} AND SharedAcct_id = q_SharedAcct.id AND owner_id = {$this->user->getUserId()};";
+    $sql = "UPDATE q_share,q_owners SET active = 0 WHERE q_share.id = {$SharedAcctId} AND acct_id = q_share.id AND owner_id = {$this->user->getUserId()};";
     return $this->DB->query($sql);
   }
 
   function updateAccount($name,$SharedAcctId) {
     $accountNameEscaped = Normalize::mysql($name);
-    $sql = "UPDATE q_SharedAcct,q_owners SET name = '{$accountNameEscaped}' WHERE q_SharedAcct.id = {$SharedAcctId} AND SharedAcct_id = q_SharedAcct.id AND owner_id = {$this->user->getUserId()};";
+    $sql = "UPDATE q_share,q_owners SET name = '{$accountNameEscaped}' WHERE q_share.id = {$SharedAcctId} AND acct_id = q_share.id AND owner_id = {$this->user->getUserId()};";
     return $this->DB->query($sql);
   }
 
   function getAccountNameById($id) {
-    $sql = "SELECT name FROM q_SharedAcct
+    $sql = "SELECT name FROM q_share
         WHERE id = {$id};";
     $this->DB->query($sql);
     $return = $this->DB->fetch();
@@ -91,19 +91,19 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
   }
 
   function getOwnedAccounts() {
-    $sql = "SELECT * FROM q_SharedAcct,q_owners
-        WHERE q_SharedAcct.id = SharedAcct_id 
+    $sql = "SELECT * FROM q_acct,q_owners
+        WHERE q_share.id = acct_id 
           AND owner_id = {$this->user->getUserId()}
           AND active = 1;";
     $this->ownedAccounts = $this->DB->query($sql);
   }
 
   function getSharedAccounts() {
-    $sql = "SELECT * FROM q_SharedAcct,q_share,q_user_groups
-        WHERE q_share.SharedAcct_id=q_SharedAcct.id
+    $sql = "SELECT * FROM q_acct,q_share
+        WHERE acct_id=q_share.id
           AND q_user_groups.group_id=q_share.group_id
           AND q_user_groups.user_id = {$this->user->getUserId()}
-          AND q_SharedAcct.active = 1;";
+          AND q_share.active = 1;";
     $this->sharedAccounts = $this->DB->query($sql);
   }
 
@@ -111,7 +111,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
     $this->getSharedAccounts();
     $this->getOwnedAccounts();
     $fsQuickAccounts = new HTMLFieldset($this->container);
-    new HTMLLegend($fsQuickAccounts,'Account Management');
+    new HTMLLegend($fsQuickAccounts,'Account Sharing');
     $this->buildCreateAccountForm($fsQuickAccounts);
     $this->buildOwnedAccountsTable($fsQuickAccounts);
     $this->buildSharedAccountsTable($fsQuickAccounts);
