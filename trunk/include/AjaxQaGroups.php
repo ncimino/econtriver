@@ -47,7 +47,7 @@ class AjaxQaGroups extends AjaxQaWidget {
       $this->infoMsg->addMessage(2,'Successfully left group.');
     }
   }
-  
+
   function rejoinEntries($grpId) {
     if (!empty($grpId) and $this->rejoinGroup($grpId)) {
       $this->infoMsg->addMessage(2,'Successfully joined group.');
@@ -86,7 +86,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
     $sql = "UPDATE q_user_groups SET active = 1 WHERE user_id = {$this->user->getUserId()} AND group_id = {$group_id}";
     return $this->DB->query($sql);
   }
-  
+
   function updateGroup($name,$id) {
     $groupNameEscaped = Normalize::mysql($name);
     $sql = "UPDATE q_group SET name = '{$groupNameEscaped}' WHERE id = {$id};";
@@ -155,13 +155,13 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
       $inputEditGroup = new HTMLInputText($tableListGroups->cells[$i][0],$inputName,$groupName,$this->getEditGrpNameClass(),$inputId);
       if ($editable) {
         $aEditGroup = new HTMLAnchor($tableListGroups->cells[$i][1],'#','Edit');
-        $aEditGroup->setAttribute('onclick',"QaEditGroup('{$this->parentId}','{$inputId}','{$group['group_id']}');");
+        $aEditGroup->setAttribute('onclick',"QaGroupEdit('{$this->parentId}','{$inputId}','{$group['group_id']}');");
         $aDropGroup = new HTMLAnchor($tableListGroups->cells[$i][2],'#','Leave');
-        $aDropGroup->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to leave the \'".$group['name']."\' group?')) { QaDropGroup('{$this->parentId}','{$group['group_id']}'); }");
+        $aDropGroup->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to leave the \'".$group['name']."\' group?')) { QaGroupDrop('{$this->parentId}','{$group['group_id']}'); }");
       } else {
         $inputEditGroup->setAttribute('disabled',"disabled");
         $aRejoinGroup = new HTMLAnchor($tableListGroups->cells[$i][1],'#','Join');
-        $aRejoinGroup->setAttribute('onclick',"QaRejoinGroup('{$this->parentId}','{$group['group_id']}');");
+        $aRejoinGroup->setAttribute('onclick',"QaGroupRejoin('{$this->parentId}','{$group['group_id']}');");
       }
       $i++;
     }
@@ -170,9 +170,11 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
   function buildCreateGroupForm($parentElement) {
     $divAddGroup = new HTMLDiv($parentElement,$this->getCreateGrpClass());
     new HTMLHeading($divAddGroup,5,'Add Group:');
-    new HTMLInputText($divAddGroup,$this->getCreateGrpInName(),'',$this->getCreateGrpClass(),$this->getCreateGrpInId());
+    $aAddGroupInput = new HTMLInputText($divAddGroup,$this->getCreateGrpInName(),'',$this->getCreateGrpClass(),$this->getCreateGrpInId());
+    //$aAddGroupInput->setAttribute('onkeyup',"enterFocus(event,{$this->getCreateGrpLinkId()})");
     $aAddGroup = new HTMLAnchor($divAddGroup,'#','Add Group');
-    $aAddGroup->setAttribute('onclick',"QaAddGroup('{$this->parentId}','{$this->getCreateGrpInId()}');");
+    $aAddGroup->setAttribute('onclick',"QaGroupAdd('{$this->parentId}','{$this->getCreateGrpInId()}');");
+    //$aAddGroup->setAttribute('onfocus',"QaGroupAdd('{$this->parentId}','{$this->getCreateGrpInId()}');");
   }
 }
 ?>
