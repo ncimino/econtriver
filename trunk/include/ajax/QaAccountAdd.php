@@ -1,6 +1,6 @@
 <?php
 require_once '../autoload.php';
-$widget = new AjaxQaAccounts($_GET['content_id']);
-$widget->addEntries($_GET['name']);
+$widget = new AjaxQaAccounts($_POST['content_id']);
+$widget->addEntries($_POST['name']);
 $widget->buildWidget();
 ?>

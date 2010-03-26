@@ -10,7 +10,8 @@ CONSTRAINT q_share_id PRIMARY KEY(id),
 acct_id int NOT NULL,
 CONSTRAINT q_share_acct_id FOREIGN KEY (acct_id) REFERENCES q_acct(id),
 group_id int NOT NULL,
-CONSTRAINT q_share_group_id FOREIGN KEY (group_id) REFERENCES q_group(id)
+CONSTRAINT q_share_group_id FOREIGN KEY (group_id) REFERENCES q_group(id),
+active int(1) NOT NULL
 )";
 
   $db_obj->query($sql);

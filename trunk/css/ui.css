@@ -1,0 +1,9 @@
+@CHARSET "ISO-8859-1";
+
+.ui-state-hover {
+	border: 3px solid yellow;
+}
+
+.ui-state-active {
+	border: 3px solid #DD0;
+}

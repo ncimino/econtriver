@@ -1,3 +1,5 @@
+@CHARSET "ISO-8859-1";
+
 a:link, a:visited, a:hover, a:active {
     color: gray;
 }
@@ -24,6 +26,11 @@ h1, h2, h3, h4, h5, h6 {
 
 h2, h4, h6 {
     text-decoration: underline;
+}
+
+div {
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
 }
 
 div.banner_ie_limiter {
@@ -108,4 +115,8 @@ table.groups, table.owned_accounts, table.shared_accounts {
     border: #CCC 1px solid;
     padding: 4px;
     margin: 4px;
+}
+
+td.split_grp_acct_col {
+    vertical-align: top;
 }

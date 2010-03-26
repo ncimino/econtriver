@@ -59,6 +59,9 @@ class AjaxQaGroups extends AjaxQaWidget {
       return false;
     } elseif (!(Normalize::groupNames($sanitizedName,$this->infoMsg))) {
       return false;
+    } elseif ($this->getGroupByName($name)) {
+      $this->infoMsg->addMessage(0,"Group '{$name}' is already in use.");
+      return false;
     } else {
       return $sanitizedName;
     }
@@ -99,6 +102,13 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
     $this->DB->query($sql);
     $return = $this->DB->fetch();
     return $return['name'];
+  }
+  
+  function getGroupByName($name) {
+    $sql = "SELECT * FROM q_group
+        WHERE name = '{$name}';";
+    $this->DB->query($sql);
+    return $this->DB->fetch();
   }
 
   function getActiveGroups() {
