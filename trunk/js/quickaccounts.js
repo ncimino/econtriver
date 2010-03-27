@@ -65,5 +65,15 @@ function QaGroupRejoin(content_id, group_id) {
  */
 
 function QaSharedAccountsGet(content_id) {
-	AjaxIt('QaSharedAccountsGet', content_id);
+	after_load = function() {
+		$(".grp").draggable({ revert: 'invalid' });
+		$(".acct").droppable({
+			activeClass: 'ui-state-hover',
+			hoverClass: 'ui-state-active',
+			drop: function(event, ui) {
+				$(this).addClass('ui-state-highlight').find('p').html('Dropped!');
+			}
+		});
+	};
+	AjaxIt('QaSharedAccountsGet', content_id, '', '', after_load);
 }

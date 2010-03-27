@@ -2,8 +2,8 @@
 require_once '../include/autoload.php';
 
 try {
-  $db_obj = new DBCon();
-  $sql = "CREATE TABLE txn_history
+	$db_obj = new DBCon();
+	$sql = "CREATE TABLE txn_history
 (
 txn_history_id int NOT NULL AUTO_INCREMENT, 
 CONSTRAINT txn_history_id PRIMARY KEY(txn_history_id),
@@ -23,9 +23,9 @@ clear bit NOT NULL,
 amount decimal(16,2) NOT NULL,
 md5 VARCHAR(32) NOT NULL
 )";
-  $db_obj->query($sql);
-  echo "COMPLETED:<BR>\n".$sql."<BR>\n";
+	$db_obj->query($sql);
+	echo "COMPLETED:<BR>\n".$sql."<BR>\n";
 } catch (Exception $err) {
-  echo 'Caught exception: ',  $err->getMessage(), "\n";
+	echo 'Caught exception: ',  $err->getMessage(), "\n";
 }
 ?>

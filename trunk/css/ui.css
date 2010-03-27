@@ -5,5 +5,9 @@
 }
 
 .ui-state-active {
-	border: 3px solid #DD0;
+	border: 3px solid green;
+}
+
+.ui-draggable, .ui-draggable-dragging {
+	cursor:move;
 }

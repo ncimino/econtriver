@@ -10,18 +10,21 @@ ul.boxy {
 	font-size: 13px;
 	font-family: Arial, sans-serif;
 }
+
 ul.boxy li {
-	cursor:move;
+	cursor: move;
 	padding: 2px 2px;
 	border: 1px solid #ccc;
 	background-color: #eee;
 }
+
 .clickable a {
 	display: block;
 	text-decoration: none;
 	cursor: pointer;
 	cursor: hand;
 }
+
 .clickable li:hover {
 	background-color: #f6f6f6;
 }

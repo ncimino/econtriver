@@ -5,8 +5,7 @@ function submitForm(thisfield) {
 
 // onclick='hideElement(id)'
 function hideElement(id) {
-	if (document.getElementById(id))
-		document.getElementById(id).style.display = 'none';
+	$("#" + id).slideUp("fast");
 }
 
 // onclick='focus(id)'
@@ -14,16 +13,10 @@ function focus(id) {
 	document.getElementById(id).focus();
 }
 
-// <body onload='timedHide('info_messages_div',3500)'>
 var lastTimeout;
 function timedHide(id, time) {
 	clearTimeout(lastTimeout);
-	lastTimeout = setTimeout("hide(" + id + ")", time);
-	//lastTimeout = setTimeout("hideElement(" + id + ")", time);
-}
-function hide(id) {
-	//new Effect.BlindUp(id);
-	$("#"+id).slideUp("slow");
+	lastTimeout = setTimeout("hideElement(" + id + ")", time);
 }
 
 // onkeypress='return enterSubmit(this,event);'
@@ -53,11 +46,10 @@ function enterFocus(event, number) {
 }
 
 // onfocus='clearField(this,"Some Value")'
-function clearField(obj, initialvalue) {
-	if (initialvalue == '')
-		obj.value = "";
-	else if (obj.value == initialvalue)
-		obj.value = "";
+function clearField(id) {
+	$('#' + id).one("focus", function() {
+		$(this).val("");
+	});
 }
 
 // onclick='return confirmSubmit("Are you sure?")'
@@ -69,15 +61,15 @@ function confirmSubmit(msg) {
 		return false;
 }
 
-// AjaxIt('myfile.php','main_div','test=1&foo=3','acct_name');
-function AjaxIt(file, content_id, post_data, focus_id) {
+// AjaxIt('myfile.php','main_div','test=1&foo=3','acct_name',function(){});
+function AjaxIt(file, content_id, post_data, focus_id, after_load) {
 	if (post_data) {
 		post_data = "content_id=" + content_id + "&" + post_data;
 	} else {
 		post_data = "content_id=" + content_id;
 	}
 	url = "include/ajax/" + file + ".php";
-	sendPostRequest(url, content_id, post_data, focus_id);
+	sendPostRequest(url, content_id, post_data, focus_id, after_load);
 }
 
 // AjaxGetIt('myfile.php?test=2');
@@ -98,7 +90,7 @@ function sendGetRequest(url, focus_id) {
 	return req.responseText;
 }
 
-function sendPostRequest(url, content_id, post_data, focus_id) {
+function sendPostRequest(url, content_id, post_data, focus_id, after_load) {
 	var req = createXMLHTTPObject();
 	if (!req) {
 		document.getElementById(content_id).innerHTML = "An error has occured.";
@@ -110,38 +102,13 @@ function sendPostRequest(url, content_id, post_data, focus_id) {
 		if (req.status != 200 && req.status != 304) {
 			document.getElementById(content_id).innerHTML = "An error has occured.";
 			return;
-		} /*else if (req.readyState == 0) {
-			document.getElementById(content_id).innerHTML = "Prepairing to initialize request.";
-			return;
-		} else if (req.readyState == 1) {
-			document.getElementById(content_id).innerHTML = "Initialization of request completed. Prepairing to send request.";
-			return;
-		} else if (req.readyState == 2) {
-			document.getElementById(content_id).innerHTML = "Request was sent. Prepairing to process data.";
-			return;
-		} else if (req.readyState == 3) {
-			document.getElementById(content_id).innerHTML = "Data is being processed.";
-			return;
-		}*/ else if (req.readyState == 4) {
+		} else if (req.readyState == 4) {
 			document.getElementById(content_id).innerHTML = req.responseText;
 			QaHideMsgs();
 			if (focus_id)
 				focus(focus_id);
-			
-			$(function() {
-
-				$("#active_grps_div").draggable({ revert: 'invalid' });
-
-				$("input.acct_name").droppable({
-					activeClass: 'ui-state-hover',
-					hoverClass: 'ui-state-active',
-					drop: function(event, ui) {
-						$(this).addClass('ui-state-highlight').find('p').html('Dropped!');
-					}
-				});
-
-			});
-			
+			if (after_load)
+				$(after_load);
 			return;
 		}
 	};
@@ -174,4 +141,3 @@ function createXMLHTTPObject() {
 	}
 	return xmlhttp;
 }
-
