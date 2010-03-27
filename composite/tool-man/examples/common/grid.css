@@ -1,4 +1,4 @@
-.horizontalgridline, .verticalgridline {
+.horizontalgridline,.verticalgridline {
 	position: absolute;
 	font: 8pt arial;
 	color: #999;

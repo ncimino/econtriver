@@ -2,11 +2,11 @@
 require_once '../include/autoload.php';
 
 try {
-  $db_obj = new DBCon();
-  $sql = "DROP TABLE  `q_acct` ;";
-  $db_obj->query($sql);
-  echo "COMPLETED:<BR>\n".$sql."<BR>\n";
+	$db_obj = new DBCon();
+	$sql = "DROP TABLE  `q_acct` ;";
+	$db_obj->query($sql);
+	echo "COMPLETED:<BR>\n".$sql."<BR>\n";
 } catch (Exception $err) {
-  echo 'Caught exception: ',  $err->getMessage(), "\n";
+	echo 'Caught exception: ',  $err->getMessage(), "\n";
 }
 ?>

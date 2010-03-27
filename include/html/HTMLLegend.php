@@ -1,8 +1,7 @@
 <?php
 class HTMLLegend extends HTMLElement {
-  function __construct($parentElement,$value,$class=NULL,$id=NULL) {
-    parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'legend',$value);
-    $this->setClassAndId($class,$id);
-  }
+	function __construct($parentElement,$value,$id=NULL,$class=NULL) {
+		parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'legend',$value,$id,$class);
+	}
 }
 ?>

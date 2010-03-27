@@ -1,13 +1,8 @@
 <?php
 class HTMLSelect extends HTMLElement {
-  function __construct($parentElement,$name=NULL,$class=NULL,$id=NULL) {
-    parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'select','');
-    if(!empty($name)) { $this->setAttribute( 'name', $name ); }
-    if (($class===NULL) and ($id===NULL)) {
-      $this->setClassAndId($name);
-    } else {
-      $this->setClassAndId($class,$id);
-    }
-  }
+	function __construct($parentElement,$name=NULL,$id=NULL,$class=NULL) {
+		parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'select','',$id,$class);
+		if (!empty($name)) { $this->setAttribute( 'name', $name ); }
+	}
 }
 ?>
