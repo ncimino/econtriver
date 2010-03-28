@@ -102,7 +102,7 @@ class RecoverAccount {
 		$verify1 = $cipher->encrypt($this->user->getPassword());
 		$verify2 = $cipher->encrypt($this->user->getTime());
 		$recoveryLink = $this->siteInfo->getSiteHTTP().'/recover.php?recover_id='.$this->user->getUserId().'&verify1='.$verify1.'&verify2='.$verify2;
-		//echo "<a href='".$recoveryLink."' >RECOVER NOW</a>\n";
+		echo "<a href='".$recoveryLink."' >RECOVER NOW</a>\n";
 		new HTMLAnchor($email->content,$recoveryLink,'Recover My Account');
 		new HTMLParagraph($email->content,'Once you follow this link, then enter and verify a new password.  This new password will then be used to login.');
 
@@ -121,8 +121,8 @@ class RecoverAccount {
 		} else {
 			$this->user->setUserById($recoverId);
 			$cipher = new Cipher($this->siteInfo->getSalt());
-			if ($cipher->decrypt($verify1) != $this->user->getPassword()) { // Check if verify1 = user password
-				$this->infoMsg->addMessage(0,'The user verification information is incorrect. Resubmit the information. password');
+			if ($verify1 != $cipher->encrypt($this->user->getPassword())) { // Check if verify1 = user password
+				$this->infoMsg->addMessage(0,'The user verification information is incorrect. Resubmit the information.');
 				return false;
 			} else {
 				$verify2Decrypted = $cipher->decrypt($verify2);

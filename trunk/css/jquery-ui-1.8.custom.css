@@ -1384,6 +1384,10 @@ button.ui-button::-moz-focus-inner {
 	cursor: move;
 }
 
+.ui-draggable-dragging {
+	opacity: 0.75;
+}
+
 /* Slider
 ----------------------------------*/
 .ui-slider {
