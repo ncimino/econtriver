@@ -1,126 +1,131 @@
 @CHARSET "ISO-8859-1";
-
-a:link,a:visited,a:hover,a:active {
-	color: gray;
+a:link, a:visited, a:hover, a:active {
+    color: gray;
 }
 
 a {
-	border: none 0px;
+    border: none 0px;
 }
 
 body {
-	position: relative;
-	min-width: 1000px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	margin: 8px;
+    position: relative;
+    min-width: 1000px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    margin: 8px;
 }
 
-form,div,p,a,h1 {
-	margin: 0px;
-	padding: 0px;
+form, div, p, a, h1 {
+    margin: 0px;
+    padding: 0px;
 }
 
-h1,h2,h3,h4,h5,h6 {
-	color: gray;
+h1, h2, h3, h4, h5, h6 {
+    color: gray;
 }
 
-h2,h4,h6 {
-	text-decoration: underline;
+h2, h4, h6 {
+    text-decoration: underline;
 }
 
-div,input,fieldset {
-	-webkit-border-radius: 6px;
-	-moz-border-radius: 6px;
+div, input, fieldset {
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
 }
 
 div#page {
-	font-size: 13px;
+    font-size: 13px;
 }
 
 div#banner_ie_limiter {
-	width: 1000px;
-	height: 0px;
+    width: 1000px;
+    height: 0px;
 }
 
 div#banner {
-	position: relative;
-	background-color: white;
+    position: relative;
+    background-color: white;
 }
 
 div#banner_site_name {
-	position: absolute;
-	bottom: 2px;
-	right: 200px;
-	color: gray;
-	font-size: x-large;
+    position: absolute;
+    bottom: 2px;
+    right: 200px;
+    color: gray;
+    font-size: x-large;
 }
 
 #sitename_anchor {
-	text-decoration: none;
+    text-decoration: none;
 }
 
 div.info_messages {
-	border: #060 1px solid;
-	background-color: #EFE;
-	padding: 2px;
-	margin: 7px;
+    border: #060 1px solid;
+    background-color: #EFE;
+    padding: 2px;
+    margin: 7px;
 }
 
 div#login {
-	border: #DD0 1px solid;
-	background-color: #FFC;
-	padding: 2px;
+    border: #DD0 1px solid;
+    background-color: #FFC;
+    padding: 2px;
 }
 
 div#logo {
-	position: absolute;
-	background-color: white;
-	border: #DD0 1px solid;
-	padding: 2px;
-	top: -6px;
-	right: 0px;
+    position: absolute;
+    background-color: white;
+    border: #DD0 1px solid;
+    padding: 2px;
+    top: -6px;
+    right: 0px;
 }
 
 img {
-	border: 0px;
+    border: 0px;
 }
 
 .error {
-	color: #F00;
+    color: #F00;
 }
 
 .warning {
-	color: #AB1;
+    color: #AB1;
 }
 
 .info {
-	color: #008;
+    color: #008;
 }
 
 .quick_accounts_manage {
-	padding: 8px;
-	margin: 8px;
+    padding: 8px;
+    margin: 8px;
 }
 
-.quick_groups,.quick_accts,.quick_shares {
-	border: #DD0 1px solid;
-	padding: 8px;
-	margin: 8px;
+.quick_groups, .quick_accts, .quick_shares {
+    border: #DD0 1px solid;
+    padding: 8px;
+    margin: 8px;
 }
 
-.edit_name,.edit_group_name,.acct_name,.grp_name {
-	background-color: #FFE;
-	border: #DD0 1px solid;
-	padding: 4px;
-	margin: 4px;
+.edit_name, .edit_group_name, .acct, .grp {
+    background-color: #FFE;
+    border: #DD0 1px solid;
+    padding: 4px;
+    margin: 4px;
 }
 
-table.groups,table.owned_accounts,table.shared_accounts {
-	border: #CCC 1px solid;
-	padding: 4px;
-	margin: 4px;
+table.groups, table.owned_accounts, table.shared_accounts {
+    border: #CCC 1px solid;
+    padding: 4px;
+    margin: 4px;
 }
 
 td.split_grp_acct_col {
-	vertical-align:top;
+    vertical-align: top;
+}
+
+.grp {
+    background-color: #f8f8f8;
+    border: #DDD 1px solid;
+    margin-left: 16px;
 }

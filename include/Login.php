@@ -18,9 +18,9 @@ class Login {
 			$PLogin = new HTMLParagraph($FormLogin);
 			new HTMLLabel($PLogin,'Email:','email_input');
 			$value = (isset($_POST['email'])) ? $_POST['email'] : '';
-			new HTMLInputText($PLogin,'email',$value,'email','email_input');
+			new HTMLInputText($PLogin,'email',$value,'email_input');
 			new HTMLLabel($PLogin,' Password:','password_input');
-			new HTMLInputPassword($PLogin,'password');
+			new HTMLInputPassword($PLogin,'password','password_input');
 			new HTMLText($PLogin,' ');
 			new HTMLAnchor($PLogin,'javascript:submitForm(\'login_form\')','Login');
 			new HTMLText($PLogin,' - ');

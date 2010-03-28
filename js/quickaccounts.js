@@ -66,12 +66,18 @@ function QaGroupRejoin(content_id, group_id) {
 
 function QaSharedAccountsGet(content_id) {
 	after_load = function() {
-		$(".draggable*").draggable({ revert: 'invalid' });
-		$(".droppable").droppable({
-			activeClass: 'ui-state-hover',
-			hoverClass: 'ui-state-active',
-			drop: function(event, ui) {
-				$(this).addClass('ui-state-highlight').find('p').html('Dropped!');
+		$(".ui-draggable").draggable( {
+			revert : 'invalid'
+		});
+		$(".ui-droppable").droppable( {
+			activeClass : 'ui-state-hover',
+			hoverClass : 'ui-state-active',
+			drop : function(event, ui) {
+				grp_id = $(ui.draggable).attr("id").slice(6);
+				acct_id = $(this).attr("id").slice(7);
+				var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
+				AjaxIt('QaSharedAccountsAdd', content_id, post_data);
+				QaSharedAccountsGet(content_id);
 			}
 		});
 	};
