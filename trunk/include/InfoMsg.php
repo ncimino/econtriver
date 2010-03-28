@@ -27,16 +27,28 @@ class InfoMsg {
 			foreach ($this->messages as $index=>$value) {
 				if ($index != 0) { new HTMLBr($this->parentElement); }
 				if ($value['level']==-1) {
+					$this->parentElement->setAttribute('class',"ui-state-error ui-corner-all");
 					new HTMLText($this->parentElement,"This should not have occurred. Please report this problem: ");
 					new HTMLAnchor($this->parentElement,'bugs.php','Report Bug');
 					new HTMLBr($this->parentElement);
-					new HTMLSpan($this->parentElement,'Fatal Error: ','','error');
+					$icon = new HTMLSpan($this->parentElement,'','','ui-icon ui-icon-alert');
+					$icon->setAttribute('style','float: left; margin-right: .3em;');
+					new HTMLStrong($this->parentElement,' Fatal Error: ');
 				} elseif ($value['level']==0) {
-					new HTMLSpan($this->parentElement,'Error: ','','error');
+					$this->parentElement->setAttribute('class',"ui-state-error ui-corner-all");
+					$icon = new HTMLSpan($this->parentElement,'','','ui-icon ui-icon-alert');
+					$icon->setAttribute('style','float: left; margin-right: .3em;');
+					new HTMLStrong($this->parentElement,' Error: ');
 				} elseif ($value['level']==1) {
-					new HTMLSpan($this->parentElement,'Warning: ','','warning');
+					$this->parentElement->setAttribute('class',"ui-state-highlight ui-corner-all");
+					$icon = new HTMLSpan($this->parentElement,'','','ui-icon ui-icon-info');
+					$icon->setAttribute('style','float: left; margin-right: .3em;');
+					new HTMLStrong($this->parentElement,' Warning: ');
 				} elseif ($value['level']==2) {
-					new HTMLSpan($this->parentElement,'Info: ','','info');
+					$this->parentElement->setAttribute('class',"ui-state-highlight ui-corner-all");
+					$icon = new HTMLSpan($this->parentElement,'','','ui-icon ui-icon-info');
+					$icon->setAttribute('style','float: left; margin-right: .3em;');
+					new HTMLStrong($this->parentElement,' Info: ');
 				}
 				new HTMLText($this->parentElement,$value['message']." ");
 				if(!empty($value['link_text'])) { new HTMLAnchor($this->parentElement,$value['link'],$value['link_text']); }

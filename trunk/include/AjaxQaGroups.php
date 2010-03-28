@@ -139,14 +139,14 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 	function buildActiveGroupsTable($parentElement) {
 		if ($this->DB->num($this->activeGroups)>0) {
 			$divGroups = new HTMLDiv($parentElement,self::getActiveGrpClass());
-			$this->buildGroupsTable($divGroups,'Active Groups:',$this->activeGroups,'',self::getActiveGrpClass());
+			$this->buildGroupsTable($divGroups,'Active Groups:',$this->activeGroups,self::getActiveGrpClass());
 		}
 	}
 
 	function buildInactiveGroupsTable($parentElement) {
 		if ($this->DB->num($this->inactiveGroups)>0) {
 			$divGroups = new HTMLDiv($parentElement,self::getInactiveGrpClass());
-			$this->buildGroupsTable($divGroups,'Inactive Groups:',$this->inactiveGroups,'',self::getInactiveGrpClass(),false);
+			$this->buildGroupsTable($divGroups,'Inactive Groups:',$this->inactiveGroups,self::getInactiveGrpClass(),false);
 		}
 	}
 

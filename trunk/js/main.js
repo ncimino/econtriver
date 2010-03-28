@@ -75,7 +75,6 @@ function AjaxIt(file, content_id, post_data, focus_id, after_load) {
 // AjaxGetIt('myfile.php?test=2');
 function AjaxGetIt(file, focus_id) {
 	url = "include/ajax/" + file;
-	// focus_id = (focus_id) ? focus_id : false;
 	return sendGetRequest(url, focus_id);
 }
 
