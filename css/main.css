@@ -107,7 +107,7 @@ img {
     margin: 8px;
 }
 
-.edit_name, .edit_group_name, .acct, .grp {
+.edit_name, .edit_group_name, .acct {
     background-color: #FFE;
     border: #DD0 1px solid;
     padding: 4px;
@@ -124,8 +124,10 @@ td.split_grp_acct_col {
     vertical-align: top;
 }
 
-.grp {
+div.grp {
     background-color: #f8f8f8;
     border: #DDD 1px solid;
+    padding: 4px;
+    margin: 2px;
     margin-left: 16px;
 }

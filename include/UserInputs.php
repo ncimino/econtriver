@@ -11,21 +11,21 @@ class UserInputs {
 		if (empty($labelParentElement)) { $labelParentElement = $inputParentElement; }
 		if (empty($inputName)) { $inputName = $this->user->getEmailName(); }
 		if (empty($value)) { $value = $this->user->getEmail(); }
-		$inputEmail = new HTMLInputText($inputParentElement,$inputName,$value);
+		$inputEmail = new HTMLInputText($inputParentElement,$inputName,$value,$inputName.'_input');
 		$this->user->setEmailId($inputEmail->getAttribute('id'));
 		new HTMLLabel($labelParentElement,$label,$inputEmail->getAttribute('id'));
 	}
 
-	function inputPassword ($inputParentElement,$labelParentElement,$label='Password:',$inputName=NULL,$value=NULL) {
+	function inputPassword ($inputParentElement,$labelParentElement,$label='Password:',$inputName=NULL) {
 		if (empty($inputName)) { $inputName = $this->user->getPasswordName(); }
-		$inputPassword = new HTMLInputPassword($inputParentElement,$inputName,$value);
+		$inputPassword = new HTMLInputPassword($inputParentElement,$inputName,$inputName.'_input');
 		$this->user->setPasswordId($inputPassword->getAttribute('id'));
 		new HTMLLabel($labelParentElement,$label,$inputPassword->getAttribute('id'));
 	}
 
-	function inputVerPassword ($inputParentElement,$labelParentElement,$label='Verify Password:',$inputName=NULL,$value=NULL) {
+	function inputVerPassword ($inputParentElement,$labelParentElement,$label='Verify Password:',$inputName=NULL) {
 		if (empty($inputName)) { $inputName = $this->user->getVerPasswordName(); }
-		$inputVerPassword = new HTMLInputPassword($inputParentElement,$inputName,$value);
+		$inputVerPassword = new HTMLInputPassword($inputParentElement,$inputName,$inputName.'_input');
 		$this->user->setVerPasswordId($inputVerPassword->getAttribute('id'));
 		new HTMLLabel($labelParentElement,$label,$inputVerPassword->getAttribute('id'));
 	}
@@ -34,7 +34,7 @@ class UserInputs {
 		if (empty($labelParentElement)) { $labelParentElement = $inputParentElement; }
 		if (empty($inputName)) { $inputName = $this->user->getHandleName(); }
 		if (empty($value)) { $value = $this->user->getHandle(); }
-		$inputHandle = new HTMLInputText($inputParentElement,$inputName,$value);
+		$inputHandle = new HTMLInputText($inputParentElement,$inputName,$value,$inputName.'_input');
 		$this->user->setHandleId($inputHandle->getAttribute('id'));
 		new HTMLLabel($labelParentElement,$label,$inputHandle->getAttribute('id'));
 	}
@@ -42,7 +42,7 @@ class UserInputs {
 	function selectFormat ($inputParentElement,$labelParentElement,$label='Date Format:',$inputName=NULL,$value=NULL) {
 		if (empty($inputName)) { $inputName = $this->user->getDateFormatName(); }
 		if (empty($value)) { $value = $this->user->getDateFormat(); }
-		$selectFormat = new HTMLSelect($inputParentElement,$inputName);
+		$selectFormat = new HTMLSelect($inputParentElement,$inputName,$inputName.'_select');
 		$this->user->setDateFormatId($selectFormat->getAttribute('id'));
 		new HTMLLabel($labelParentElement,$label,$selectFormat->getAttribute('id'));
 		$format[0]['php'] = "Y-m-d";
@@ -58,7 +58,7 @@ class UserInputs {
 	function selectTimezone ($inputParentElement,$labelParentElement,$label='Timezone:',$inputName=NULL,$value=NULL) {
 		if (empty($inputName)) { $inputName = $this->user->getTimezoneName(); }
 		if (empty($value)) { $value = $this->user->getTimezone(); }
-		$selectTimezone = new HTMLSelect($inputParentElement,$inputName);
+		$selectTimezone = new HTMLSelect($inputParentElement,$inputName,$inputName.'_select');
 		$this->user->setTimezoneId($selectTimezone->getAttribute('id'));
 		new HTMLLabel($labelParentElement,$label,$selectTimezone->getAttribute('id'));
 		$timezone_identifiers = DateTimeZone::listIdentifiers();

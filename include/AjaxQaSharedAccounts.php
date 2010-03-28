@@ -156,7 +156,7 @@ VALUES ('{$acctId}','{$grpId}',1);";
 				$groupId = $this->getActiveGrpId().'_'.$group['group_id'];
 				$groupClass = $this->getGrpClass().' ui-draggable';
 				$shares = new HTMLDiv($tableListAccounts->cells[$i][0],$groupId,$groupClass);
-				new HTMLParagraph($shares,$group['name']);
+				new HTMLParagraph($shares,$group['name'],'',$this->getGrpClass());
 			}
 			$i++;
 		}
@@ -182,11 +182,10 @@ VALUES ('{$acctId}','{$grpId}',1);";
 		$tableListGroups = new Table($parentElement,$this->DB->num($queryResult),1);
 		$i = 0;
 		while ($group = $this->DB->fetch($queryResult)) {
-			$groupName = (empty($group['name'])) ? $this->getGroupNameById($this->getEditGrpId()) : $group['name'];
 			$inputId = $this->getActiveGrpId().'_'.$group['group_id'];
 			$inputClass = $this->getGrpClass().' ui-draggable';
 			$inputEditGroup = new HTMLDiv($tableListGroups->cells[$i][0],$inputId,$inputClass);
-			new HTMLParagraph($inputEditGroup,$groupName);
+			new HTMLParagraph($inputEditGroup,$group['name'],'',$this->getGrpClass());
 			$i++;
 		}
 	}
