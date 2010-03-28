@@ -14,11 +14,11 @@ class Login {
 			new HTMLText($DivLogin,' - ');
 			new HTMLAnchor($DivLogin,'index.php?logout=1','Logout');
 		} else {
-			$FormLogin = new HTMLForm($DivLogin,'index.php','login');
+			$FormLogin = new HTMLForm($DivLogin,'index.php','login_form','login');
 			$PLogin = new HTMLParagraph($FormLogin);
 			new HTMLLabel($PLogin,'Email:','email_input');
 			$value = (isset($_POST['email'])) ? $_POST['email'] : '';
-			new HTMLInputText($PLogin,'email',$value);
+			new HTMLInputText($PLogin,'email',$value,'email','email_input');
 			new HTMLLabel($PLogin,' Password:','password_input');
 			new HTMLInputPassword($PLogin,'password');
 			new HTMLText($PLogin,' ');

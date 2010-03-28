@@ -159,7 +159,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
 			//$inputName = $this->getEditSharedAcctNameInName().'_'.$account['id'];
 
 			//$inputEditAccount = new HTMLInputText($tableListAccounts->cells[$i][0],$inputName,$accountName,$inputId,$this->getAcctClass());
-			$inputEditAccount = new HTMLDiv($tableListAccounts->cells[$i][0],$inputId,$this->getAcctClass());
+			$inputEditAccount = new HTMLDiv($tableListAccounts->cells[$i][0],$inputId,$this->getAcctClass().' droppable');
 			new HTMLParagraph($inputEditAccount,$accountName);
 			if ($editable) {
 				/*
@@ -201,7 +201,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
 			$inputId = $this->getActiveGrpId().'_'.$group['group_id'];
 			//$inputName = $this->getEditGrpNameInName().'_'.$group['group_id'];
 
-			$inputEditGroup = new HTMLDiv($tableListGroups->cells[$i][0],$inputId,$this->getGrpClass());
+			$inputEditGroup = new HTMLDiv($tableListGroups->cells[$i][0],$inputId,$this->getGrpClass().' draggable');
 			new HTMLParagraph($inputEditGroup,$groupName);
 			if ($editable) {
 				/*
