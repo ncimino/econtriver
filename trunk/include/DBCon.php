@@ -10,12 +10,8 @@ class DBCon {
 	function __construct($connect_bool=true) {
 		if ($connect_bool)
 		{
-			//try {
 			$this->connect();
 			$this->selectDB();
-			/*} catch (Exception $err) {
-			 throw $err;
-			 }*/
 			return $this->link;
 		}else{
 			return true;

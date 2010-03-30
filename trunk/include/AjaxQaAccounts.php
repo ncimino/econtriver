@@ -97,11 +97,15 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
 	}
 
 	function getSharedAccounts() {
-		$sql = "SELECT * FROM q_acct,q_share,q_user_groups
+		$sql = "SELECT * FROM q_acct,q_share,q_user_groups,q_owners
         WHERE q_share.acct_id=q_acct.id
           AND q_user_groups.group_id=q_share.group_id
           AND q_user_groups.user_id = {$this->user->getUserId()}
-          AND q_acct.active = 1;";
+          AND q_share.active = 1
+          AND q_acct.active = 1
+          AND q_owners.acct_id = q_acct.id
+          AND q_owners.owner_id <> {$this->user->getUserId()}
+          GROUP BY q_acct.id;";
 		$this->sharedAccounts = $this->DB->query($sql);
 	}
 

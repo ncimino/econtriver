@@ -43,8 +43,17 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 		}//*/
 
 	function insertShare($acctId,$grpId) {
-		$sql = "INSERT INTO q_share (acct_id,group_id,active)
-VALUES ('{$acctId}','{$grpId}',1);";
+		$this->getShare($acctId,$grpId);
+		if ($this->DB->num() == 0) {
+			$sql = "INSERT INTO q_share (acct_id,group_id,active) VALUES ('{$acctId}','{$grpId}',1);";
+			return $this->DB->query($sql);
+		} else {
+			$this->infoMsg->addMessage(0,'This group is already associated with this account.');
+		}
+	}
+
+	function getShare($acctId,$grpId) {
+		$sql = "SELECT id FROM q_share WHERE acct_id='{$acctId}' AND group_id='{$grpId}';";
 		return $this->DB->query($sql);
 	}
 	/*
@@ -82,11 +91,15 @@ VALUES ('{$acctId}','{$grpId}',1);";
 	}
 
 	function getSharedAccounts() {
-		$sql = "SELECT * FROM q_acct,q_share,q_user_groups
+		$sql = "SELECT * FROM q_acct,q_share,q_user_groups,q_owners
         WHERE q_share.acct_id=q_acct.id
           AND q_user_groups.group_id=q_share.group_id
           AND q_user_groups.user_id = {$this->user->getUserId()}
-          AND q_share.active = 1;";
+          AND q_share.active = 1
+          AND q_acct.active = 1
+          AND q_owners.acct_id = q_acct.id
+          AND q_owners.owner_id <> {$this->user->getUserId()}
+          GROUP BY q_acct.id;";
 		$this->sharedAccounts = $this->DB->query($sql);
 	}
 
