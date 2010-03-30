@@ -76,7 +76,7 @@ function QaSharedAccountsGet(content_id) {
 				grp_id = $(ui.draggable).attr("id").slice(6);
 				acct_id = $(this).attr("id").slice(7);
 				var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
-				AjaxIt('QaSharedAccountsAdd', content_id, post_data);
+				AjaxIt('QaSharedAccountsAdd', content_id, post_data, '', after_load);
 				QaSharedAccountsGet(content_id);
 			}
 		});
