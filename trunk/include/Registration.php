@@ -42,6 +42,10 @@ class Registration {
 		$userInputs->selectTimezone($TableReg->cells[6][1],$TableReg->cells[6][0]);
 
 		new HTMLBr($parentElement);
+		new HTMLParagraph($parentElement,'We will not sell, trade, or give any of your information away.
+		You will not receive newsletter emails from us. We will send you an email to recover your account information
+		if you request it when you forget your password.');
+		new HTMLBr($parentElement);
 		new HTMLInputSubmit($parentElement,'reg_submit','Register');
 	}
 
