@@ -64,22 +64,79 @@ function QaGroupRejoin(content_id, group_id) {
  * Shared Accounts
  */
 
-function QaSharedAccountsGet(content_id) {
-	after_load = function() {
+function bindQaSaDragNDrop(content_id) {
+	return function() {
 		$(".ui-draggable").draggable( {
 			revert : 'invalid'
 		});
-		$(".ui-droppable").droppable( {
-			activeClass : 'ui-state-hover',
-			hoverClass : 'ui-state-active',
-			drop : function(event, ui) {
-				grp_id = $(ui.draggable).attr("id").slice(6);
-				acct_id = $(this).attr("id").slice(7);
-				var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
-				AjaxIt('QaSharedAccountsAdd', content_id, post_data, '', after_load);
-				QaSharedAccountsGet(content_id);
-			}
-		});
+		$(".ui-droppable").droppable(
+				{
+					activeClass : 'ui-state-hover',
+					hoverClass : 'ui-state-active',
+					drop : function(event, ui) {
+						grp_id = $(ui.draggable).attr("id").slice(6);
+						acct_id = $(this).attr("id").slice(7);
+						QaSharedAccountsAdd(content_id, grp_id, acct_id,
+								bindQaSaDragNDrop(content_id));
+					}
+				});
 	};
-	AjaxIt('QaSharedAccountsGet', content_id, '', '', after_load);
+}
+
+function QaSharedAccountsGet(content_id) {
+	AjaxIt('QaSharedAccountsGet', content_id, '', '',
+			bindQaSaDragNDrop(content_id));
+}
+
+function QaSharedAccountsAdd(content_id, grp_id, acct_id) {
+	var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
+	AjaxIt('QaSharedAccountsAdd', content_id, post_data, '',
+			bindQaSaDragNDrop(content_id));
+}
+
+function QaSharedAccountsDrop(content_id, grp_id, acct_id) {
+	var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
+	AjaxIt('QaSharedAccountsDrop', content_id, post_data, '',
+			bindQaSaDragNDrop(content_id));
+}
+
+/*
+ * Group Membership
+ */
+
+function bindQaGmDragNDrop(content_id) {
+	return function() {
+		clearField('contact');
+		$(".ui-draggable").draggable( {
+			revert : 'invalid'
+		});
+		$(".ui-droppable").droppable(
+				{
+					activeClass : 'ui-state-hover',
+					hoverClass : 'ui-state-active',
+					drop : function(event, ui) {
+						contact_id = $(ui.draggable).attr("id").slice(10);
+						grp_id = $(this).attr("id").slice(6);
+						QaSharedAccountsAdd(content_id, grp_id, acct_id,
+								bindQaGmDragNDrop(content_id));
+					}
+				});
+	};
+}
+
+function QaGroupMembersGet(content_id) {
+	AjaxIt('QaGroupMembersGet', content_id, '', '',
+			bindQaGmDragNDrop(content_id));
+}
+
+function QaGroupMembersAdd(content_id, grp_id, acct_id) {
+	var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
+	AjaxIt('QaSharedAccountsAdd', content_id, post_data, '',
+			bindQaGmDragNDrop(content_id));
+}
+
+function QaGroupMembersDrop(content_id, grp_id, acct_id) {
+	var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
+	AjaxIt('QaSharedAccountsDrop', content_id, post_data, '',
+			bindQaGmDragNDrop(content_id));
 }

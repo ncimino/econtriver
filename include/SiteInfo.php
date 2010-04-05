@@ -87,8 +87,15 @@ class SiteInfo {
 	function verifyReferer() { return preg_match('/^'.Normalize::encodeFs($this->getSiteHTTP()).'/',$_SERVER['HTTP_REFERER']); }
 
 	public function __toString() {
+		$ini_str = '';
 		foreach ($this->ini_arr as $key => $value) {
-			$ini_str .= "ini_arr[".$key."]=".$value."\n";
+			if (is_array($value)) {
+				foreach ($value as $array_key => $array_value) {
+					$ini_str .= "ini_arr[".$key."][".$array_key."]=".$array_value."\n";
+				}
+			} else {
+				$ini_str .= "ini_arr[".$key."]=".$value."\n";
+			}
 		}
 		return $ini_str;
 	}
