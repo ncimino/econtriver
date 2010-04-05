@@ -64,7 +64,7 @@ function QaGroupRejoin(content_id, group_id) {
  * Shared Accounts
  */
 
-function bindQaSaDragNDrop(content_id) {
+function bindQaSa(content_id) {
 	return function() {
 		$(".ui-draggable").draggable( {
 			revert : 'invalid'
@@ -77,7 +77,7 @@ function bindQaSaDragNDrop(content_id) {
 						grp_id = $(ui.draggable).attr("id").slice(6);
 						acct_id = $(this).attr("id").slice(7);
 						QaSharedAccountsAdd(content_id, grp_id, acct_id,
-								bindQaSaDragNDrop(content_id));
+								bindQaSa(content_id));
 					}
 				});
 	};
@@ -85,26 +85,26 @@ function bindQaSaDragNDrop(content_id) {
 
 function QaSharedAccountsGet(content_id) {
 	AjaxIt('QaSharedAccountsGet', content_id, '', '',
-			bindQaSaDragNDrop(content_id));
+			bindQaSa(content_id));
 }
 
 function QaSharedAccountsAdd(content_id, grp_id, acct_id) {
 	var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
 	AjaxIt('QaSharedAccountsAdd', content_id, post_data, '',
-			bindQaSaDragNDrop(content_id));
+			bindQaSa(content_id));
 }
 
 function QaSharedAccountsDrop(content_id, grp_id, acct_id) {
 	var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
 	AjaxIt('QaSharedAccountsDrop', content_id, post_data, '',
-			bindQaSaDragNDrop(content_id));
+			bindQaSa(content_id));
 }
 
 /*
  * Group Membership
  */
 
-function bindQaGmDragNDrop(content_id) {
+function bindQaGm(content_id) {
 	return function() {
 		clearField('contact');
 		$(".ui-draggable").draggable( {
@@ -118,7 +118,7 @@ function bindQaGmDragNDrop(content_id) {
 						contact_id = $(ui.draggable).attr("id").slice(10);
 						grp_id = $(this).attr("id").slice(6);
 						QaSharedAccountsAdd(content_id, grp_id, acct_id,
-								bindQaGmDragNDrop(content_id));
+								bindQaGm(content_id));
 					}
 				});
 	};
@@ -126,17 +126,17 @@ function bindQaGmDragNDrop(content_id) {
 
 function QaGroupMembersGet(content_id) {
 	AjaxIt('QaGroupMembersGet', content_id, '', '',
-			bindQaGmDragNDrop(content_id));
+			bindQaGm(content_id));
 }
 
 function QaGroupMembersAdd(content_id, grp_id, acct_id) {
 	var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
 	AjaxIt('QaSharedAccountsAdd', content_id, post_data, '',
-			bindQaGmDragNDrop(content_id));
+			bindQaGm(content_id));
 }
 
 function QaGroupMembersDrop(content_id, grp_id, acct_id) {
 	var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
 	AjaxIt('QaSharedAccountsDrop', content_id, post_data, '',
-			bindQaGmDragNDrop(content_id));
+			bindQaGm(content_id));
 }
