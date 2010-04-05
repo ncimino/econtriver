@@ -20,8 +20,11 @@ class MainPage {
 		$aManageGroups = new HTMLAnchor($divMenu,'#','Manage Groups');
 		$aManageGroups->setAttribute('onclick',"QaGroupGet('".self::getQaManageId()."');");
 		new HTMLText($divMenu,' | ');
-		$aManageGroups = new HTMLAnchor($divMenu,'#','Account Sharing');
-		$aManageGroups->setAttribute('onclick',"QaSharedAccountsGet('".self::getQaManageId()."');");
+		$aAccountSharing = new HTMLAnchor($divMenu,'#','Account Sharing');
+		$aAccountSharing->setAttribute('onclick',"QaSharedAccountsGet('".self::getQaManageId()."');");
+		new HTMLText($divMenu,' | ');
+		$aGroupMembership = new HTMLAnchor($divMenu,'#','Group Membership');
+		$aGroupMembership->setAttribute('onclick',"QaGroupMembersGet('".self::getQaManageId()."');");
 
 		new HTMLDiv($parentElement,self::getQaManageId(),self::getQaManageClass());
 	}

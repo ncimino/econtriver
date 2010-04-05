@@ -27,20 +27,12 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 			$this->infoMsg->addMessage(2,'Group was successfully added to Account.');
 		}
 	}
-	/*
-	 function updateEntries($name,$SharedAcctId) {
-		if (!empty($SharedAcctId) and $sanitizedName = $this->checkAccountName($name)) {
-		if ($this->updateAccount($sanitizedName,$SharedAcctId)) {
-		$this->infoMsg->addMessage(2,'Account was successfully updated.');
+
+	function dropEntries($acctId,$grpId) {
+		if ($this->dropShare($acctId,$grpId)) {
+			$this->infoMsg->addMessage(2,'Group was successfully removed from account.');
 		}
-		}
-		}//*/
-	/*
-	 function dropEntries($SharedAcctId) {
-		if (!empty($SharedAcctId) and $this->dropAccount($SharedAcctId)) {
-		$this->infoMsg->addMessage(2,'Account was successfully deleted.');
-		}
-		}//*/
+	}
 
 	function insertShare($acctId,$grpId) {
 		$this->getShare($acctId,$grpId);
@@ -56,31 +48,16 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 		$sql = "SELECT id FROM q_share WHERE acct_id='{$acctId}' AND group_id='{$grpId}';";
 		return $this->DB->query($sql);
 	}
-	/*
-	 function insertOwner() {
-		$sql = "INSERT INTO q_owners (acct_id,owner_id)
-		VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
+
+	function dropShare($acctId,$grpId) {
+		$sql = "DELETE q_share.*
+			FROM q_share,q_owners
+			WHERE q_share.acct_id = {$acctId}
+			AND q_share.group_id = {$grpId}
+			AND q_owners.acct_id = q_share.acct_id
+			AND q_owners.owner_id = {$this->user->getUserId()};";
 		return $this->DB->query($sql);
-		}//*/
-	/*
-	 function dropAccount($SharedAcctId) {
-		$sql = "UPDATE q_share,q_owners SET active = 0 WHERE q_share.id = {$SharedAcctId} AND acct_id = q_share.id AND owner_id = {$this->user->getUserId()};";
-		return $this->DB->query($sql);
-		}//*/
-	/*
-	 function updateAccount($name,$SharedAcctId) {
-		$accountNameEscaped = Normalize::mysql($name);
-		$sql = "UPDATE q_share,q_owners SET name = '{$accountNameEscaped}' WHERE q_share.id = {$SharedAcctId} AND acct_id = q_share.id AND owner_id = {$this->user->getUserId()};";
-		return $this->DB->query($sql);
-		}//*/
-	/*
-	 function getAccountNameById($id) {
-		$sql = "SELECT name FROM q_share
-		WHERE id = {$id};";
-		$this->DB->query($sql);
-		$return = $this->DB->fetch();
-		return $return['name'];
-		}//*/
+	}
 
 	function getOwnedAccounts() {
 		$sql = "SELECT * FROM q_acct,q_owners
@@ -123,7 +100,8 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 		$sql = "SELECT * FROM q_share,q_group
         WHERE q_group.id = group_id 
           AND acct_id = {$acctId}
-          AND active = 1;";
+          AND active = 1
+        ORDER BY name ASC;";
 		$this->activeShares = $this->DB->query($sql);
 	}
 
@@ -168,8 +146,12 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 			while ($group = $this->DB->fetch()) {
 				$groupId = $this->getActiveGrpId().'_'.$group['group_id'];
 				$groupClass = $this->getGrpClass().' ui-draggable';
-				$shares = new HTMLDiv($tableListAccounts->cells[$i][0],$groupId,$groupClass);
-				new HTMLParagraph($shares,$group['name'],'',$this->getGrpClass());
+				$sharesDiv = new HTMLDiv($tableListAccounts->cells[$i][0],$groupId,$groupClass);
+				$sharesP = new HTMLParagraph($sharesDiv,$group['name'],'',$this->getGrpClass());
+				$sharesA = new HTMLAnchor($sharesP,'#','','','');
+				$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('quick_accounts_manage_div','{$group['group_id']}','{$account['id']}');");
+				$sharesSpan = new HTMLSpan($sharesA,'','','ui-icon ui-icon-circle-close');
+				$sharesSpan->setStyle('float: right;');
 			}
 			$i++;
 		}
