@@ -1,6 +1,7 @@
 <?php
 class AjaxQaGroupMembers extends AjaxQaWidget {
 	private $activeGroups; // MySQL result
+	private $activeShares; // MySQL result
 	private $contacts; // MySQL result
 	private $parentId;
 
@@ -21,41 +22,42 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		}
 	}
 
-	function addEntries($acctId,$grpId) {
-		if ($this->insertShare($acctId,$grpId)) {
+	function addEntries($userId,$grpId) {
+		if ($this->insertShare($userId,$grpId)) {
 			$this->infoMsg->addMessage(2,'Group was successfully added to Account.');
 		}
 	}
 
 	function dropEntries($acctId,$grpId) {
 		if ($this->dropShare($acctId,$grpId)) {
-			$this->infoMsg->addMessage(2,'Group was successfully removed from account.');
+			$this->infoMsg->addMessage(2,'User was successfully removed from group.');
 		}
 	}
 
-	function insertShare($acctId,$grpId) {
-		$this->getShare($acctId,$grpId);
+	function insertShare($userId,$grpId) {
+		$this->getShare($userId,$grpId);
 		if ($this->DB->num() == 0) {
-			$sql = "INSERT INTO q_share (acct_id,group_id,active) VALUES ('{$acctId}','{$grpId}',1);";
+			$sql = "INSERT INTO q_user_groups (user_id,group_id,active) VALUES ('{$userId}','{$grpId}',1);";
 			return $this->DB->query($sql);
 		} else {
-			$this->infoMsg->addMessage(0,'This group is already associated with this account.');
+			$this->infoMsg->addMessage(0,'This user is already associated with this group.');
 		}
 	}
 
-	function getShare($acctId,$grpId) {
-		$sql = "SELECT id FROM q_share WHERE acct_id='{$acctId}' AND group_id='{$grpId}';";
+	function getShare($userId,$grpId) {
+		$sql = "SELECT id FROM q_user_groups WHERE user_id='{$userId}' AND group_id='{$grpId}';";
 		return $this->DB->query($sql);
 	}
 
-	function dropShare($acctId,$grpId) {
-		$sql = "DELETE q_share.*
-			FROM q_share,q_owners
-			WHERE q_share.acct_id = {$acctId}
-			AND q_share.group_id = {$grpId}
-			AND q_owners.acct_id = q_share.acct_id
-			AND q_owners.owner_id = {$this->user->getUserId()};";
-		return $this->DB->query($sql);
+	function dropShare($userId,$grpId) {
+		// This method is not currently being used.
+		// If it is implemented, then a check should be added to see if the user doing the removal is also a member - security check
+		/*
+		$sql = "UPDATE q_user_groups
+			SET active = 0
+			WHERE q_user_groups.user_id = {$userId}
+			AND q_user_groups.group_id = {$grpId};";
+		return $this->DB->query($sql);//*/
 	}
 
 	function getActiveGroups() {
@@ -100,19 +102,28 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 			$inputClass = $this->getAcctClass().' ui-droppable';
 			$inputAccount = new HTMLDiv($tableListAccounts->cells[$i][0],$inputId,$inputClass);
 			new HTMLParagraph($inputAccount,$group['name']);
-			//$this->getActiveShares($group['id']);
+			$this->getAssociatedContacts($group['id']);
 			while ($contact = $this->DB->fetch()) {
-				$groupId = $this->getActiveGrpId().'_'.$contact['id'];
+				$groupId = $this->getActiveGrpId().'_'.$contact['user_id'];
 				$groupClass = $this->getGrpClass().' ui-draggable';
 				$sharesDiv = new HTMLDiv($tableListAccounts->cells[$i][0],$groupId,$groupClass);
-				$sharesP = new HTMLParagraph($sharesDiv,$contact['name'],'',$this->getGrpClass());
+				$sharesP = new HTMLParagraph($sharesDiv,$contact['handle'],'',$this->getGrpClass());
+				/*
 				$sharesA = new HTMLAnchor($sharesP,'#','','','');
-				$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('quick_accounts_manage_div','{$contact['id']}','{$group['id']}');");
+				$sharesA->setAttribute('onclick',"QaGroupMembersDrop('quick_accounts_manage_div','{$group['id']}','{$contact['user_id']}');");
 				$sharesSpan = new HTMLSpan($sharesA,'','','ui-icon ui-icon-circle-close');
-				$sharesSpan->setStyle('float: right;');
+				$sharesSpan->setStyle('float: right;');//*/
 			}
 			$i++;
 		}
+	}
+	
+	function getAssociatedContacts($grpId) {
+		$sql = "SELECT q_user_groups.*,user.handle,user.user_id FROM q_user_groups,user
+        WHERE q_user_groups.group_id = {$grpId}
+          AND q_user_groups.user_id = user.user_id
+          AND q_user_groups.active = 1;";
+		$this->activeShares = $this->DB->query($sql);
 	}
 
 	function buildActiveContactsTable($parentElement) {
