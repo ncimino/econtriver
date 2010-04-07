@@ -122,24 +122,24 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 	function buildOwnedAccountsTable($parentElement) {
 		if ($this->DB->num($this->ownedAccounts)>0) {
 			$divOwnedAccounts = new HTMLDiv($parentElement);
-			$this->buildAccountsTable($divOwnedAccounts,'Owned Accounts:',$this->ownedAccounts);
+			$this->buildAccountsTable($divOwnedAccounts,'Owned Accounts:',$this->ownedAccounts,true);
 		}
 	}
 
 	function buildSharedAccountsTable($parentElement) {
 		if ($this->DB->num($this->sharedAccounts)>0) {
 			$divSharedAccounts = new HTMLDiv($parentElement);
-			$this->buildAccountsTable($divSharedAccounts,'Shared Accounts:',$this->sharedAccounts);
+			$this->buildAccountsTable($divSharedAccounts,'Shared Accounts:',$this->sharedAccounts,false);
 		}
 	}
 
-	function buildAccountsTable($parentElement,$title,$queryResult) {
+	function buildAccountsTable($parentElement,$title,$queryResult,$allowEditing) {
 		new HTMLHeading($parentElement,5,$title);
 		$tableListAccounts = new Table($parentElement,$this->DB->num($queryResult),1);
 		$i = 0;
 		while ($account = $this->DB->fetch($queryResult)) {
 			$inputId = $this->getSharedAcctId().'_'.$account['id'];
-			$inputClass = $this->getAcctClass().' ui-droppable';
+			$inputClass = ($allowEditing) ? $this->getAcctClass().' ui-droppable' : $this->getAcctClass();
 			$inputAccount = new HTMLDiv($tableListAccounts->cells[$i][0],$inputId,$inputClass);
 			new HTMLParagraph($inputAccount,$account['name']);
 			$this->getActiveShares($account['id']);
@@ -148,10 +148,12 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 				$groupClass = $this->getGrpClass().' ui-draggable';
 				$sharesDiv = new HTMLDiv($tableListAccounts->cells[$i][0],$groupId,$groupClass);
 				$sharesP = new HTMLParagraph($sharesDiv,$group['name'],'',$this->getGrpClass());
-				$sharesA = new HTMLAnchor($sharesP,'#','','','');
-				$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('quick_accounts_manage_div','{$group['group_id']}','{$account['id']}');");
-				$sharesSpan = new HTMLSpan($sharesA,'','','ui-icon ui-icon-circle-close');
-				$sharesSpan->setStyle('float: right;');
+				if ($allowEditing) {
+					$sharesA = new HTMLAnchor($sharesP,'#','','','');
+					$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('quick_accounts_manage_div','{$group['group_id']}','{$account['id']}');");
+					$sharesSpan = new HTMLSpan($sharesA,'','','ui-icon ui-icon-circle-close');
+					$sharesSpan->setStyle('float: right;');
+				}
 			}
 			$i++;
 		}

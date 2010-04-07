@@ -116,8 +116,8 @@ function bindQaGm(content_id) {
 					activeClass : 'ui-state-hover',
 					hoverClass : 'ui-state-active',
 					drop : function(event, ui) {
-						user_id = $(ui.draggable).attr("id").slice(6);
-						grp_id = $(this).attr("id").slice(7);
+						user_id = $(ui.draggable).attr("id").slice(10);
+						grp_id = $(this).attr("id").slice(6);
 						QaGroupMembersAdd(content_id, grp_id, user_id,
 								bindQaGm(content_id));
 					}
@@ -137,5 +137,17 @@ function QaGroupMembersAdd(content_id, grp_id, user_id) {
 function QaGroupMembersDrop(content_id, grp_id, user_id) {
 	var post_data = "grp_id=" + grp_id + "&user_id=" + user_id;
 	AjaxIt('QaGroupMembersDrop', content_id, post_data, '',
+			bindQaGm(content_id));
+}
+
+function QaContactAdd(content_id, contact_input_id) {
+	var post_data = "name=" + escape(document.getElementById(contact_input_id).value);
+	AjaxIt('QaContactAdd', content_id, post_data, '',
+			bindQaGm(content_id));
+}
+
+function QaContactDrop(content_id, user_id) {
+	var post_data = "user_id=" + user_id;
+	AjaxIt('QaContactDrop', content_id, post_data, '',
 			bindQaGm(content_id));
 }

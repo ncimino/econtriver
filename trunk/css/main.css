@@ -107,7 +107,7 @@ img {
     margin: 8px;
 }
 
-.edit_name, .edit_group_name, .acct {
+.edit_name, .edit_group_name, .acct, .contact {
     background-color: #FFE;
     border: #DD0 1px solid;
     padding: 4px;
