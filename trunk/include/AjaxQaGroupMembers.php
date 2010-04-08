@@ -10,7 +10,7 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 	function getContactClass() { return 'contact'; }
 	function getContactInputId() { return self::getContactClass(); }
 	function getContactId() { return self::getContactClass().'id'; }
-	function getGrpClass() { return 'grp'; }
+	function getGrpClass() { return 'group'; }
 	function getActiveGrpId() { return self::getGrpClass().'id'; }
 	function getInactiveGrpId() { return self::getGrpClass().'id'; }
 
@@ -31,7 +31,10 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 	}
 
 	function addContact($contactName) {
-		if ($this->insertContact($contactName)) {
+		$userId = $this->findContact($contactName);
+		if (!$userId) {
+			$this->infoMsg->addMessage(0,'User was not found.');
+		} elseif ($this->insertContact($userId)) {
 			$this->infoMsg->addMessage(2,'Contact was successfully added.');
 		} else {
 			$this->infoMsg->addMessage(0,'You are already affiliated with this contact.');
@@ -50,15 +53,11 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		}
 	}
 
-	function insertContact($contactName) {
-		if ($userId = $this->findContact($contactName)) {
-			$this->getContact($userId);
-			if ($this->DB->num() == 0) {
-				$sql = "INSERT INTO contacts (owner_id,contact_id) VALUES ('{$this->user->getUserId()}','{$userId}');";
-				return $this->DB->query($sql);
-			} else {
-				return false;
-			}
+	function insertContact($userId) {
+		$this->getContact($userId);
+		if ($this->DB->num() == 0) {
+			$sql = "INSERT INTO contacts (owner_id,contact_id) VALUES ('{$this->user->getUserId()}','{$userId}');";
+			return $this->DB->query($sql);
 		} else {
 			return false;
 		}
@@ -127,14 +126,16 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		$sql = "SELECT q_user_groups.*,user.handle FROM q_user_groups,user
         WHERE q_user_groups.group_id = {$grpId}
           AND q_user_groups.user_id = user.user_id
-          AND q_user_groups.active = 1;";
+          AND q_user_groups.active = 1
+        ORDER BY user.handle ASC;";
 		$this->activeShares = $this->DB->query($sql);
 	}
 
 	function getContacts() {
 		$sql = "SELECT contacts.*,user.handle FROM contacts,user
         WHERE contacts.owner_id = {$this->user->getUserId()}
-          AND contacts.contact_id = user.user_id;";
+          AND contacts.contact_id = user.user_id
+        ORDER BY user.handle ASC;";
 		$this->contacts = $this->DB->query($sql);
 	}
 
@@ -169,9 +170,9 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 			$this->getAssociatedContacts($group['group_id']);
 			while ($contact = $this->DB->fetch()) {
 				$contactId = $this->getContactId().'_'.$contact['user_id'];
-				$contactClass = $this->getContactClass().' ui-draggable';
+				$contactClass = $this->getContactClass().' ui-draggable sub-item';
 				$sharesDiv = new HTMLDiv($tableListAccounts->cells[$i][0],$contactId,$contactClass);
-				$sharesP = new HTMLParagraph($sharesDiv,$contact['handle'],'',$this->getGrpClass());
+				$sharesP = new HTMLParagraph($sharesDiv,$contact['handle']);
 				/*
 				 $sharesA = new HTMLAnchor($sharesP,'#','','','');
 				 $sharesA->setAttribute('onclick',"QaGroupMembersDrop('quick_accounts_manage_div','{$group['id']}','{$contact['user_id']}');");
@@ -210,8 +211,6 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		$divAddContact = new HTMLDiv($parentElement);
 		new HTMLHeading($divAddContact,5,'Add Contact:');
 		$inputAddContact = new HTMLInputText($divAddContact,'contact','Email or User name','contact');
-		//$inputAddContact->setAttribute('onfocus',"clearField('contact','Email or User name');");
-		//new HTMLScript($divAddContact,"clearField('contact','Email or User name');");
 		$aAddContact = new HTMLAnchor($divAddContact,'#','Add Contact');
 		$aAddContact->setAttribute('onclick',"QaContactAdd('{$this->parentId}','".self::getContactInputId()."');");
 	}

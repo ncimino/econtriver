@@ -31,6 +31,11 @@ function QaAccountDrop(content_id, acct_id) {
 	AjaxIt('QaAccountDrop', content_id, post_data);
 }
 
+function QaAccountRestore(content_id, acct_id) {
+	var post_data = "acct_id=" + acct_id;
+	AjaxIt('QaAccountRestore', content_id, post_data);
+}
+
 /*
  * Groups
  */
@@ -74,8 +79,8 @@ function bindQaSa(content_id) {
 					activeClass : 'ui-state-hover',
 					hoverClass : 'ui-state-active',
 					drop : function(event, ui) {
-						grp_id = $(ui.draggable).attr("id").slice(6);
-						acct_id = $(this).attr("id").slice(7);
+						grp_id = $(ui.draggable).attr("id").slice(8);
+						acct_id = $(this).attr("id").slice(10);
 						QaSharedAccountsAdd(content_id, grp_id, acct_id,
 								bindQaSa(content_id));
 					}
@@ -117,7 +122,7 @@ function bindQaGm(content_id) {
 					hoverClass : 'ui-state-active',
 					drop : function(event, ui) {
 						user_id = $(ui.draggable).attr("id").slice(10);
-						grp_id = $(this).attr("id").slice(6);
+						grp_id = $(this).attr("id").slice(8);
 						QaGroupMembersAdd(content_id, grp_id, user_id,
 								bindQaGm(content_id));
 					}

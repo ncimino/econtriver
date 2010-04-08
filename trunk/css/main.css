@@ -124,10 +124,30 @@ td.split_grp_acct_col {
     vertical-align: top;
 }
 
-div.grp {
-    background-color: #f8f8f8;
-    border: #DDD 1px solid;
+.contact {
+    background-color: #f2fff2;
+    border: #b8e8b3 1px solid;
     padding: 4px;
     margin: 2px;
-    margin-left: 16px;
+	min-width: 10em;
+}
+
+.group {
+    background-color: #f2f2ff;
+    border: #a7a7e4 1px solid;
+    padding: 4px;
+    margin: 2px;
+	min-width: 10em;
+}
+
+.account {
+    background-color: #FFE;
+    border: #DD0 1px solid;
+    padding: 4px;
+    margin: 2px;
+	min-width: 10em;
+}
+
+.sub-item {
+	margin-left: 1em;
 }
