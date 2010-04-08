@@ -8,7 +8,7 @@ class AjaxQaGroups extends AjaxQaWidget {
 	function getCreateGrpClass() { return 'add_grp'; }
 	function getCreateGrpInName() { return self::getCreateGrpClass().'_name'; }
 	function getCreateGrpInId() { return self::getCreateGrpClass().'_text'; }
-	function getEditGrpNameClass() { return 'edit_name'; }
+	function getEditGrpNameClass() { return 'group'; }
 	function getEditGrpNameInName() { return self::getEditGrpNameClass().'_name'; }
 	function getEditGrpNameInId() { return self::getEditGrpNameClass().'_text'; }
 	function getActiveGrpClass() { return 'active_grps'; }

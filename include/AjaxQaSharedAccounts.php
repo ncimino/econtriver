@@ -3,14 +3,16 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 	private $ownedAccounts; // MySQL result
 	private $sharedAccounts; // MySQL result
 	private $activeShares; // MySQL result
+	private $activeGroups; // MySQL result
+	private $contactGroups; // MySQL result
 	private $parentId;
 
 	function getSplitGroupAcctClass() { return 'split_grp_acct'; }
 
-	function getAcctClass() { return 'acct'; }
+	function getAcctClass() { return 'account'; }
 	function getSharedAcctId() { return self::getAcctClass().'id'; }
 	function getOwnedAcctId() { return self::getAcctClass().'id'; }
-	function getGrpClass() { return 'grp'; }
+	function getGrpClass() { return 'group'; }
 	function getActiveGrpId() { return self::getGrpClass().'id'; }
 	function getInactiveGrpId() { return self::getGrpClass().'id'; }
 
@@ -73,10 +75,11 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
           AND q_user_groups.group_id=q_share.group_id
           AND q_user_groups.user_id = {$this->user->getUserId()}
           AND q_share.active = 1
+          AND q_user_groups.active = 1
           AND q_acct.active = 1
           AND q_owners.acct_id = q_acct.id
           AND q_owners.owner_id <> {$this->user->getUserId()}
-          GROUP BY q_acct.id;";
+        GROUP BY q_acct.id;";
 		$this->sharedAccounts = $this->DB->query($sql);
 	}
 
@@ -88,12 +91,14 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 		$this->activeGroups = $this->DB->query($sql);
 	}
 
-	function getInactiveGroups() {
-		$sql = "SELECT * FROM q_group,q_user_groups
-        WHERE q_group.id = group_id 
-          AND user_id = {$this->user->getUserId()}
-          AND active = 0;";
-		$this->inactiveGroups = $this->DB->query($sql);
+	function getContactGroups() {
+		$sql = "SELECT * FROM contacts,q_user_groups,q_group
+        WHERE owner_id = {$this->user->getUserId()}
+          AND contact_id = q_user_groups.user_id
+          AND q_user_groups.group_id = q_group.id
+          AND q_user_groups.active = 1
+        GROUP BY q_group.id;";
+		$this->contactGroups = $this->DB->query($sql);
 	}
 
 	function getActiveShares($acctId) {
@@ -106,16 +111,17 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 	}
 
 	function buildWidget() {
+		$this->getContactGroups();
 		$this->getActiveGroups();
-		$this->getInactiveGroups();
 		$this->getSharedAccounts();
 		$this->getOwnedAccounts();
 		$fsQuickAccounts = new HTMLFieldset($this->container);
 		new HTMLLegend($fsQuickAccounts,'Account Sharing');
-		$tableSplit = new Table($fsQuickAccounts,1,2,'',self::getSplitGroupAcctClass());
+		$tableSplit = new Table($fsQuickAccounts,1,3,'',self::getSplitGroupAcctClass());
 		$this->buildOwnedAccountsTable($tableSplit->cells[0][0]);
 		$this->buildSharedAccountsTable($tableSplit->cells[0][0]);
 		$this->buildActiveGroupsTable($tableSplit->cells[0][1]);
+		$this->buildContactGroupsTable($tableSplit->cells[0][2]);
 		$this->printHTML();
 	}
 
@@ -145,9 +151,9 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 			$this->getActiveShares($account['id']);
 			while ($group = $this->DB->fetch()) {
 				$groupId = $this->getActiveGrpId().'_'.$group['group_id'];
-				$groupClass = $this->getGrpClass().' ui-draggable';
+				$groupClass = $this->getGrpClass().' ui-draggable sub-item';
 				$sharesDiv = new HTMLDiv($tableListAccounts->cells[$i][0],$groupId,$groupClass);
-				$sharesP = new HTMLParagraph($sharesDiv,$group['name'],'',$this->getGrpClass());
+				$sharesP = new HTMLParagraph($sharesDiv,$group['name']);
 				if ($allowEditing) {
 					$sharesA = new HTMLAnchor($sharesP,'#','','','');
 					$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('quick_accounts_manage_div','{$group['group_id']}','{$account['id']}');");
@@ -166,13 +172,12 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 		}
 	}
 
-	function buildInactiveGroupsTable($parentElement) {
-		if ($this->DB->num($this->inactiveGroups)>0) {
+	function buildContactGroupsTable($parentElement) {
+		if ($this->DB->num($this->contactGroups)>0) {
 			$divGroups = new HTMLDiv($parentElement);
-			$this->buildGroupsTable($divGroups,'Inactive Groups:',$this->inactiveGroups);
+			$this->buildGroupsTable($divGroups,'Contacts belong to:',$this->contactGroups);
 		}
 	}
-
 
 	function buildGroupsTable($parentElement,$title,$queryResult) {
 		new HTMLHeading($parentElement,5,$title);
@@ -182,7 +187,7 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 			$inputId = $this->getActiveGrpId().'_'.$group['group_id'];
 			$inputClass = $this->getGrpClass().' ui-draggable';
 			$inputEditGroup = new HTMLDiv($tableListGroups->cells[$i][0],$inputId,$inputClass);
-			new HTMLParagraph($inputEditGroup,$group['name'],'',$this->getGrpClass());
+			new HTMLParagraph($inputEditGroup,$group['name']);
 			$i++;
 		}
 	}
