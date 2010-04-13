@@ -5,6 +5,8 @@ class AjaxQaGroups extends AjaxQaWidget {
 	private $parentId;
 	private $grpName = '';
 
+	function getFsId() { return self::getMainClass().'_id'; }
+	function getFsCloseId() { return self::getMainClass().'_close_id'; }
 	function getCreateGrpClass() { return 'add_grp'; }
 	function getCreateGrpInName() { return self::getCreateGrpClass().'_name'; }
 	function getCreateGrpInId() { return self::getCreateGrpClass().'_text'; }
@@ -42,6 +44,12 @@ class AjaxQaGroups extends AjaxQaWidget {
 
 	function dropEntries($grpId) {
 		if (!empty($grpId) and $this->dropGroup($grpId)) {
+			$this->infoMsg->addMessage(2,'Group was successfully disabled.');
+		}
+	}
+
+	function permDropEntries($grpId) {
+		if (!empty($grpId) and $this->permDropGroup($grpId)) {
 			$this->infoMsg->addMessage(2,'Successfully left group.');
 		}
 	}
@@ -80,6 +88,37 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 
 	function dropGroup($group_id) {
 		$sql = "UPDATE q_user_groups SET active = 0 WHERE user_id = {$this->user->getUserId()} AND group_id = {$group_id}";
+		return $this->DB->query($sql);
+	}
+
+	function permDropGroup($group_id) {
+		$sql = "DELETE FROM q_user_groups WHERE user_id = {$this->user->getUserId()} AND group_id = {$group_id}";
+		$dropUserGroupResult = $this->DB->query($sql);
+		if ($this->getNumberOfGroupMembers($group_id) == 0) { // If there are no more members of the group, then remove it
+			return $this->deleteGroup($group_id);
+		} else {
+			return $dropUserGroupResult;
+		}
+	}
+
+	function getNumberOfGroupMembers($group_id) {
+		$sql = "SELECT id FROM q_user_groups WHERE group_id = {$group_id}";
+		$this->DB->query($sql);
+		return $this->DB->num();
+	}
+
+	function deleteGroup($group_id) {
+		$deleteGroupSharesResult = $this->deleteGroupShares($group_id);
+		if ($deleteGroupSharesResult) {
+			$sql = "DELETE FROM q_group WHERE id = {$group_id}";
+			return $this->DB->query($sql);
+		} else {
+			return false;
+		}
+	}
+
+	function deleteGroupShares($group_id) {
+		$sql = "DELETE FROM q_share WHERE group_id = {$group_id}";
 		return $this->DB->query($sql);
 	}
 
@@ -128,11 +167,15 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 	function buildWidget() {
 		$this->getActiveGroups();
 		$this->getInactiveGroups();
-		$fsQuickGroups = new HTMLFieldset($this->container);
-		new HTMLLegend($fsQuickGroups,'Group Management');
-		$this->buildCreateGroupForm($fsQuickGroups);
-		$this->buildActiveGroupsTable($fsQuickGroups);
-		$this->buildInactiveGroupsTable($fsQuickGroups);
+		$divQuickAccounts = new HTMLDiv($this->container,self::getFsId());
+		//new HTMLHeading($divQuickAccounts,4,'Group Management');
+		new HTMLLegend($divQuickAccounts,'Group Management');
+		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
+		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-closethick');
+		$this->buildCreateGroupForm($divQuickAccounts);
+		$this->buildActiveGroupsTable($divQuickAccounts);
+		$this->buildInactiveGroupsTable($divQuickAccounts);
 		$this->printHTML();
 	}
 
@@ -152,7 +195,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 
 	function buildGroupsTable($parentElement,$title,$queryResult,$tableName,$editable=true) {
 		new HTMLHeading($parentElement,5,$title);
-		$cols = ($editable) ? 3 : 2;
+		$cols = ($editable) ? 3 : 3;
 		$tableListGroups = new Table($parentElement,$this->DB->num($queryResult),$cols,$tableName);
 		$i = 0;
 		while ($group = $this->DB->fetch($queryResult)) {
@@ -164,12 +207,14 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 			if ($editable) {
 				$aEditGroup = new HTMLAnchor($tableListGroups->cells[$i][1],'#','Edit');
 				$aEditGroup->setAttribute('onclick',"QaGroupEdit('{$this->parentId}','{$inputId}','{$group['group_id']}');");
-				$aDropGroup = new HTMLAnchor($tableListGroups->cells[$i][2],'#','Leave');
-				$aDropGroup->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to leave the \'".$group['name']."\' group?')) { QaGroupDrop('{$this->parentId}','{$group['group_id']}'); }");
+				$aDropGroup = new HTMLAnchor($tableListGroups->cells[$i][2],'#','Disable');
+				$aDropGroup->setAttribute('onclick',"QaGroupDrop('{$this->parentId}','{$group['group_id']}')");
 			} else {
 				$inputEditGroup->setAttribute('disabled',"disabled");
 				$aRejoinGroup = new HTMLAnchor($tableListGroups->cells[$i][1],'#','Join');
 				$aRejoinGroup->setAttribute('onclick',"QaGroupRejoin('{$this->parentId}','{$group['group_id']}');");
+				$aPermDropGroup = new HTMLAnchor($tableListGroups->cells[$i][2],'#','Leave');
+				$aPermDropGroup->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to leave the \'".$group['name']."\' group?')) { QaGroupPermDrop('{$this->parentId}','{$group['group_id']}'); }");
 			}
 			$i++;
 		}

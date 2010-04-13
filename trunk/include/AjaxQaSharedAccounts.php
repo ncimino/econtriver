@@ -8,7 +8,8 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 	private $parentId;
 
 	function getSplitGroupAcctClass() { return 'split_grp_acct'; }
-
+	function getFsId() { return self::getMainClass().'_id'; }
+	function getFsCloseId() { return self::getMainClass().'_close_id'; }
 	function getAcctClass() { return 'account'; }
 	function getSharedAcctId() { return self::getAcctClass().'id'; }
 	function getOwnedAcctId() { return self::getAcctClass().'id'; }
@@ -115,9 +116,12 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 		$this->getActiveGroups();
 		$this->getSharedAccounts();
 		$this->getOwnedAccounts();
-		$fsQuickAccounts = new HTMLFieldset($this->container);
-		new HTMLLegend($fsQuickAccounts,'Account Sharing');
-		$tableSplit = new Table($fsQuickAccounts,1,3,'',self::getSplitGroupAcctClass());
+		$divQuickAccounts = new HTMLDiv($this->container,self::getFsId());
+		new HTMLLegend($divQuickAccounts,'Account Sharing');
+		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
+		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-closethick');
+		$tableSplit = new Table($divQuickAccounts,1,3,'',self::getSplitGroupAcctClass());
 		$this->buildOwnedAccountsTable($tableSplit->cells[0][0]);
 		$this->buildSharedAccountsTable($tableSplit->cells[0][0]);
 		$this->buildActiveGroupsTable($tableSplit->cells[0][1]);

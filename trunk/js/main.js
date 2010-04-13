@@ -4,8 +4,9 @@ function submitForm(thisfield) {
 }
 
 // onclick='hideElement(id)'
-function hideElement(id) {
-	$("#" + id).slideUp("fast");
+function hideElement(id,speed) {
+	if (!speed) speed = "fast";
+	$("#" + id).slideUp(speed);
 }
 
 // onclick='focus(id)'
@@ -79,29 +80,35 @@ function AjaxGetIt(file, focus_id) {
 }
 
 function sendGetRequest(url, focus_id) {
-	var req = createXMLHTTPObject();
-	if (!req)
-		return;
-	req.open("GET", url, false);
-	req.send(null);
-	if (focus_id)
-		focus(focus_id);
-	return req.responseText;
+	var returnData;
+	$.ajax( {
+		type : "GET",
+		url : url,
+		async : false,
+		success : function(data) {
+			if (focus_id)
+				focus(focus_id);
+			returnData = data;
+		}
+	});
+	return returnData;
 }
 
 function sendPostRequest(url, content_id, post_data, focus_id, after_load) {
-	$.ajax({
-		   type: "POST",
-		   url: url,
-		   data: post_data,
-		   beforeSend: function(){
-		document.getElementById(content_id).innerHTML = "Loading...";
+	$.ajax( {
+		type : "POST",
+		url : url,
+		data : post_data,
+		beforeSend : function() {
+			document.getElementById(content_id).innerHTML = "Loading...";
 		},
-		   success: function(msg){
+		success : function(msg) {
 			document.getElementById(content_id).innerHTML = msg;
-			   QaHideMsgs();
-				if (focus_id) focus(focus_id);
-				if (after_load) $(after_load);
-			   }
-		 });
+			QaHideMsgs();
+			if (focus_id)
+				focus(focus_id);
+			if (after_load)
+				$(after_load);
+		}
+	});
 }
