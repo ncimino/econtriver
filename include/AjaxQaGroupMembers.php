@@ -2,11 +2,13 @@
 class AjaxQaGroupMembers extends AjaxQaWidget {
 	private $activeGroups; // MySQL result
 	private $activeShares; // MySQL result
+	private $inactiveShares; // MySQL result
 	private $contacts; // MySQL result
 	private $parentId;
 
 	function getSplitGroupMemberClass() { return 'split_grp_acct'; }
-
+	function getFsId() { return self::getMainClass().'_id'; }
+	function getFsCloseId() { return self::getMainClass().'_close_id'; }
 	function getContactClass() { return 'contact'; }
 	function getContactInputId() { return self::getContactClass(); }
 	function getContactId() { return self::getContactClass().'id'; }
@@ -122,13 +124,22 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		$this->activeGroups = $this->DB->query($sql);
 	}
 
-	function getAssociatedContacts($grpId) {
+	function getAssociatedActiveContacts($grpId) {
 		$sql = "SELECT q_user_groups.*,user.handle FROM q_user_groups,user
         WHERE q_user_groups.group_id = {$grpId}
           AND q_user_groups.user_id = user.user_id
           AND q_user_groups.active = 1
         ORDER BY user.handle ASC;";
 		$this->activeShares = $this->DB->query($sql);
+	}
+	
+	function getAssociatedInactiveContacts($grpId) {
+		$sql = "SELECT q_user_groups.*,user.handle FROM q_user_groups,user
+        WHERE q_user_groups.group_id = {$grpId}
+          AND q_user_groups.user_id = user.user_id
+          AND q_user_groups.active = 0
+        ORDER BY user.handle ASC;";
+		$this->inactiveShares = $this->DB->query($sql);
 	}
 
 	function getContacts() {
@@ -142,9 +153,12 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 	function buildWidget() {
 		$this->getActiveGroups();
 		$this->getContacts();
-		$fsQuickAccounts = new HTMLFieldset($this->container);
-		new HTMLLegend($fsQuickAccounts,'Group Memberships');
-		$tableSplit = new Table($fsQuickAccounts,1,2,'',self::getSplitGroupMemberClass());
+		$divQuickAccounts = new HTMLDiv($this->container,self::getFsId());
+		new HTMLLegend($divQuickAccounts,'Group Memberships');
+		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
+		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-closethick');
+		$tableSplit = new Table($divQuickAccounts,1,2,'',self::getSplitGroupMemberClass());
 		$this->buildActiveGroupsTable($tableSplit->cells[0][0]);
 		$this->buildAddContactForm($tableSplit->cells[0][1]);
 		$this->buildActiveContactsTable($tableSplit->cells[0][1]);
@@ -167,7 +181,7 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 			$groupClass = $this->getGrpClass().' ui-droppable';
 			$groupAccount = new HTMLDiv($tableListAccounts->cells[$i][0],$groupId,$groupClass);
 			new HTMLParagraph($groupAccount,$group['name']);
-			$this->getAssociatedContacts($group['group_id']);
+			$this->getAssociatedActiveContacts($group['group_id']);
 			while ($contact = $this->DB->fetch()) {
 				$contactId = $this->getContactId().'_'.$contact['user_id'];
 				$contactClass = $this->getContactClass().' ui-draggable sub-item';
@@ -178,6 +192,13 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 				 $sharesA->setAttribute('onclick',"QaGroupMembersDrop('quick_accounts_manage_div','{$group['id']}','{$contact['user_id']}');");
 				 $sharesSpan = new HTMLSpan($sharesA,'','','ui-icon ui-icon-circle-close');
 				 $sharesSpan->setStyle('float: right;');//*/
+			}
+			$this->getAssociatedInactiveContacts($group['group_id']);
+			while ($contact = $this->DB->fetch()) {
+				$contactId = $this->getContactId().'_'.$contact['user_id'];
+				$contactClass = $this->getContactClass().' ui-draggable sub-item';
+				$sharesDiv = new HTMLDiv($tableListAccounts->cells[$i][0],$contactId,$contactClass);
+				$sharesP = new HTMLParagraph($sharesDiv,$contact['handle'].' (Inactive)');
 			}
 			$i++;
 		}

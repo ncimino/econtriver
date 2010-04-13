@@ -4,11 +4,14 @@ class MainPage {
 
 	const qaMenu = 'quick_accounts_menu';
 	const qaManage = 'quick_accounts_manage';
+	const qaTxn = 'quick_accounts_txn';
 
 	function getQaMenuClass() { return self::qaMenu; }
 	function getQaMenuId() { return self::getQaMenuClass().'_div'; }
 	function getQaManageClass() { return self::qaManage; }
 	function getQaManageId() { return self::getQaManageClass().'_div'; }
+	function getQaTxnClass() { return self::qaTxn; }
+	function getQaTxnId() { return self::getQaTxnClass().'_div'; }
 
 	function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
 
@@ -27,6 +30,8 @@ class MainPage {
 		$aGroupMembership->setAttribute('onclick',"QaGroupMembersGet('".self::getQaManageId()."');");
 
 		new HTMLDiv($parentElement,self::getQaManageId(),self::getQaManageClass());
+		
+		new HTMLDiv($parentElement,self::getQaTxnId(),self::getQaTxnClass());
 	}
 }
 ?>

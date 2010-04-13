@@ -6,6 +6,8 @@ class AjaxQaAccounts extends AjaxQaWidget {
 	private $parentId;
 	private $acctName = '';
 
+	function getFsId() { return self::getMainClass().'_id'; }
+	function getFsCloseId() { return self::getMainClass().'_close_id'; }
 	function getCreateAcctClass() { return 'add_acct'; }
 	function getCreateAcctInName() { return self::getCreateAcctClass().'_name'; }
 	function getCreateAcctInId() { return self::getCreateAcctClass().'_text'; }
@@ -125,7 +127,7 @@ class AjaxQaAccounts extends AjaxQaWidget {
 		        WHERE q_share.acct_id=q_acct.id
 		          AND q_user_groups.group_id=q_share.group_id
 		          AND q_user_groups.user_id = {$this->user->getUserId()}
-		          AND q_share.active = 1
+		          AND q_user_groups.active = 1
 		          AND q_acct.active = 1
 		          AND q_owners.acct_id = q_acct.id
 		          AND q_owners.owner_id <> {$this->user->getUserId()}
@@ -145,12 +147,15 @@ class AjaxQaAccounts extends AjaxQaWidget {
 		$this->getOwnedAccounts();
 		$this->getSharedAccounts();
 		$this->getDeletedAccounts();
-		$fsQuickAccounts = new HTMLFieldset($this->container);
-		new HTMLLegend($fsQuickAccounts,'Account Management');
-		$this->buildCreateAccountForm($fsQuickAccounts);
-		$this->buildOwnedAccountsTable($fsQuickAccounts);
-		$this->buildSharedAccountsTable($fsQuickAccounts);
-		$this->buildDeletedAccountsTable($fsQuickAccounts);
+		$divQuickAccounts = new HTMLDiv($this->container,self::getFsId());
+		new HTMLLegend($divQuickAccounts,'Account Management');
+		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
+		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-closethick');
+		$this->buildCreateAccountForm($divQuickAccounts);
+		$this->buildOwnedAccountsTable($divQuickAccounts);
+		$this->buildSharedAccountsTable($divQuickAccounts);
+		$this->buildDeletedAccountsTable($divQuickAccounts);
 		$this->printHTML();
 	}
 

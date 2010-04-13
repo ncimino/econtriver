@@ -18,6 +18,9 @@ class Site {
     $this->head = new Head($this->document,$this->siteInfo);
     $this->body = new Body($this->document,$this->infoMsg,$this->siteInfo,$this->user,$title);
     $this->content = $this->body->divMid;
+    if (preg_match("/Mozilla\/[1-4]{1}/",$this->user->getUserAgent())) {
+    	$this->infoMsg->addMessage(1,'You are not using an HTML 5.0 browser, which this site requires. Try upgrading to ','Google Chrome','http://www.google.com/chrome');
+    }
   }
 
   function replaceTitle($title) {
@@ -29,7 +32,7 @@ class Site {
     new HTMLHeading($this->content,4,'Welcome to '.$this->siteInfo->getName().'!');
     $content[] = "This site was created to help manage investment and account transactions.
     These account tracking pages allow you to share accounts and grant privileges to other 
-    users so that they can add, remove, and change transaction.";
+    users so that they can add, remove, and change transactions.";
 
     $content[] = "There are several ideas that I have for web applications, and as time goes
     on I will continue to build more. For now I am working on a project which will

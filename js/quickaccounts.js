@@ -60,6 +60,11 @@ function QaGroupDrop(content_id, group_id) {
 	AjaxIt('QaGroupDrop', content_id, post_data);
 }
 
+function QaGroupPermDrop(content_id, group_id) {
+	var post_data = "group_id=" + group_id;
+	AjaxIt('QaGroupPermDrop', content_id, post_data);
+}
+
 function QaGroupRejoin(content_id, group_id) {
 	var post_data = "group_id=" + group_id;
 	AjaxIt('QaGroupRejoin', content_id, post_data);
@@ -146,13 +151,26 @@ function QaGroupMembersDrop(content_id, grp_id, user_id) {
 }
 
 function QaContactAdd(content_id, contact_input_id) {
-	var post_data = "name=" + escape(document.getElementById(contact_input_id).value);
-	AjaxIt('QaContactAdd', content_id, post_data, '',
-			bindQaGm(content_id));
+	var post_data = "name="
+			+ escape(document.getElementById(contact_input_id).value);
+	AjaxIt('QaContactAdd', content_id, post_data, '', bindQaGm(content_id));
 }
 
 function QaContactDrop(content_id, user_id) {
 	var post_data = "user_id=" + user_id;
-	AjaxIt('QaContactDrop', content_id, post_data, '',
-			bindQaGm(content_id));
+	AjaxIt('QaContactDrop', content_id, post_data, '', bindQaGm(content_id));
+}
+
+/*
+ * Transactions
+ */
+
+$(document).ready(function() {
+	if ($('#quick_accounts_txn_div').length) {
+		QaTxnGet('quick_accounts_txn_div');
+	}
+});
+
+function QaTxnGet(content_id) {
+	AjaxIt('QaTxnGet', content_id);
 }

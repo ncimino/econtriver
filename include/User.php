@@ -95,6 +95,7 @@ class User {
 	public function setTimezoneId($value) { $this->currentUserIds['timezone'] = $value; }
 	public function setDateFormatId($value) { $this->currentUserIds['date_format'] = $value; }
 
+	public function getUserAgent() { return $_SERVER['HTTP_USER_AGENT']; }
 	public function getUserId() { return $this->currentUser['user_id']; }
 	public function getPassword() { return $this->currentUser['password']; }
 	public function getVerPassword() { return $this->currentUser['ver_password']; }
