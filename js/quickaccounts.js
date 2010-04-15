@@ -76,6 +76,9 @@ function QaGroupRejoin(content_id, group_id) {
 
 function bindQaSa(content_id) {
 	return function() {
+		// Refresh Txn info
+		QaTxnGet('quick_accounts_txn_div');
+		// Makes Groups dragable and Groups dropable
 		$(".ui-draggable").draggable( {
 			revert : 'invalid'
 		});

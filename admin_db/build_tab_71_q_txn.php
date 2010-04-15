@@ -7,6 +7,8 @@ try {
 (
 id int NOT NULL AUTO_INCREMENT, 
 CONSTRAINT q_txn_id PRIMARY KEY(id),
+acct_id int NOT NULL,
+CONSTRAINT q_txn_acct_id FOREIGN KEY (acct_id) REFERENCES q_acct(id),
 entered timestamp NOT NULL,
 date int NOT NULL,
 description varchar(255),
