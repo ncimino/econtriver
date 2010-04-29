@@ -4,8 +4,9 @@ function submitForm(thisfield) {
 }
 
 // onclick='hideElement(id)'
-function hideElement(id,speed) {
-	if (!speed) speed = "fast";
+function hideElement(id, speed) {
+	if (!speed)
+		speed = "fast";
 	$("#" + id).slideUp(speed);
 }
 
@@ -107,8 +108,16 @@ function sendPostRequest(url, content_id, post_data, focus_id, after_load) {
 			QaHideMsgs();
 			if (focus_id)
 				focus(focus_id);
-			if (after_load)
-				$(after_load);
+			if (after_load) {
+				if (after_load.length == 1) {
+					$(after_load);
+				} else {
+					for (i=0;i<after_load.length;i++)
+					{
+						$(after_load[i]);
+					}
+				}
+			}
 		}
 	});
 }
