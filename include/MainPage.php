@@ -17,7 +17,7 @@ class MainPage {
 
 		$divMenu = new HTMLDiv($parentElement,self::getQaMenuId(),self::getQaMenuClass());
 
-		$aManageAccounts = new HTMLAnchor($divMenu,'#','Manage Accounts');
+		$aManageAccounts = new HTMLAnchor($divMenu,'#','Manage Accounts','accounts_link');
 		$aManageAccounts->setAttribute('onclick',"QaAccountGet('".self::getQaManageId()."');");
 		new HTMLText($divMenu,' | ');
 		$aManageGroups = new HTMLAnchor($divMenu,'#','Manage Groups');
