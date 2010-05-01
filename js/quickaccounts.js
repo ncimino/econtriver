@@ -85,7 +85,7 @@ function QaGroupRejoin(content_id, group_id) {
  */
 
 function bindQaSa(content_id) {
-	return [function() {
+	return [ function() {
 		// Makes Groups draggable and Groups droppable
 			$(".ui-draggable").draggable( {
 				revert : 'invalid'
@@ -102,7 +102,7 @@ function bindQaSa(content_id) {
 						}
 					});
 			// Refresh Txn info
-		}, QaTxnGet()];
+		}, QaTxnGet() ];
 }
 
 function QaSharedAccountsGet(content_id) {
@@ -126,7 +126,7 @@ function QaSharedAccountsDrop(content_id, grp_id, acct_id) {
  */
 
 function bindQaGm(content_id) {
-	return [function() {
+	return [ function() {
 		// Clears find contact input from 'Email or User name'
 			clearField('contact');
 			// Makes Users dragable and Groups dropable
@@ -146,7 +146,7 @@ function bindQaGm(content_id) {
 					});
 		}
 		// Refresh Txn info
-		, QaTxnGet()];
+		, QaTxnGet() ];
 }
 
 function QaGroupMembersGet(content_id) {
@@ -183,6 +183,22 @@ $(document).ready(function() {
 	if ($('#quick_accounts_txn_div').length) {
 		QaTxnGet();
 	}
+
+	// Bind dateselection to datepicker
+	$(function() {
+		$('.dateselection').live('click', function() {
+			$(this).datepicker( {
+				showOn : 'focus'
+			}).focus();
+		});
+	});
+	
+	// Bind Add Txn button to QaTxnAdd
+	$(function() {
+		$('#new_txn_submit').live('click', function() {
+			QaTxnAdd();
+		});
+	});
 });
 
 function QaTxnGet(content_id) {
@@ -190,4 +206,18 @@ function QaTxnGet(content_id) {
 		content_id = 'quick_accounts_txn_div';
 	}
 	AjaxIt('QaTxnGet', content_id);
+}
+
+function QaTxnAdd(content_id) {
+	if (!content_id)
+		content_id = 'quick_accounts_txn_div';
+	var post_data = 
+			"acct=" + escape(document.getElementById('new_txn_acct').value) + 
+			"&date="	+ escape(document.getElementById('new_txn_date').value) +
+			"&type=" + escape(document.getElementById('new_txn_type').value) + 
+			"&establishment=" + escape(document.getElementById('new_txn_establishment').value) + 
+			"&note=" + escape(document.getElementById('new_txn_note').value) + 
+			"&credit=" + escape(document.getElementById('new_txn_credit').value) + 
+			"&debit=" + escape(document.getElementById('new_txn_debit').value);
+	AjaxIt('QaTxnAdd', content_id, post_data, 'new_txn_date', '');
 }

@@ -75,6 +75,11 @@ class DBCon {
 		if (empty($result)){ $result = $this->result; }
 		return mysql_fetch_array($result);
 	}
+	
+	public function resetRowPointer($result="") {
+	if (empty($result)){ $result = $this->result; }
+		mysql_data_seek($result,0);
+	}
 
 	public function setDB($database="") {
 		$this->database = $database;

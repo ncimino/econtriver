@@ -25,6 +25,12 @@ class User {
 		}
 	}
 
+	public function setSiteTimezone() {
+		if ($this->getTimezone()) {
+			date_default_timezone_set($this->getTimezone());
+		}
+	}
+	
 	public function setCookies() {
 		$this->cookies->setCookies($this->currentUser['user_id'],$this->currentUser['password']);
 	}
@@ -205,12 +211,15 @@ class User {
 			return false;
 		} elseif ($userByEmail and $userByEmail['password']==$this->getPassword()) {
 			$this->setUserByEmail();
+			$this->setSiteTimezone();
 			return true;
 		} elseif ($userByHandle and $userByHandle['password']==$this->getPassword()) {
 			$this->setUserByHandle();
+			$this->setSiteTimezone();
 			return true;
 		} elseif ($userById and $userById['password']==$this->cookies->getPassword()) {
 			$this->setUserById($this->cookies->getUserId());
+			$this->setSiteTimezone();
 			return true;
 		} else {
 			return false;
