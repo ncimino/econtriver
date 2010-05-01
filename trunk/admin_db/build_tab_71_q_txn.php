@@ -11,10 +11,11 @@ acct_id int NOT NULL,
 CONSTRAINT q_txn_acct_id FOREIGN KEY (acct_id) REFERENCES q_acct(id),
 entered timestamp NOT NULL,
 date int NOT NULL,
-description varchar(255),
+type varchar(255),
+establishment varchar(255),
+note varchar(255),
 credit decimal(38,2),
 debit decimal(38,2),
-attachment mediumblob,
 active int(1) NOT NULL
 )";
 

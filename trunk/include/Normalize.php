@@ -21,6 +21,13 @@ class Normalize {
 			return false;
 		}
 	}
+	static function validateCash($value) {
+		if (!empty($value) and preg_match('/^((\$\d*)|(\$\d*\.\d{2})|(\d*)|(\d*\.\d{2}))$/',$value)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	static function sanitize($value,$infoMsg,$siteInfo) {
 		$value = htmlentities($value);
 		if (empty($value)) {
