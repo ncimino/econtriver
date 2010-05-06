@@ -22,7 +22,7 @@ class Normalize {
 		}
 	}
 	static function validateCash($value) {
-		if (!empty($value) and preg_match('/^((\$\d*)|(\$\d*\.\d{2})|(\d*)|(\d*\.\d{2}))$/',$value)) {
+		if (preg_match('/^((\$\d*)|(\$\d*\.\d{2})|(\d*)|(\d*\.\d{2}))$/',$value)) {
 			return true;
 		} else {
 			return false;

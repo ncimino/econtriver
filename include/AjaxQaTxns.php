@@ -1,7 +1,9 @@
 <?php
 class AjaxQaTxns extends AjaxQaWidget {
 	private $activeAccounts; // MySQL result
+	private $activeTxns; // MySQL result
 	private $newTxnValues = array();
+	private $displayAcct = 0;
 
 	function __construct($parentId) {
 		parent::__construct();
@@ -31,12 +33,12 @@ class AjaxQaTxns extends AjaxQaWidget {
 				  AND q_acct.active=1 )
 				GROUP BY q_acct.id
 				ORDER BY q_acct.name ASC;";
-		$this->activeOwnedAccounts = $this->DB->query($sql);
+		$this->activeAccounts = $this->DB->query($sql);
 	}
 
 	function buildWidget() {
 		$this->getActiveAccounts();
-		if ($this->DB->num($this->activeOwnedAccounts)) {
+		if ($this->DB->num($this->activeAccounts)) {
 			$this->buildActions();
 			$this->buildTxnsTable();
 		} else {
@@ -48,7 +50,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 	function buildActions() {
 		$divActions = new HTMLDiv($this->container,'txn_actions_id','txn_actions');
 		$selectAcct = new HTMLSelect($divActions,'show_acct','show_acct_id');
-		new HTMLOption($selectAcct,'All Accounts','0');
+		new HTMLOption($selectAcct,'All Accounts',0);
 		while($result = $this->DB->fetch($this->activeAccounts)) {
 			new HTMLOption($selectAcct,$result['name'],$result['id']);
 		}
@@ -56,7 +58,9 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function buildTxnsTable() {
 		$divNew = new HTMLDiv($this->container,'txn_id','txn');
-		$tableTxn = new Table($divNew,3,12,'txn_table','txn');
+		$this->getTxns();
+		$rows = $this->DB->num($this->activeTxns) + 2;
+		$tableTxn = new Table($divNew,$rows,12,'txn_table','txn');
 		$this->buildTxnTitles($tableTxn,0);
 		$this->buildNewTxns($tableTxn,1);
 		$this->buildTxns($tableTxn,2);
@@ -103,7 +107,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'new_txn_acct','new_txn_acct');
 		$this->DB->resetRowPointer($this->activeAccounts);
 		while($result = $this->DB->fetch($this->activeAccounts)) {
-			$selected = ($this->newTxnValues['acct'] = '10') ? TRUE : FALSE; // Will select currently shown account
+			$selected = ($this->newTxnValues['acct'] = $this->displayAcct) ? TRUE : FALSE; // Will select currently shown account
 			new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
 		}
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
@@ -121,7 +125,97 @@ class AjaxQaTxns extends AjaxQaWidget {
 	}
 
 	function buildTxns($tableTxn,$row) {
-		new HTMLText($tableTxn->cells[$row][0],'test');
+		if ($this->activeTxns) {
+			while($txn = $this->DB->fetch($this->activeTxns)) {
+				$col = 0;
+				$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'txn_acct','txn_acct');
+				$this->DB->resetRowPointer($this->activeAccounts);
+				while($result = $this->DB->fetch($this->activeAccounts)) {
+					$selected = ($txn['acct_id'] == $result['id']) ? TRUE : FALSE; // Will select currently shown account
+					new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
+				}
+				new HTMLText($tableTxn->cells[$row][$col++],$txn['handle']);
+				new HTMLText($tableTxn->cells[$row][$col++],date($this->user->getDateFormat(),strtotime($txn['entered'])));
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_date',date($this->user->getDateFormat(),$txn['date']),'txn_date','dateselection');
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_type',$txn['type'],'txn_type');
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_establishment',$txn['establishment'],'txn_establishment');
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_note',$txn['note'],'txn_note');
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_credit',$txn['credit'],'txn_credit');
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_debit',$txn['debit'],'txn_debit');
+				/*
+				new HTMLText($tableTxn->cells[$row][$col++],'-');
+				new HTMLText($tableTxn->cells[$row][$col++],'-');
+				$submitNew = new HTMLAnchor($tableTxn->cells[$row][$col++],'#','','txn_add');
+				new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick');
+				*/
+				$row++;
+			}
+		} else {
+			$this->infoMsg->addMessage(-1,'There was a problem retrieving the transaction data.');
+		}
+	}
+
+	function getTxns() {
+		if ($this->displayAcct) {
+			$sql = "SELECT q_txn.*,user.handle FROM q_txn,q_owners,q_user_groups,q_share,q_acct,user
+					WHERE ( 
+						  q_txn.acct_id = q_share.acct_id
+					  AND q_acct.id = {$this->displayAcct}
+					  AND q_user_groups.group_id = q_share.group_id
+					  AND q_user_groups.user_id = user.user_id
+					  AND q_txn.user_id = q_user_groups.user_id
+					  AND q_share.acct_id = q_acct.id
+					  AND q_user_groups.active = 1 
+					  AND q_acct.active = 1 
+					  AND q_user_groups.active = 1  
+					  ) OR (
+					  	  q_txn.acct_id = q_owners.acct_id
+					  AND q_owners.owner_id = {$this->user->getUserId()}
+					  AND q_owners.owner_id = user.user_id
+					  AND q_acct.active = 1
+					  )
+					GROUP BY q_txn.id
+					ORDER BY q_txn.date DESC;";
+			return $this->activeTxns = $this->DB->query($sql);
+		} else {
+			// This is not returning the correct users
+			$sql = "SELECT q_txn.*,user.handle FROM q_txn,q_owners,q_user_groups,q_share,q_acct,user
+					WHERE ( 
+						  q_txn.acct_id = q_share.acct_id
+					  AND q_user_groups.group_id = q_share.group_id
+					  AND q_user_groups.user_id = user.user_id
+					  AND q_txn.user_id = q_user_groups.user_id
+					  AND q_share.acct_id = q_acct.id
+					  AND q_user_groups.active = 1 
+					  AND q_acct.active = 1 
+					  AND q_user_groups.active = 1 
+					  ) OR (
+					  	  q_txn.acct_id = q_owners.acct_id
+					  AND q_owners.owner_id = {$this->user->getUserId()}
+					  AND q_owners.owner_id = user.user_id
+					  AND q_acct.active = 1
+					  )
+					GROUP BY q_txn.id
+					ORDER BY q_txn.date DESC;";
+			echo $sql;
+			return $this->activeTxns = $this->DB->query($sql);
+		}
+	}
+
+	function insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit) {
+		if (!empty($credit) and !empty($debit)) {
+			$this->infoMsg->addMessage(-1,'Credit and debit have values, this transaction cannot be added.');
+			return false;
+		} elseif (empty($credit) and empty($debit)) {
+			$this->infoMsg->addMessage(-1,'Credit and debit do not have values, this transaction cannot be added.');
+			return false;
+		} else {
+			$txn_type = (!empty($credit)) ? 'credit' : 'debit';
+			$value = (!empty($credit)) ? $credit : $debit;
+			$sql = "INSERT INTO q_txn (acct_id,user_id,date,type,establishment,note,$txn_type,active)
+				VALUES ($acct,$user_id,$date,'$type','$establishment','$note',$value,1);";
+			return $this->DB->query($sql);
+		}
 	}
 
 	function addEntries($acct,$date,$type,$establishment,$note,$credit,$debit) {
@@ -129,6 +223,8 @@ class AjaxQaTxns extends AjaxQaWidget {
 			$date = strtotime($date);
 			if ($this->insertTxn($acct,$this->user->getUserId(),$date,$type,$establishment,$note,$credit,$debit)) {
 				$this->infoMsg->addMessage(2,'Transaction was successfully added.');
+			} else {
+				$this->infoMsg->addMessage(-1,'An error occured while trying to add the transaction.');
 			}
 		} else {
 			$this->newTxnValues['acct'] = $acct;
@@ -143,10 +239,17 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function validateNewTxn($date,$credit,$debit) {
 		if (!strtotime($date)) {
-			$this->infoMsg->addMessage(2,'Date was incorrectly formatted.');
+			$this->infoMsg->addMessage(0,'Date was incorrectly formatted.');
+			return FALSE;
+		} elseif (empty($credit) and empty($debit)) {
+			$this->infoMsg->addMessage(0,'Credit or Debit require a value.');
+			return FALSE;
+		} elseif (!empty($credit) and !empty($debit)) {
+			$this->infoMsg->addMessage(0,'Credit and Debit cannot both have values.');
 			return FALSE;
 		} elseif (!(Normalize::validateCash($credit) and Normalize::validateCash($debit))) {
-			$this->infoMsg->addMessage(2,'Credit and Debit values are invalid.');
+			$txnType = (!empty($credit)) ? 'Credit' : 'Debit';
+			$this->infoMsg->addMessage(0,$txnType.' value is invalid.');
 			return FALSE;
 		} else {
 			return TRUE;
