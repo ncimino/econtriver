@@ -40,7 +40,7 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 	function insertShare($acctId,$grpId) {
 		$this->getShare($acctId,$grpId);
 		if ($this->DB->num() == 0) {
-			$sql = "INSERT INTO q_share (acct_id,group_id,active) VALUES ('{$acctId}','{$grpId}',1);";
+			$sql = "INSERT INTO q_share (acct_id,group_id) VALUES ('{$acctId}','{$grpId}');";
 			return $this->DB->query($sql);
 		} else {
 			$this->infoMsg->addMessage(0,'This group is already associated with this account.');
@@ -75,7 +75,6 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
         WHERE q_share.acct_id=q_acct.id
           AND q_user_groups.group_id=q_share.group_id
           AND q_user_groups.user_id = {$this->user->getUserId()}
-          AND q_share.active = 1
           AND q_user_groups.active = 1
           AND q_acct.active = 1
           AND q_owners.acct_id = q_acct.id
@@ -106,7 +105,6 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 		$sql = "SELECT * FROM q_share,q_group
         WHERE q_group.id = group_id 
           AND acct_id = {$acctId}
-          AND active = 1
         ORDER BY name ASC;";
 		$this->activeShares = $this->DB->query($sql);
 	}
