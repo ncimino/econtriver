@@ -168,6 +168,10 @@ td.split_grp_acct_col {
     right: 0.5em;
 }
 
+table.txn {
+	border: solid #DD0 1px;
+}
+
 .txn {
     border-collapse: collapse;
 }
@@ -178,6 +182,30 @@ td.split_grp_acct_col {
 
 .txn_actions {
     margin-bottom: 1em;
+}
+
+tr.txn_row:nth-child(odd) {
+	background-color:#eee; 
+}
+
+tr#txn_table_1 {
+	background-color: #FFC;
+}
+
+.txn_input {
+	border: 0px hidden;
+	background-color: rgba(255,255,255,0);
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	/*display:block;
+	min-width: 1em;*/
+}
+
+a.txn_title:link, a.txn_title:visited, a.txn_title:hover, a.txn_title:active {
+    color: black;
+}
+
+.non_editable {
+	color: gray;
 }
 
 /*
