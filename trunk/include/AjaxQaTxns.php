@@ -4,11 +4,11 @@ class AjaxQaTxns extends AjaxQaWidget {
 	private $activeTxns; // MySQL result
 	private $activeTxnsSum = 0; // MySQL result
 	private $newTxnValues = array();
-	private $displayAcct = 0;
 	private $sortDir = 'DESC';
 	private $sortField = 'q_txn.date';
+	private $showAcct = 0;
 
-	function __construct($parentId,$sortId=NULL,$sortDir=NULL) {
+	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$showAcct=NULL) {
 		parent::__construct();
 		$this->parentId = $parentId;
 		if (!$this->user->verifyUser()) {
@@ -16,12 +16,27 @@ class AjaxQaTxns extends AjaxQaWidget {
 		} else {
 			if (isset($sortDir)) $this->sortDir = $sortDir;
 			if (isset($sortId)) $this->sortField = $this->convIdToField($sortId);
+			if (isset($showAcct)) $this->setShowAcct($showAcct);
+			else $this->getShowAcct();
+			$this->newTxnValues['acct'] = 0;
 			$this->newTxnValues['date'] = date($this->user->getDateFormat(),$this->user->getTime());
 			$this->newTxnValues['type'] = '';
 			$this->newTxnValues['establishment'] = '';
 			$this->newTxnValues['note'] = '';
 			$this->newTxnValues['credit'] = '';
 			$this->newTxnValues['debit'] = '';
+		}
+	}
+
+	function setShowAcct($acct_id) {
+		if (QaSettings::setSetting('show_acct',$this->user->getUserId(),$acct_id,$this->DB)) {
+			$this->showAcct = $acct_id;
+		}
+	}
+
+	function getShowAcct() {
+		if ($acct_id = QaSettings::getSetting('show_acct',$this->user->getUserId(),$this->DB)) {
+			$this->showAcct = $acct_id;
 		}
 	}
 
@@ -54,10 +69,11 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function buildActions() {
 		$divActions = new HTMLDiv($this->container,'txn_actions_id','txn_actions');
-		$selectAcct = new HTMLSelect($divActions,'show_acct','show_acct_id');
+		$selectAcct = new HTMLSelect($divActions,'show_acct','show_acct');
 		new HTMLOption($selectAcct,'All Accounts',0);
 		while($result = $this->DB->fetch($this->activeAccounts)) {
-			new HTMLOption($selectAcct,$result['name'],$result['id']);
+			$selected = ($result['id'] == $this->showAcct) ? TRUE : FALSE;
+			new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
 		}
 	}
 
@@ -127,10 +143,11 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function buildNewTxns($tableTxn,$row) {
 		$col = 0;
-		$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'new_txn_acct','new_txn_acct');
+		$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'new_txn_acct','new_txn_acct','txn_input');
 		$this->DB->resetRowPointer($this->activeAccounts);
+		$selectedAcct = ($this->newTxnValues['acct']) ? $this->newTxnValues['acct'] : $this->showAcct;
 		while($result = $this->DB->fetch($this->activeAccounts)) {
-			$selected = ($this->newTxnValues['acct'] = $this->displayAcct) ? TRUE : FALSE; // Will select currently shown account
+			$selected = ($selectedAcct == $result['id']) ? TRUE : FALSE; // Will select currently shown account
 			new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
 		}
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
@@ -139,8 +156,8 @@ class AjaxQaTxns extends AjaxQaWidget {
 		new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_type',$this->newTxnValues['type'],'new_txn_type','txn_input');
 		new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_establishment',$this->newTxnValues['establishment'],'new_txn_establishment','txn_input');
 		new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_note',$this->newTxnValues['note'],'new_txn_note','txn_input');
-		new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_credit',$this->newTxnValues['credit'],'new_txn_credit','txn_input');
-		new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_debit',$this->newTxnValues['debit'],'new_txn_debit','txn_input');
+		new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_credit',$this->newTxnValues['credit'],'new_txn_credit','txn_input credit');
+		new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_debit',$this->newTxnValues['debit'],'new_txn_debit','txn_input debit');
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
 		$submitNew = new HTMLAnchor($tableTxn->cells[$row][$col++],'#','','txn_add');
@@ -153,23 +170,31 @@ class AjaxQaTxns extends AjaxQaWidget {
 			echo $this->activeTxnsSum;
 			while($txn = $this->DB->fetch($this->activeTxns)) {
 				$col = 0;
-				$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'txn_acct','txn_acct');
+				$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'txn_acct_'.$txn['id'],'txn_acct_'.$row,'txn_input txn_acct_select');
 				$this->DB->resetRowPointer($this->activeAccounts);
 				while($result = $this->DB->fetch($this->activeAccounts)) {
 					$selected = ($txn['acct_id'] == $result['id']) ? TRUE : FALSE;
 					new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
 				}
+				//*
 				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable');
 				new HTMLText($tableTxn->cells[$row][$col++],$txn['handle']);
-				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable');
+				//*/
+				/*
+				$handle = new HTMLInputText($tableTxn->cells[$row][$col++],'txn_handle_'.$txn['id'],$txn['handle'],'txn_handle_'.$txn['id'],'non_editable txn_input');
+				$handle->setAttribute('disabled','disabled');
+				//*/
+				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable number');
 				new HTMLText($tableTxn->cells[$row][$col++],date($this->user->getDateFormat(),strtotime($txn['entered'])));
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_date',date($this->user->getDateFormat(),$txn['date']),'txn_date','dateselection txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_type',$txn['type'],'txn_type','txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_establishment',$txn['establishment'],'txn_establishment','txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_note',$txn['note'],'txn_note','txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_credit',$txn['credit'],'txn_credit','txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_debit',$txn['debit'],'txn_debit','txn_input');
-				new HTMLText($tableTxn->cells[$row][$col++],$currentBalance);
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_date_'.$txn['id'],date($this->user->getDateFormat(),$txn['date']),'txn_date_'.$txn['id'],'dateselection txn_input number');
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_type_'.$txn['id'],$txn['type'],'txn_type_'.$txn['id'],'txn_input');
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_establishment_'.$txn['id'],$txn['establishment'],'txn_establishment_'.$txn['id'],'txn_input');
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_note_'.$txn['id'],$txn['note'],'txn_note_'.$txn['id'],'txn_input');
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_credit_'.$txn['id'],$txn['credit'],'txn_credit_'.$txn['id'],'txn_input number credit');
+				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_debit_'.$txn['id'],$txn['debit'],'txn_debit_'.$txn['id'],'txn_input number debit');
+				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' number');
+				new HTMLText($tableTxn->cells[$row][$col++],number_format(round($currentBalance,2),2));
+				
 				$currentBalance = $currentBalance + $txn['debit'] - $txn['credit'];
 				/*
 				 new HTMLText($tableTxn->cells[$row][$col++],'-');
@@ -193,7 +218,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 					ORDER BY {$this->sortField} {$this->sortDir};";
 		return $this->activeTxns = $this->DB->query($sql);
 	}
-	
+
 	function getTxnsSum() {
 		return $this->activeTxnsSum = $this->getCreditSum() - $this->getDebitSum();
 	}
@@ -206,7 +231,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 		echo 'credit:'.$result['total'];
 		return $result['total'];
 	}
-	
+
 	function getDebitSum() {
 		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
 					WHERE ({$this->getSqlAcctsToShow()})
@@ -217,8 +242,8 @@ class AjaxQaTxns extends AjaxQaWidget {
 	}
 
 	function getSqlAcctsToShow() {
-		if ($this->displayAcct) {
-			$acctsToShow = "q_txn.acct_id = ".$this->displayAcct;
+		if ($this->showAcct) {
+			$acctsToShow = "q_txn.acct_id = ".$this->showAcct;
 		} else {
 			$i = 0;
 			$this->DB->resetRowPointer($this->activeAccounts);

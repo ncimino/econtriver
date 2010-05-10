@@ -169,7 +169,7 @@ td.split_grp_acct_col {
 }
 
 table.txn {
-	border: solid #DD0 1px;
+    border: solid #DD0 1px;
 }
 
 .txn {
@@ -178,26 +178,41 @@ table.txn {
 
 .txn_col {
     border-left: dotted black 1px;
+    padding: 0px;
 }
 
 .txn_actions {
     margin-bottom: 1em;
 }
 
+.number {
+    text-align: right;
+}
+
+.txn_acct_select:nth-child(odd) {
+	background-color:#eee; 
+}
+	
 tr.txn_row:nth-child(odd) {
 	background-color:#eee; 
 }
 
-tr#txn_table_1 {
+tr#txn_table_1, #new_txn_acct {
 	background-color: #FFC;
 }
 
 .txn_input {
 	border: 0px hidden;
+	margin: 0px;
+	padding: 0px;
 	background-color: rgba(255,255,255,0);
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	/*display:block;
-	min-width: 1em;*/
+	min-width: 1em;/**/
+}
+
+.credit, .debit {
+	width: 5em;
 }
 
 a.txn_title:link, a.txn_title:visited, a.txn_title:hover, a.txn_title:active {

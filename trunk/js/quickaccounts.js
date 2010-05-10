@@ -178,7 +178,7 @@ function QaContactDrop(content_id, user_id) {
 /*
  * Transactions
  */
-
+var sort_by_id;
 $(document).ready(function() {
 	if ($('#quick_accounts_txn_div').length) {
 		QaTxnGet();
@@ -203,27 +203,45 @@ $(document).ready(function() {
 		// Bind Sort Txns link to QaTxnSort
 		$(function() {
 			$('.txn_title').live('click', function() {
-				QaTxnGet('quick_accounts_txn_div', this.id);
+				sort_by_id = this.id;
+				QaTxnGet('quick_accounts_txn_div', this.id, 1);
+			});
+		});
+
+		// Bind Show Acct dropdown to QaTxnShow
+		$(function() {
+			$('#show_acct').live('change',function() {
+				QaTxnGet('quick_accounts_txn_div', sort_by_id, 0,
+						this.value);
 			});
 		});
 	});
 
-function QaTxnGet(content_id, sort_id) {
+function QaTxnGet(content_id, sort_id, change_dir, show_acct) {
 	if (!content_id) {
 		content_id = 'quick_accounts_txn_div';
 	}
 	if (sort_id) {
 		if (document.getElementById(sort_id + '_DESC')) {
-			sort_dir = 'ASC';
+			if (change_dir == 1)
+				sort_dir = 'ASC';
+			else
+				sort_dir = 'DESC';
 		} else {
-			sort_dir = 'DESC';
+			if (change_dir == 1)
+				sort_dir = 'DESC';
+			else
+				sort_dir = 'ASC';
 		}
 		var post_data = "sort_id=" + escape(sort_id) + "&sort_dir="
 				+ escape(sort_dir);
-		AjaxIt('QaTxnGet', content_id, post_data);
+		if (show_acct || show_acct == 0)
+			var post_data = post_data + "&show_acct=" + escape(show_acct);
 	} else {
-		AjaxIt('QaTxnGet', content_id);
+		if (show_acct || show_acct == 0)
+			var post_data = "show_acct=" + escape(show_acct);
 	}
+	AjaxIt('QaTxnGet', content_id, post_data);
 }
 
 function QaTxnAdd(content_id) {
