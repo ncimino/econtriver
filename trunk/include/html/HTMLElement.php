@@ -25,6 +25,7 @@ class HTMLElement {
 	function appendChild($parentDOMElement) { return $parentDOMElement->appendChild( $this->HTMLElement ); }
 	function remove() { return $this->HTMLElement->parentNode->removeChild( $this->HTMLElement ); }
 	function replaceData($data) { $this->HTMLElement->replaceData( 0, $this->HTMLElement->length, $data ); }
+	function removeAttribute($name) { $this->HTMLElement->removeAttribute( $name ); }
 	/*
 	 * Setters
 	 */

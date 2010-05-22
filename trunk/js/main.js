@@ -10,6 +10,12 @@ function hideElement(id, speed) {
 	$("#" + id).slideUp(speed);
 }
 
+function showElement(id, speed) {
+	if (!speed)
+		speed = "fast";
+	$("#" + id).slideDown(speed);
+}
+
 // onclick='focus(id)'
 function focus(id) {
 	document.getElementById(id).focus();

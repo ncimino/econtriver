@@ -54,6 +54,10 @@ div#banner_site_name {
     font-size: x-large;
 }
 
+div#widget_info_messages {
+	margin: 3px;
+}
+
 #sitename_anchor {
     text-decoration: none;
 }
@@ -97,8 +101,11 @@ img {
 }
 
 .quick_accounts_manage {
+    padding: 4px;
+    /* 
     padding: 8px;
     margin: 8px;
+    /**/
 }
 
 .quick_groups, .quick_accts, .quick_shares {
@@ -190,20 +197,20 @@ table.txn {
 }
 
 .txn_acct_select_even {
-	border: 0px hidden;
-	margin: 0px;
-	padding: 0px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
+    border: 0px hidden;
+    margin: 0px;
+    padding: 0px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
 .txn_acct_select_odd {
-	background-color:#eee;
-	border: 0px hidden;
-	margin: 0px;
-	padding: 0px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
+    background-color: #eee;
+    border: 0px hidden;
+    margin: 0px;
+    padding: 0px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
 }
-	
+
 tr.txn_row:nth-child(odd) {
 	background-color:#eee; 
 }
@@ -265,4 +272,24 @@ div.ui-datepicker{
 
 .ui-float-left {
 	float:left;
+}
+
+.ui-icon-inactive {
+	background-repeat: no-repeat;
+	display: block;
+	overflow: hidden;
+	text-indent: -99999px;
+	width: 16px;
+	height: 16px;
+	background-image: url(../images/ui/ui-icons_ffd27a_256x240.png);
+}
+
+.ui-icon-special {
+	background-repeat: no-repeat;
+	display: block;
+	overflow: hidden;
+	text-indent: -99999px;
+	width: 16px;
+	height: 16px;
+	background-image: url(../images/ui/ui-icons_228ef1_256x240.png);
 }
