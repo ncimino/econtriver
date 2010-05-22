@@ -19,6 +19,7 @@ note varchar(255),
 credit decimal(38,2),
 debit decimal(38,2),
 parent_txn_id int,
+banksays int(1),
 active int(1) NOT NULL
 )";
 

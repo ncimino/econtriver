@@ -3,6 +3,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 	private $activeAccounts; // MySQL result
 	private $activeTxns; // MySQL result
 	private $activeTxnsSum = 0; // MySQL result
+	private $activeTxnsBankSaysSum = 0; // MySQL result
 	private $newTxnValues = array();
 	private $sortDir = 'DESC';
 	private $sortField = 'q_txn.date';
@@ -81,6 +82,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$divNew = new HTMLDiv($this->container,'txn_id','txn');
 		$this->getTxns();
 		$this->getTxnsSum();
+		$this->getTxnsBankSaysSum();
 		$rows = $this->DB->num($this->activeTxns) + 2;
 		$tableTxn = new Table($divNew,$rows,12,'txn_table','txn');
 		$this->buildTxnTitles($tableTxn,0);
@@ -161,16 +163,18 @@ class AjaxQaTxns extends AjaxQaWidget {
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
 		$submitNew = new HTMLAnchor($tableTxn->cells[$row][$col++],'#','','txn_add');
+		$submitNew->setTitle("Add");
 		new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick');
 	}
 
 	function buildTxns($tableTxn,$row) {
 		if ($this->activeTxns) {
 			$currentBalance = $this->activeTxnsSum;
-			echo $this->activeTxnsSum;
+			$currentBankSays = $this->activeTxnsBankSaysSum;
 			while($txn = $this->DB->fetch($this->activeTxns)) {
 				$col = 0;
-				$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'txn_acct_'.$txn['id'],'txn_acct_'.$row,'txn_input txn_acct_select');
+				$oddOrEven = ($row % 2 == 0) ? "_odd" : "_even";
+				$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'txn_acct_'.$txn['id'],'txn_acct_'.$txn['id'],'txn_acct_select'.$oddOrEven);
 				$this->DB->resetRowPointer($this->activeAccounts);
 				while($result = $this->DB->fetch($this->activeAccounts)) {
 					$selected = ($txn['acct_id'] == $result['id']) ? TRUE : FALSE;
@@ -181,9 +185,9 @@ class AjaxQaTxns extends AjaxQaWidget {
 				new HTMLText($tableTxn->cells[$row][$col++],$txn['handle']);
 				//*/
 				/*
-				$handle = new HTMLInputText($tableTxn->cells[$row][$col++],'txn_handle_'.$txn['id'],$txn['handle'],'txn_handle_'.$txn['id'],'non_editable txn_input');
-				$handle->setAttribute('disabled','disabled');
-				//*/
+				 $handle = new HTMLInputText($tableTxn->cells[$row][$col++],'txn_handle_'.$txn['id'],$txn['handle'],'txn_handle_'.$txn['id'],'non_editable txn_input');
+				 $handle->setAttribute('disabled','disabled');
+				 //*/
 				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable number');
 				new HTMLText($tableTxn->cells[$row][$col++],date($this->user->getDateFormat(),strtotime($txn['entered'])));
 				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_date_'.$txn['id'],date($this->user->getDateFormat(),$txn['date']),'txn_date_'.$txn['id'],'dateselection txn_input number');
@@ -192,15 +196,25 @@ class AjaxQaTxns extends AjaxQaWidget {
 				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_note_'.$txn['id'],$txn['note'],'txn_note_'.$txn['id'],'txn_input');
 				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_credit_'.$txn['id'],$txn['credit'],'txn_credit_'.$txn['id'],'txn_input number credit');
 				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_debit_'.$txn['id'],$txn['debit'],'txn_debit_'.$txn['id'],'txn_input number debit');
+
 				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' number');
 				new HTMLText($tableTxn->cells[$row][$col++],number_format(round($currentBalance,2),2));
-				
+
+				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' number');
+				$checked = ($txn['banksays']) ? TRUE : FALSE;
+				new HTMLInputCheckbox($tableTxn->cells[$row][$col],'txn_banksays_'.$txn['id'],'txn_banksays_'.$txn['id'],'txn_banksays_check',$checked);
+				$parent_id = ($txn['parent_txn_id']) ? $txn['parent_txn_id'] : $txn['id'];
+				new HTMLInputHidden($tableTxn->cells[$row][$col],'txn_parent_id_'.$txn['id'],$parent_id,'txn_parent_id_'.$txn['id']);
+				new HTMLText($tableTxn->cells[$row][$col++],number_format(round($currentBankSays,2),2));
+
 				$currentBalance = $currentBalance + $txn['debit'] - $txn['credit'];
-				/*
-				 new HTMLText($tableTxn->cells[$row][$col++],'-');
-				 $submitNew = new HTMLAnchor($tableTxn->cells[$row][$col++],'#','','txn_add');
-				 new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick');
-				 */
+				if ($checked) $currentBankSays = $currentBankSays + $txn['debit'] - $txn['credit'];
+
+				if ($parent_id == $txn['parent_txn_id']) {
+					$showHistory = new HTMLAnchor($tableTxn->cells[$row][$col++],'#','','txn_show_history');
+					new HTMLSpan($showHistory,'','txn_show_history_'.$txn['id'],'ui-icon ui-icon-clock');
+				}
+					
 				$row++;
 			}
 		} else {
@@ -215,7 +229,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 					  AND q_txn.user_id = user.user_id
 					  AND q_txn.acct_id = q_acct.id
 					GROUP BY q_txn.id
-					ORDER BY {$this->sortField} {$this->sortDir};";
+					ORDER BY {$this->sortField} {$this->sortDir},q_txn.type ASC,q_txn.establishment ASC;"; // Need to add next lvl search for consistent results
 		return $this->activeTxns = $this->DB->query($sql);
 	}
 
@@ -223,12 +237,24 @@ class AjaxQaTxns extends AjaxQaWidget {
 		return $this->activeTxnsSum = $this->getCreditSum() - $this->getDebitSum();
 	}
 
+	function getTxnsBankSaysSum() {
+		return $this->activeTxnsBankSaysSum = $this->getCreditBankSaysSum() - $this->getDebitBankSaysSum();
+	}
+
 	function getCreditSum() {
 		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
 					WHERE ({$this->getSqlAcctsToShow()})
 					  AND q_txn.active = 1;";
 		$result = $this->DB->fetch($this->DB->query($sql));
-		echo 'credit:'.$result['total'];
+		return $result['total'];
+	}
+
+	function getCreditBankSaysSum() {
+		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
+					WHERE ({$this->getSqlAcctsToShow()})
+					  AND q_txn.active = 1
+					  AND q_txn.banksays = 1;";
+		$result = $this->DB->fetch($this->DB->query($sql));
 		return $result['total'];
 	}
 
@@ -237,7 +263,15 @@ class AjaxQaTxns extends AjaxQaWidget {
 					WHERE ({$this->getSqlAcctsToShow()})
 					  AND q_txn.active = 1;";
 		$result = $this->DB->fetch($this->DB->query($sql));
-		echo 'debit:'.$result['total'];
+		return $result['total'];
+	}
+
+	function getDebitBankSaysSum() {
+		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
+					WHERE ({$this->getSqlAcctsToShow()})
+					  AND q_txn.active = 1
+					  AND q_txn.banksays = 1;";
+		$result = $this->DB->fetch($this->DB->query($sql));
 		return $result['total'];
 	}
 
@@ -257,7 +291,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 		return $acctsToShow;
 	}
 
-	function insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit) {
+	function insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays) {
 		if (!empty($credit) and !empty($debit)) {
 			$this->infoMsg->addMessage(-1,'Credit and debit have values, this transaction cannot be added.');
 			return false;
@@ -267,17 +301,25 @@ class AjaxQaTxns extends AjaxQaWidget {
 		} else {
 			$txn_type = (!empty($credit)) ? 'credit' : 'debit';
 			$value = (!empty($credit)) ? $credit : $debit;
-			$sql = "INSERT INTO q_txn (acct_id,user_id,date,type,establishment,note,$txn_type,active)
-				VALUES ($acct,$user_id,$date,'$type','$establishment','$note',$value,1);";
+			//$parent_id = ($parent_id == 'null') ? null : $parent_id;
+			//$banksays = ($banksays == 'null') ? null : $banksays;
+			$banksays = ($banksays == 'on') ? 1 : 0;
+			$sql = "INSERT INTO q_txn (acct_id,user_id,date,type,establishment,note,$txn_type,parent_txn_id,banksays,active)
+				VALUES ($acct,$user_id,$date,'$type','$establishment','$note',$value,$parent_id,$banksays,1);";
 			return $this->DB->query($sql);
 		}
 	}
 
-	function addEntries($acct,$date,$type,$establishment,$note,$credit,$debit) {
+	function addEntries($acct,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays,$current_txn_id) {
 		if ($this->validateNewTxn($date,$credit,$debit)) {
 			$date = strtotime($date);
-			if ($this->insertTxn($acct,$this->user->getUserId(),$date,$type,$establishment,$note,$credit,$debit)) {
-				$this->infoMsg->addMessage(2,'Transaction was successfully added.');
+			if ($this->insertTxn($acct,$this->user->getUserId(),$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays)) {
+				if ($current_txn_id != 'null') {
+					if ($this->makeTxnInactive($current_txn_id))
+					$this->infoMsg->addMessage(2,'Transaction was successfully modified.');
+				} else {
+					$this->infoMsg->addMessage(2,'Transaction was successfully added.');
+				}
 			} else {
 				$this->infoMsg->addMessage(-1,'An error occured while trying to add the transaction.');
 			}
@@ -290,6 +332,11 @@ class AjaxQaTxns extends AjaxQaWidget {
 			$this->newTxnValues['credit'] = $credit;
 			$this->newTxnValues['debit'] = $debit;
 		}
+	}
+
+	function makeTxnInactive($current_txn_id) {
+		$sql = "UPDATE q_txn SET active = 0 WHERE q_txn.id = $current_txn_id;";
+		return $this->DB->query($sql);
 	}
 
 	function validateNewTxn($date,$credit,$debit) {

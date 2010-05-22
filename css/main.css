@@ -189,8 +189,19 @@ table.txn {
     text-align: right;
 }
 
-.txn_acct_select:nth-child(odd) {
-	background-color:#eee; 
+.txn_acct_select_even {
+	border: 0px hidden;
+	margin: 0px;
+	padding: 0px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+.txn_acct_select_odd {
+	background-color:#eee;
+	border: 0px hidden;
+	margin: 0px;
+	padding: 0px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 	
 tr.txn_row:nth-child(odd) {
@@ -221,6 +232,10 @@ a.txn_title:link, a.txn_title:visited, a.txn_title:hover, a.txn_title:active {
 
 .non_editable {
 	color: gray;
+}
+
+.txn_banksays_check {
+	float: left;
 }
 
 /*
