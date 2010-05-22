@@ -225,11 +225,45 @@ $(document).ready(function() {
 								this.getAttribute('id').slice(13));
 					});
 		});
+
+		// Bind Txn History to QaTxnShowHistory
+		$(function() {
+			$('.txn_show_history').live(
+					'click',
+					function() {
+						if (document.getElementById('txn_history_' + this.getAttribute('id').slice(17)) &&
+								document.getElementById('txn_history_' + this.getAttribute('id').slice(17)).getAttribute('style')) {
+							document.getElementById('txn_history_' + this.getAttribute('id').slice(17)).removeAttribute('style');
+							QaTxnGetHistory('txn_history_' + this.getAttribute('id').slice(17), this.getAttribute('id').slice(17));
+						} else {
+							document.getElementById('txn_history_' + this.getAttribute('id').slice(17)).setAttribute('style','display:none;');
+						}
+					});
+		});
+		
+		// Bind Txn Notes to QaTxnShowNotes
+		$(function() {
+			$('.txn_show_notes').live(
+					'click',
+					function() {
+						if (document.getElementById('txn_notes_' + this.getAttribute('id').slice(15)) &&
+								document.getElementById('txn_notes_' + this.getAttribute('id').slice(15)).getAttribute('style')) {
+							document.getElementById('txn_notes_' + this.getAttribute('id').slice(15)).removeAttribute('style');
+							// populate
+						} else {
+							document.getElementById('txn_notes_' + this.getAttribute('id').slice(15)).setAttribute('style','display:none;');
+						}
+					});
+		});
 	});
 
 function QaTxnEdit(content_id, sort_id, change_dir, show_acct, txn_id) {
-	//alert(txn_id);
 	QaTxnAdd('txn_', '_' + txn_id, txn_id);
+}
+
+function QaTxnGetHistory(content_id,txn_id) {
+	var post_data = "txn_id=" + escape(txn_id);
+	AjaxIt('QaTxnGetHistory', content_id, post_data);
 }
 
 function QaTxnGet(content_id, sort_id, change_dir, show_acct) {
@@ -294,8 +328,6 @@ function QaTxnAdd(prefix, postfix, current_txn_id, focus_id, content_id) {
 			+ "&debit="
 			+ escape(document.getElementById(prefix + 'debit' + postfix).value)
 			+ "&parent_id=" + escape(parent_id) + "&banksays="
-			+ escape(banksays)
-			+"&current_txn_id=" 
-			+ escape(current_txn_id);
+			+ escape(banksays) + "&current_txn_id=" + escape(current_txn_id);
 	AjaxIt('QaTxnAdd', content_id, post_data, focus_id, '');
 }
