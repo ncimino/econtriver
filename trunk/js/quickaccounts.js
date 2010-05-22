@@ -196,7 +196,7 @@ $(document).ready(function() {
 		// Bind Add Txn button to QaTxnAdd
 		$(function() {
 			$('#new_txn_submit').live('click', function() {
-				QaTxnAdd();
+				QaTxnAdd('new_txn_');
 			});
 		});
 
@@ -210,12 +210,27 @@ $(document).ready(function() {
 
 		// Bind Show Acct dropdown to QaTxnShow
 		$(function() {
-			$('#show_acct').live('change',function() {
-				QaTxnGet('quick_accounts_txn_div', sort_by_id, 0,
-						this.value);
+			$('#show_acct').live('change', function() {
+				QaTxnGet('quick_accounts_txn_div', sort_by_id, 0, this.value);
 			});
 		});
+
+		// Bind BankSays Checkbox to QaTxnEdit
+		$(function() {
+			$('.txn_banksays_check').live(
+					'change',
+					function() {
+						QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0,
+								document.getElementById('show_acct').value,
+								this.getAttribute('id').slice(13));
+					});
+		});
 	});
+
+function QaTxnEdit(content_id, sort_id, change_dir, show_acct, txn_id) {
+	//alert(txn_id);
+	QaTxnAdd('txn_', '_' + txn_id, txn_id);
+}
 
 function QaTxnGet(content_id, sort_id, change_dir, show_acct) {
 	if (!content_id) {
@@ -244,19 +259,43 @@ function QaTxnGet(content_id, sort_id, change_dir, show_acct) {
 	AjaxIt('QaTxnGet', content_id, post_data);
 }
 
-function QaTxnAdd(content_id) {
+function QaTxnAdd(prefix, postfix, current_txn_id, focus_id, content_id) {
 	if (!content_id)
 		content_id = 'quick_accounts_txn_div';
+	if (!prefix)
+		prefix = '';
+	if (!postfix)
+		postfix = '';
+	if (document.getElementById(prefix + 'banksays' + postfix)) {
+		banksays = document.getElementById(prefix + 'banksays' + postfix).value;
+	} else {
+		banksays = 'null';
+	}
+	if (document.getElementById(prefix + 'parent_id' + postfix)) {
+		parent_id = document.getElementById(prefix + 'parent_id' + postfix).value;
+	} else {
+		parent_id = 'null';
+	}
+	if (!current_txn_id)
+		current_txn_id = 'null';
 	var post_data = "acct="
-			+ escape(document.getElementById('new_txn_acct').value) + "&date="
-			+ escape(document.getElementById('new_txn_date').value) + "&type="
-			+ escape(document.getElementById('new_txn_type').value)
+			+ escape(document.getElementById(prefix + 'acct' + postfix).value)
+			+ "&date="
+			+ escape(document.getElementById(prefix + 'date' + postfix).value)
+			+ "&type="
+			+ escape(document.getElementById(prefix + 'type' + postfix).value)
 			+ "&establishment="
-			+ escape(document.getElementById('new_txn_establishment').value)
-			+ "&note=" + escape(document.getElementById('new_txn_note').value)
+			+ escape(document
+					.getElementById(prefix + 'establishment' + postfix).value)
+			+ "&note="
+			+ escape(document.getElementById(prefix + 'note' + postfix).value)
 			+ "&credit="
-			+ escape(document.getElementById('new_txn_credit').value)
+			+ escape(document.getElementById(prefix + 'credit' + postfix).value)
 			+ "&debit="
-			+ escape(document.getElementById('new_txn_debit').value);
-	AjaxIt('QaTxnAdd', content_id, post_data, 'new_txn_date', '');
+			+ escape(document.getElementById(prefix + 'debit' + postfix).value)
+			+ "&parent_id=" + escape(parent_id) + "&banksays="
+			+ escape(banksays)
+			+"&current_txn_id=" 
+			+ escape(current_txn_id);
+	AjaxIt('QaTxnAdd', content_id, post_data, focus_id, '');
 }
