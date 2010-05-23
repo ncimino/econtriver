@@ -2,7 +2,6 @@
 
 class QaSettings {
 	static function setSetting($name,$userId,$value,$DBObj) {
-		echo "setting:".$value;
 		if (QaSettings::getSetting($name,$userId,$DBObj) === FALSE) {
 			$sql = "INSERT INTO q_settings (user_id,name,value) VALUES ($userId,'$name',$value);";
 		} else {

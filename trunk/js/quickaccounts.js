@@ -191,69 +191,94 @@ $(document).ready(function() {
 					showOn : 'focus'
 				}).focus();
 			});
-		});
 
 		// Bind Add Txn button to QaTxnAdd
-		$(function() {
 			$('#new_txn_submit').live('click', function() {
 				QaTxnAdd('new_txn_');
 			});
-		});
 
 		// Bind Sort Txns link to QaTxnSort
-		$(function() {
 			$('.txn_title').live('click', function() {
 				sort_by_id = this.id;
 				QaTxnGet('quick_accounts_txn_div', this.id, 1);
 			});
-		});
 
 		// Bind Show Acct dropdown to QaTxnShow
-		$(function() {
 			$('#show_acct').live('change', function() {
 				QaTxnGet('quick_accounts_txn_div', sort_by_id, 0, this.value);
 			});
-		});
 
 		// Bind BankSays Checkbox to QaTxnEdit
-		$(function() {
 			$('.txn_banksays_check').live(
 					'change',
 					function() {
+						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
 						QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0,
 								document.getElementById('show_acct').value,
-								this.getAttribute('id').slice(13));
+								txn_id);
 					});
-		});
 
 		// Bind Txn History to QaTxnShowHistory
-		$(function() {
 			$('.txn_show_history').live(
 					'click',
 					function() {
-						if (document.getElementById('txn_history_' + this.getAttribute('id').slice(17)) &&
-								document.getElementById('txn_history_' + this.getAttribute('id').slice(17)).getAttribute('style')) {
-							document.getElementById('txn_history_' + this.getAttribute('id').slice(17)).removeAttribute('style');
-							QaTxnGetHistory('txn_history_' + this.getAttribute('id').slice(17), this.getAttribute('id').slice(17));
+						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
+						cell_id = 'txn_history_' + txn_id ;
+						cell = document.getElementById('txn_history_row_' + txn_id);
+						table = document.getElementById('txnh_table_' + txn_id);
+						if (cell && cell.getAttribute('style')) {
+							cell.removeAttribute('style');
+							if (!(table)) QaTxnGetHistory(cell_id, txn_id); // Only update this information if the table doesn't exist
 						} else {
-							document.getElementById('txn_history_' + this.getAttribute('id').slice(17)).setAttribute('style','display:none;');
+							cell.setAttribute('style','display:none;');
 						}
 					});
-		});
 		
 		// Bind Txn Notes to QaTxnShowNotes
-		$(function() {
 			$('.txn_show_notes').live(
 					'click',
 					function() {
-						if (document.getElementById('txn_notes_' + this.getAttribute('id').slice(15)) &&
-								document.getElementById('txn_notes_' + this.getAttribute('id').slice(15)).getAttribute('style')) {
-							document.getElementById('txn_notes_' + this.getAttribute('id').slice(15)).removeAttribute('style');
+						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
+						if (document.getElementById('txn_notes_row_' + txn_id) &&
+								document.getElementById('txn_notes_row_' + txn_id).getAttribute('style')) {
+							document.getElementById('txn_notes_row_' + txn_id).removeAttribute('style');
 							// populate
 						} else {
-							document.getElementById('txn_notes_' + this.getAttribute('id').slice(15)).setAttribute('style','display:none;');
+							document.getElementById('txn_notes_row_' + txn_id).setAttribute('style','display:none;');
 						}
 					});
+			
+			// Bind Txn Modification to change save icon
+			$('.txn_acct_select_odd, .txn_acct_select_even, .txn_input').live(
+					'change',
+					function() {
+						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
+						element = document.getElementById('txn_save_' + txn_id);
+						if (element) element.setAttribute('class','ui-icon-special ' + element.getAttribute('class'));
+						element = document.getElementById('txn_save_anchor_' + txn_id);
+						if (element) element.setAttribute('class','txn_save ' + element.getAttribute('class'));
+						else element.setAttribute('class','txn_save');
+					});
+			
+			// Bind Txn Save to QaTxnEdit
+			$('.txn_save').live(
+					'click',
+					function() {
+						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
+						QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0,
+								document.getElementById('show_acct').value,
+								txn_id);
+					});
+			
+			// Bind Txn Save to QaTxnEdit
+			/*$('.txn_save').live(
+					'click',
+					function() {
+						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
+						QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0,
+								document.getElementById('show_acct').value,
+								txn_id);
+					});*/
 		});
 	});
 

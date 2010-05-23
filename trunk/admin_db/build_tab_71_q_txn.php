@@ -11,7 +11,7 @@ acct_id int NOT NULL,
 CONSTRAINT q_txn_acct_id FOREIGN KEY (acct_id) REFERENCES q_acct(id),
 user_id int NOT NULL,
 CONSTRAINT q_txn_user_id FOREIGN KEY (user_id) REFERENCES user(user_id),
-entered timestamp NOT NULL,
+entered int NOT NULL,
 date int NOT NULL,
 type varchar(255),
 establishment varchar(255),
@@ -22,6 +22,7 @@ parent_txn_id int,
 banksays int(1),
 active int(1) NOT NULL
 )";
+	//entered timestamp NOT NULL,
 
 	$db_obj->query($sql);
 	echo "COMPLETED:<BR>\n".$sql."<BR>\n";
