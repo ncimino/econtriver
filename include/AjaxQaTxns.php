@@ -1,7 +1,10 @@
 <?php
 class AjaxQaTxns extends AjaxQaWidget {
 	private $activeAccounts; // MySQL result
+	private $userGroups; // MySQL result
 	private $txnHistory; // MySQL result
+	private $txnNotes; // MySQL result
+	private $txnGroupNotes; // MySQL result
 	private $activeTxns; // MySQL result
 	private $activeTxnsSum = 0; // MySQL result
 	private $activeTxnsBankSaysSum = 0; // MySQL result
@@ -482,6 +485,57 @@ class AjaxQaTxns extends AjaxQaWidget {
 		new HTMLText($tableTxn->cells[$row][$col++],'Debit');
 		new HTMLText($tableTxn->cells[$row][$col++],'Bank');
 		new HTMLText($tableTxn->cells[$row][$col++],'Actions');
+	}
+
+	function buildTxnNotesTable($txn_id) {
+		//$this->getActiveAccounts();
+		$this->getTxnNotes($txn_id);
+		$this->getUserGroups($txn_id);
+		$this->getTxnGroupNotes($txn_id);
+		$rows = $this->DB->num($this->txnHistory);
+		$tableTxn = new Table($this->container,$rows + 1,11,'txnh_table_'.$txn_id,'txnh');
+		$this->buildTxnHistoryTitles($tableTxn,$row = 0);
+		$this->buildTxnHistory($tableTxn,++$row);
+		$this->printHTML();
+	}
+
+	function getTxnNotes($txn_id) {
+		$sql = "SELECT q_txn_notes.*,user.handle
+				FROM q_txn_notes,user
+				WHERE q_txn_notes.txn_id={$txn_id}
+				  AND q_txn_notes.user_id = user.user_id
+				ORDER BY q_txn_notes.posted DESC;";
+		$this->txnNotes = $this->DB->query($sql);
+	}
+
+	function getUserGroups() {
+		$sql = "SELECT q_user_groups.group_id,q_group.name
+				FROM q_user_groups,q_group
+				WHERE q_user_groups.active = 1
+				  AND q_group.id = q_user_group.group_id
+				  AND q_user_groups.user_id = {$this->user->getUserId()}
+				ORDER BY q_group.name ASC;";
+		$this->userGroups = $this->DB->query($sql);
+	}
+
+	function getTxnGroupNotes($txn_id) {
+		if ($this->DB->num($this->userGroups) == 0) {
+			$group_ids = 'q_group_notes.group_id='.'0'; // No group ID ever equals 0
+		} else {
+			$current_group_id = $this->DB->fetch($this->userGroups);
+			$group_ids = 'q_group_notes.group_id='.$current_group_id['q_user_groups.group_id'];
+			while ($current_group_id = $this->DB->fetch($this->userGroups)){
+				$group_ids .= ' OR q_group_notes.group_id='.$current_group_id['q_user_groups.group_id'];
+			}
+		}
+		$sql = "SELECT q_group_notes.*,user.handle
+				FROM q_group_notes,user
+				WHERE q_group_notes.txn_id={$txn_id}
+				  AND ($group_ids)
+				  AND q_group_notes.user_id = user.user_id
+				ORDER BY q_group_notes.posted DESC;";
+		echo $sql;
+		$this->txnGroupNotes = $this->DB->query($sql);
 	}
 
 }
