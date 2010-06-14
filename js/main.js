@@ -27,6 +27,18 @@ function timedHide(id, time) {
 	lastTimeout = setTimeout("hideElement(" + id + ")", time);
 }
 
+// onkeypress="enterCall(event,myFunction('test');"
+function enterCall(event, call) {
+	//alert(event.keyCode);
+	if (event.keyCode == 13) {
+		alert('calling func');
+		call;
+		return true;
+	} else {
+		return false;
+	}
+}
+
 // onkeypress='return enterSubmit(this,event);'
 function enterSubmit(exec, thisevent) {
 	var keycode;

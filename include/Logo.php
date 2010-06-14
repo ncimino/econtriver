@@ -8,7 +8,7 @@ class Logo {
 		//$DivBannerShadow = new HTMLDiv($DivLogo,'banner_shadow');
 		//$DivBannerShadow->setAttribute('style','width:'.$SiteInfo->getLogoWidth().';height:'.$SiteInfo->getLogoHeight().';');
 		$DivBannerSiteName = new HTMLDiv($DivLogo,'banner_site_name');
-		//$AnchorSiteName = new HTMLAnchor($DivBannerSiteName,$SiteInfo->getSiteHTTP(),strtolower($SiteInfo->getSubname()),'','sitename_anchor');
+		$AnchorSiteName = new HTMLAnchor($DivBannerSiteName,$SiteInfo->getSiteHTTP(),strtolower($SiteInfo->getSubname()),'sitename_anchor');
 	}
 }
 ?>

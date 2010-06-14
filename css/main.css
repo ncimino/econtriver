@@ -48,9 +48,8 @@ div#banner {
 
 div#banner_site_name {
     position: absolute;
-    bottom: 2px;
-    right: 200px;
-    color: gray;
+    bottom: -5px;
+    right: 5px;
     font-size: x-large;
 }
 
