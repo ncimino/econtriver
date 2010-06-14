@@ -224,13 +224,13 @@ $(document).ready(function() {
 					function() {
 						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
 						cell_id = 'txn_history_' + txn_id ;
-						cell = document.getElementById('txn_history_row_' + txn_id);
+						row_id = document.getElementById('txn_history_row_' + txn_id);
 						table = document.getElementById('txnh_table_' + txn_id);
-						if (cell && cell.getAttribute('style')) {
-							cell.removeAttribute('style');
+						if (row_id && row_id.getAttribute('style')) {
+							row_id.removeAttribute('style');
 							if (!(table)) QaTxnGetHistory(cell_id, txn_id); // Only update this information if the table doesn't exist
 						} else {
-							cell.setAttribute('style','display:none;');
+							row_id.setAttribute('style','display:none;');
 						}
 					});
 		
@@ -239,12 +239,14 @@ $(document).ready(function() {
 					'click',
 					function() {
 						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
-						if (document.getElementById('txn_notes_row_' + txn_id) &&
-								document.getElementById('txn_notes_row_' + txn_id).getAttribute('style')) {
-							document.getElementById('txn_notes_row_' + txn_id).removeAttribute('style');
-							// populate
+						cell_id = 'txn_notes_' + txn_id ;
+						row_id = document.getElementById('txn_notes_row_' + txn_id);
+						table = document.getElementById('txnn_table_' + txn_id);
+						if (row_id && row_id.getAttribute('style')) {
+							row_id.removeAttribute('style');
+							if (!(table)) QaTxnGetNotes(cell_id, txn_id); // Only update this information if the table doesn't exist
 						} else {
-							document.getElementById('txn_notes_row_' + txn_id).setAttribute('style','display:none;');
+							row_id.setAttribute('style','display:none;');
 						}
 					});
 			
@@ -279,6 +281,15 @@ $(document).ready(function() {
 								document.getElementById('show_acct').value,
 								txn_id);
 					});*/
+
+			/*
+				$('.accordion .head').click(function() {
+					$(this).next().toggle('slow');
+					return false;
+				}).next().hide();//
+				
+				$('.accordion').accordion();*/
+
 		});
 	});
 
@@ -289,6 +300,11 @@ function QaTxnEdit(content_id, sort_id, change_dir, show_acct, txn_id) {
 function QaTxnGetHistory(content_id,txn_id) {
 	var post_data = "txn_id=" + escape(txn_id);
 	AjaxIt('QaTxnGetHistory', content_id, post_data);
+}
+
+function QaTxnGetNotes(content_id,txn_id) {
+	var post_data = "txn_id=" + escape(txn_id);
+	AjaxIt('QaTxnGetNotes', content_id, post_data);
 }
 
 function QaTxnGet(content_id, sort_id, change_dir, show_acct) {
