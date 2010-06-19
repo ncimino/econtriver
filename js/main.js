@@ -5,14 +5,12 @@ function submitForm(thisfield) {
 
 // onclick='hideElement(id)'
 function hideElement(id, speed) {
-	if (!speed)
-		speed = "fast";
+	if (!speed)	speed = "fast";
 	$("#" + id).slideUp(speed);
 }
 
 function showElement(id, speed) {
-	if (!speed)
-		speed = "fast";
+	if (!speed)	speed = "fast";
 	$("#" + id).slideDown(speed);
 }
 
@@ -29,10 +27,8 @@ function timedHide(id, time) {
 
 // onkeypress="enterCall(event,myFunction('test');"
 function enterCall(event, call) {
-	//alert(event.keyCode);
 	if (event.keyCode == 13) {
-		alert('calling func');
-		call;
+		call();
 		return true;
 	} else {
 		return false;

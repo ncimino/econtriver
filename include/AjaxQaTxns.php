@@ -88,12 +88,24 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function buildActions() {
 		$divActions = new HTMLDiv($this->container,'txn_actions_id','txn_actions');
+		
 		$selectAcct = new HTMLSelect($divActions,'show_acct','show_acct');
 		new HTMLOption($selectAcct,'All Accounts',0);
 		while($result = $this->DB->fetch($this->activeAccounts)) {
 			$selected = ($result['id'] == $this->showAcct) ? TRUE : FALSE;
 			new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
 		}
+
+		$divActionButtons = new HTMLDiv($divActions,'txn_actions_buttons','txn_actions_buttons');
+		$divActionButtons->setStyle('float: right;');
+		
+		$trashTxn = new HTMLAnchor($divActionButtons,'#','','txn_trash_bin_anchor');
+		$trashTxn->setTitle('Trash Bin');
+		new HTMLSpan($trashTxn,'','txn_trash_bin','ui-icon ui-icon-trash ui-float-right');
+		
+		$printTxn = new HTMLAnchor($divActionButtons,'#','','txn_print_anchor');
+		$printTxn->setTitle('Open Print View');
+		new HTMLSpan($printTxn,'','txn_print','ui-icon-inactive ui-icon-print ui-float-right');
 	}
 
 	function buildTxnsTable() {
@@ -186,10 +198,14 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'txn_add\')');
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
-		$submitNew = new HTMLAnchor($tableTxn->cells[$row][$col++],'#','','txn_add');
-		$submitNew->setAttribute('onkeyup','enterCall(event,QaTxnAdd(\'new_txn_\'))');
+		$submitNew = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_add');
+		$submitNew->setAttribute('onkeyup','enterCall(event,function() {QaTxnAdd(\'new_txn_\');})');
 		$submitNew->setTitle("Add");
-		new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick');
+		new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick ui-float-left');
+		$splitNew = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_split');
+		//$splitNew->setAttribute('onkeyup','enterCall(event,function() {QaTxnAdd(\'new_txn_\');})');
+		$splitNew->setTitle("Split");
+		new HTMLSpan($splitNew,'','new_txn_split','ui-icon-inactive ui-icon-transferthick-e-w ui-float-left');
 	}
 
 	function buildTxns($tableTxn,$row) {
@@ -249,7 +265,11 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 				$saveTxn = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_save_anchor_'.$txn['id'],'');
 				$saveTxn->setTitle('Save');
-				new HTMLSpan($saveTxn,'','txn_save_'.$txn['id'],'ui-icon-inactive ui-icon-disk ui-float-right');
+				new HTMLSpan($saveTxn,'','txn_save_'.$txn['id'],'ui-icon-inactive ui-icon-disk ui-float-left');
+
+				$deleteTxn = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_delete_anchor_'.$txn['id'],'txn_delete');
+				$deleteTxn->setTitle('Delete');
+				new HTMLSpan($deleteTxn,'','txn_delete_'.$txn['id'],'ui-icon ui-icon-trash ui-float-left');
 
 				$row++;
 				$tableTxn->makeSingleCellRow($row);
@@ -382,7 +402,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 					$this->infoMsg->addMessage(2,'Transaction was successfully added.');
 				}
 			} else {
-				$this->infoMsg->addMessage(-1,'An error occured while trying to add the transaction.');
+				$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to add the transaction.');
 			}
 		} else {
 			$this->newTxnValues['acct'] = $acct;
@@ -395,11 +415,15 @@ class AjaxQaTxns extends AjaxQaWidget {
 		}
 	}
 
+	function dropEntries($current_txn_id) {
+		$this->makeTxnInactive($current_txn_id);
+	}
+
 	function getTxnActiveStatus($current_txn_id) {
 		$sql = "SELECT q_txn.active FROM q_txn WHERE q_txn.id = $current_txn_id;";
 		return $this->DB->query($sql);
 	}
-	
+
 	function makeTxnInactive($current_txn_id) {
 		$sql = "UPDATE q_txn SET active = 0 WHERE q_txn.id = $current_txn_id;";
 		return $this->DB->query($sql);
@@ -505,11 +529,11 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$group_num = $this->DB->num($this->userGroups);
 		$this->getTxnGroupNotes($txn_id,$group_num);
 		/*
-		$tableTxn = new Table($this->container,$group_num+1,1,'txnn_table_'.$txn_id,'txnn');
-		$this->buildTxnNotes($tableTxn);
-		//*/
+		 $tableTxn = new Table($this->container,$group_num+1,1,'txnn_table_'.$txn_id,'txnn');
+		 $this->buildTxnNotes($tableTxn);
+		 //*/
 		$this->buildTxnNotes($this->container);
-		
+
 		$this->printHTML();
 	}
 

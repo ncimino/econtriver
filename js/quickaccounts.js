@@ -17,7 +17,8 @@ function bindQaAccts() {
 }
 
 function QaAccountGet(content_id) {
-	AjaxIt('QaAccountGet', content_id, '', '', bindQaAccts());
+	// AjaxIt('QaAccountGet', content_id, '', '', bindQaAccts());
+	AjaxIt('QaAccountGet', content_id);
 }
 
 function QaAccountAdd(content_id, name_id) {
@@ -26,8 +27,7 @@ function QaAccountAdd(content_id, name_id) {
 }
 
 function QaAccountEdit(content_id, name_id, acct_id) {
-	var post_data = "name=" + escape(document.getElementById(name_id).value)
-			+ "&acct_id=" + acct_id;
+	var post_data = "name=" + escape(document.getElementById(name_id).value) + "&acct_id=" + acct_id;
 	AjaxIt('QaAccountEdit', content_id, post_data, name_id, bindQaAccts());
 }
 
@@ -60,8 +60,7 @@ function QaGroupAdd(content_id, name_id) {
 }
 
 function QaGroupEdit(content_id, name_id, group_id) {
-	var post_data = "name=" + escape(document.getElementById(name_id).value)
-			+ "&group_id=" + group_id;
+	var post_data = "name=" + escape(document.getElementById(name_id).value) + "&group_id=" + group_id;
 	AjaxIt('QaGroupEdit', content_id, post_data, name_id, bindQaGroups());
 }
 
@@ -87,22 +86,21 @@ function QaGroupRejoin(content_id, group_id) {
 function bindQaSa(content_id) {
 	return [ function() {
 		// Makes Groups draggable and Groups droppable
-			$(".ui-draggable").draggable( {
-				revert : 'invalid'
-			});
-			$(".ui-droppable").droppable(
-					{
-						activeClass : 'ui-state-hover',
-						hoverClass : 'ui-state-active',
-						drop : function(event, ui) {
-							grp_id = $(ui.draggable).attr("id").slice(8);
-							acct_id = $(this).attr("id").slice(10);
-							QaSharedAccountsAdd(content_id, grp_id, acct_id,
-									bindQaSa(content_id));
-						}
-					});
-			// Refresh Txn info
-		}, QaTxnGet() ];
+		$(".ui-draggable").draggable( {
+			revert : 'invalid'
+		});
+		$(".ui-droppable")
+				.droppable( {
+				activeClass : 'ui-state-hover',
+				hoverClass : 'ui-state-active',
+				drop : function(event, ui) {
+					grp_id = $(ui.draggable).attr("id").slice(8);
+					acct_id = $(this).attr("id").slice(10);
+					QaSharedAccountsAdd(content_id, grp_id, acct_id, bindQaSa(content_id));
+				}
+				});
+		// Refresh Txn info
+	}, QaTxnGet() ];
 }
 
 function QaSharedAccountsGet(content_id) {
@@ -111,14 +109,12 @@ function QaSharedAccountsGet(content_id) {
 
 function QaSharedAccountsAdd(content_id, grp_id, acct_id) {
 	var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
-	AjaxIt('QaSharedAccountsAdd', content_id, post_data, '',
-			bindQaSa(content_id));
+	AjaxIt('QaSharedAccountsAdd', content_id, post_data, '', bindQaSa(content_id));
 }
 
 function QaSharedAccountsDrop(content_id, grp_id, acct_id) {
 	var post_data = "grp_id=" + grp_id + "&acct_id=" + acct_id;
-	AjaxIt('QaSharedAccountsDrop', content_id, post_data, '',
-			bindQaSa(content_id));
+	AjaxIt('QaSharedAccountsDrop', content_id, post_data, '', bindQaSa(content_id));
 }
 
 /*
@@ -128,25 +124,24 @@ function QaSharedAccountsDrop(content_id, grp_id, acct_id) {
 function bindQaGm(content_id) {
 	return [ function() {
 		// Clears find contact input from 'Email or User name'
-			clearField('contact');
-			// Makes Users dragable and Groups dropable
-			$(".ui-draggable").draggable( {
-				revert : 'invalid'
-			});
-			$(".ui-droppable").droppable(
-					{
-						activeClass : 'ui-state-hover',
-						hoverClass : 'ui-state-active',
-						drop : function(event, ui) {
-							user_id = $(ui.draggable).attr("id").slice(10);
-							grp_id = $(this).attr("id").slice(8);
-							QaGroupMembersAdd(content_id, grp_id, user_id,
-									bindQaGm(content_id));
-						}
-					});
-		}
-		// Refresh Txn info
-		, QaTxnGet() ];
+		clearField('contact');
+		// Makes Users dragable and Groups dropable
+		$(".ui-draggable").draggable( {
+			revert : 'invalid'
+		});
+		$(".ui-droppable")
+				.droppable( {
+				activeClass : 'ui-state-hover',
+				hoverClass : 'ui-state-active',
+				drop : function(event, ui) {
+					user_id = $(ui.draggable).attr("id").slice(10);
+					grp_id = $(this).attr("id").slice(8);
+					QaGroupMembersAdd(content_id, grp_id, user_id, bindQaGm(content_id));
+				}
+				});
+	}
+	// Refresh Txn info
+	, QaTxnGet() ];
 }
 
 function QaGroupMembersGet(content_id) {
@@ -160,13 +155,11 @@ function QaGroupMembersAdd(content_id, grp_id, user_id) {
 
 function QaGroupMembersDrop(content_id, grp_id, user_id) {
 	var post_data = "grp_id=" + grp_id + "&user_id=" + user_id;
-	AjaxIt('QaGroupMembersDrop', content_id, post_data, '',
-			bindQaGm(content_id));
+	AjaxIt('QaGroupMembersDrop', content_id, post_data, '', bindQaGm(content_id));
 }
 
 function QaContactAdd(content_id, contact_input_id) {
-	var post_data = "name="
-			+ escape(document.getElementById(contact_input_id).value);
+	var post_data = "name=" + escape(document.getElementById(contact_input_id).value);
 	AjaxIt('QaContactAdd', content_id, post_data, '', bindQaGm(content_id));
 }
 
@@ -183,166 +176,156 @@ $(document).ready(function() {
 	if ($('#quick_accounts_txn_div').length) {
 		QaTxnGet();
 	}
-
+	
 	// Bind dateselection to datepicker
-		$(function() {
-			$('.dateselection').live('click', function() {
-				$(this).datepicker( {
-					showOn : 'focus'
-				}).focus();
-			});
-
+	$(function() {
+		$('.dateselection').live('click', function() {
+			$(this).datepicker( {
+				showOn : 'focus'
+			}).focus();
+		});
+		
 		// Bind Add Txn button to QaTxnAdd
-			$('#new_txn_submit').live('click', function() {
-				QaTxnAdd('new_txn_');
-			});
-
+		$('#new_txn_submit').live('click', function() {
+			QaTxnAdd('new_txn_');
+		});
+		
+		// Bind Delete Txn button to QaTxnDelete
+		$('.txn_delete').live('click', function() {
+			txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
+			QaTxnDelete(txn_id);
+		});
+		
 		// Bind Sort Txns link to QaTxnSort
-			$('.txn_title').live('click', function() {
-				sort_by_id = this.id;
-				QaTxnGet('quick_accounts_txn_div', this.id, 1);
-			});
-
+		$('.txn_title').live('click', function() {
+			sort_by_id = this.id;
+			QaTxnGet('quick_accounts_txn_div', this.id, 1);
+		});
+		
 		// Bind Show Acct dropdown to QaTxnShow
-			$('#show_acct').live('change', function() {
-				QaTxnGet('quick_accounts_txn_div', sort_by_id, 0, this.value);
-			});
-
+		$('#show_acct').live('change', function() {
+			QaTxnGet('quick_accounts_txn_div', sort_by_id, 0, this.value);
+		});
+		
 		// Bind BankSays Checkbox to QaTxnEdit
-			$('.txn_banksays_check').live(
-					'change',
-					function() {
-						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
-						QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0,
-								document.getElementById('show_acct').value,
-								txn_id);
-					});
-
+		$('.txn_banksays_check').live('click', function() {
+			txn_id = this.getAttribute('id').slice(this.getAttribute('id')
+					.lastIndexOf('_') + 1);
+			QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document
+					.getElementById('show_acct').value, txn_id);
+		});
+		
 		// Bind Txn History to QaTxnShowHistory
-			$('.txn_show_history').live(
-					'click',
-					function() {
-						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
-						cell_id = 'txn_history_' + txn_id ;
-						row_id = document.getElementById('txn_history_row_' + txn_id);
-						table = document.getElementById('txnh_table_' + txn_id);
-						if (row_id && row_id.getAttribute('style')) {
-							row_id.removeAttribute('style');
-							if (!(table)) QaTxnGetHistory(cell_id, txn_id); // Only update this information if the table doesn't exist
-						} else {
-							row_id.setAttribute('style','display:none;');
-						}
-					});
+		$('.txn_show_history').live('click', function() {
+			txn_id = this.getAttribute('id').slice(this.getAttribute('id')
+					.lastIndexOf('_') + 1);
+			cell_id = 'txn_history_' + txn_id;
+			row_id = document.getElementById('txn_history_row_' + txn_id);
+			table = document.getElementById('txnh_table_' + txn_id);
+			if (row_id && row_id.getAttribute('style')) {
+				row_id.removeAttribute('style');
+				if (!(table)) QaTxnGetHistory(cell_id, txn_id); // Only
+			} else {
+				row_id.setAttribute('style', 'display:none;');
+			}
+		});
 		
 		// Bind Txn Notes to QaTxnShowNotes
-			$('.txn_show_notes').live(
-					'click',
-					function() {
-						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
-						cell_id = 'txn_notes_' + txn_id ;
-						row_id = document.getElementById('txn_notes_row_' + txn_id);
-						table = document.getElementById('txnn_table_' + txn_id);
-						if (row_id && row_id.getAttribute('style')) {
-							row_id.removeAttribute('style');
-							if (!(table)) QaTxnGetNotes(cell_id, txn_id); // Only update this information if the table doesn't exist
-						} else {
-							row_id.setAttribute('style','display:none;');
-						}
-					});
-			
-			// Bind Txn Modification to change save icon
-			$('.txn_acct_select_odd, .txn_acct_select_even, .txn_input').live(
-					'change',
-					function() {
-						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
-						element = document.getElementById('txn_save_' + txn_id);
-						if (element) element.setAttribute('class','ui-icon-special ' + element.getAttribute('class'));
-						element = document.getElementById('txn_save_anchor_' + txn_id);
-						if (element) element.setAttribute('class','txn_save ' + element.getAttribute('class'));
-						else element.setAttribute('class','txn_save');
-					});
-			
-			// Bind Txn Save to QaTxnEdit
-			$('.txn_save').live(
-					'click',
-					function() {
-						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
-						QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0,
-								document.getElementById('show_acct').value,
-								txn_id);
-					});
-			
-			// Bind Txn Save to QaTxnEdit
-			/*$('.txn_save').live(
-					'click',
-					function() {
-						txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
-						QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0,
-								document.getElementById('show_acct').value,
-								txn_id);
-					});*/
-
-			/*
-				$('.accordion .head').click(function() {
-					$(this).next().toggle('slow');
-					return false;
-				}).next().hide();//
-				
-				$('.accordion').accordion();*/
-
+		$('.txn_show_notes').live('click', function() {
+			txn_id = this.getAttribute('id').slice(this.getAttribute('id')
+					.lastIndexOf('_') + 1);
+			cell_id = 'txn_notes_' + txn_id;
+			row_id = document.getElementById('txn_notes_row_' + txn_id);
+			table = document.getElementById('txnn_table_' + txn_id);
+			if (row_id && row_id.getAttribute('style')) {
+				row_id.removeAttribute('style');
+				if (!(table)) QaTxnGetNotes(cell_id, txn_id);
+			} else {
+				row_id.setAttribute('style', 'display:none;');
+			}
 		});
+		
+		// Bind Txn Modification to change save icon
+		$('.txn_acct_select_odd, .txn_acct_select_even, .txn_input')
+				.live('change', function() {
+					txn_id = this.getAttribute('id').slice(this
+							.getAttribute('id').lastIndexOf('_') + 1);
+					element = document.getElementById('txn_save_' + txn_id);
+					if (element) element
+							.setAttribute('class', 'ui-icon-special ' + element
+									.getAttribute('class'));
+					element = document
+							.getElementById('txn_save_anchor_' + txn_id);
+					if (element) element
+							.setAttribute('class', 'txn_save ' + element
+									.getAttribute('class'));
+					else element.setAttribute('class', 'txn_save');
+				});
+		
+		// Bind Txn Save to QaTxnEdit
+		$('.txn_save').live('click', function() {
+			txn_id = this.getAttribute('id').slice(this.getAttribute('id')
+					.lastIndexOf('_') + 1);
+			QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document
+					.getElementById('show_acct').value, txn_id);
+		});
+		
+		// Bind Txn Save to QaTxnEdit
+		/*
+		 * $('.txn_save').live( 'click', function() { txn_id =
+		 * this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
+		 * QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0,
+		 * document.getElementById('show_acct').value, txn_id); });
+		 */
+
+		/*
+		 * $('.accordion .head').click(function() {
+		 * $(this).next().toggle('slow'); return false; }).next().hide();//
+		 * 
+		 * $('.accordion').accordion();
+		 */
+
 	});
+});
 
 function QaTxnEdit(content_id, sort_id, change_dir, show_acct, txn_id) {
 	QaTxnAdd('txn_', '_' + txn_id, txn_id);
 }
 
-function QaTxnGetHistory(content_id,txn_id) {
+function QaTxnGetHistory(content_id, txn_id) {
 	var post_data = "txn_id=" + escape(txn_id);
 	AjaxIt('QaTxnGetHistory', content_id, post_data);
 }
 
-function QaTxnGetNotes(content_id,txn_id) {
+function QaTxnGetNotes(content_id, txn_id) {
 	var post_data = "txn_id=" + escape(txn_id);
 	AjaxIt('QaTxnGetNotes', content_id, post_data);
 }
 
+function QaTxnDelete(txn_id, content_id) {
+	if (!content_id) content_id = 'quick_accounts_txn_div';
+	var post_data = "txn_id=" + escape(txn_id);
+	AjaxIt('QaTxnDelete', content_id, post_data);
+}
+
 function QaTxnGet(content_id, sort_id, change_dir, show_acct) {
-	if (!content_id) {
-		content_id = 'quick_accounts_txn_div';
-	}
+	if (!content_id) content_id = 'quick_accounts_txn_div';
 	if (sort_id) {
-		if (document.getElementById(sort_id + '_DESC')) {
-			if (change_dir == 1)
-				sort_dir = 'ASC';
-			else
-				sort_dir = 'DESC';
-		} else {
-			if (change_dir == 1)
-				sort_dir = 'DESC';
-			else
-				sort_dir = 'ASC';
-		}
-		var post_data = "sort_id=" + escape(sort_id) + "&sort_dir="
-				+ escape(sort_dir);
-		if (show_acct || show_acct == 0)
-			var post_data = post_data + "&show_acct=" + escape(show_acct);
+		sort_dir = (document.getElementById(sort_id + '_DESC')) ? ((change_dir) ? 'ASC' : 'DESC') : ((change_dir) ? 'DESC' : 'ASC');
+		var post_data = "sort_id=" + escape(sort_id) + "&sort_dir=" + escape(sort_dir);
+		if (show_acct || show_acct == 0) var post_data = post_data + "&show_acct=" + escape(show_acct);
 	} else {
-		if (show_acct || show_acct == 0)
-			var post_data = "show_acct=" + escape(show_acct);
+		if (show_acct || show_acct == 0) var post_data = "show_acct=" + escape(show_acct);
 	}
 	AjaxIt('QaTxnGet', content_id, post_data);
 }
 
 function QaTxnAdd(prefix, postfix, current_txn_id, focus_id, content_id) {
-	if (!content_id)
-		content_id = 'quick_accounts_txn_div';
-	if (!prefix)
-		prefix = '';
-	if (!postfix)
-		postfix = '';
+	if (!content_id) content_id = 'quick_accounts_txn_div';
+	if (!prefix) prefix = '';
+	if (!postfix) postfix = '';
 	if (document.getElementById(prefix + 'banksays' + postfix)) {
-		banksays = document.getElementById(prefix + 'banksays' + postfix).value;
+		banksays = $('#' + prefix + 'banksays' + postfix + ':checked').val();
 	} else {
 		banksays = 'null';
 	}
@@ -351,24 +334,14 @@ function QaTxnAdd(prefix, postfix, current_txn_id, focus_id, content_id) {
 	} else {
 		parent_id = 'null';
 	}
-	if (!current_txn_id)
-		current_txn_id = 'null';
-	var post_data = "acct="
-			+ escape(document.getElementById(prefix + 'acct' + postfix).value)
-			+ "&date="
-			+ escape(document.getElementById(prefix + 'date' + postfix).value)
-			+ "&type="
-			+ escape(document.getElementById(prefix + 'type' + postfix).value)
-			+ "&establishment="
-			+ escape(document
-					.getElementById(prefix + 'establishment' + postfix).value)
-			+ "&note="
-			+ escape(document.getElementById(prefix + 'note' + postfix).value)
-			+ "&credit="
-			+ escape(document.getElementById(prefix + 'credit' + postfix).value)
-			+ "&debit="
-			+ escape(document.getElementById(prefix + 'debit' + postfix).value)
-			+ "&parent_id=" + escape(parent_id) + "&banksays="
-			+ escape(banksays) + "&current_txn_id=" + escape(current_txn_id);
+	if (!current_txn_id) current_txn_id = 'null';
+	var post_data = "acct=" + escape(document
+			.getElementById(prefix + 'acct' + postfix).value) + "&date=" + escape(document
+			.getElementById(prefix + 'date' + postfix).value) + "&type=" + escape(document
+			.getElementById(prefix + 'type' + postfix).value) + "&establishment=" + escape(document
+			.getElementById(prefix + 'establishment' + postfix).value) + "&note=" + escape(document
+			.getElementById(prefix + 'note' + postfix).value) + "&credit=" + escape(document
+			.getElementById(prefix + 'credit' + postfix).value) + "&debit=" + escape(document
+			.getElementById(prefix + 'debit' + postfix).value) + "&parent_id=" + escape(parent_id) + "&banksays=" + escape(banksays) + "&current_txn_id=" + escape(current_txn_id);
 	AjaxIt('QaTxnAdd', content_id, post_data, focus_id, '');
 }

@@ -68,7 +68,7 @@ div.info_messages {
     margin: 7px;
 }
 
-div#login {
+div#login, div#txn_actions_buttons {
     border: #DD0 1px solid;
     background-color: #FFC;
     padding: 2px;
@@ -194,6 +194,7 @@ table.txnh {
 
 .txn_actions {
     margin-bottom: 1em;
+	width: 1000px;
 }
 
 .number {
