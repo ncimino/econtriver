@@ -89,16 +89,15 @@ function bindQaSa(content_id) {
 		$(".ui-draggable").draggable( {
 			revert : 'invalid'
 		});
-		$(".ui-droppable")
-				.droppable( {
-				activeClass : 'ui-state-hover',
-				hoverClass : 'ui-state-active',
-				drop : function(event, ui) {
-					grp_id = $(ui.draggable).attr("id").slice(8);
-					acct_id = $(this).attr("id").slice(10);
-					QaSharedAccountsAdd(content_id, grp_id, acct_id, bindQaSa(content_id));
-				}
-				});
+		$(".ui-droppable").droppable( {
+		activeClass : 'ui-state-hover',
+		hoverClass : 'ui-state-active',
+		drop : function(event, ui) {
+			grp_id = $(ui.draggable).attr("id").slice(8);
+			acct_id = $(this).attr("id").slice(10);
+			QaSharedAccountsAdd(content_id, grp_id, acct_id, bindQaSa(content_id));
+		}
+		});
 		// Refresh Txn info
 	}, QaTxnGet() ];
 }
@@ -129,16 +128,15 @@ function bindQaGm(content_id) {
 		$(".ui-draggable").draggable( {
 			revert : 'invalid'
 		});
-		$(".ui-droppable")
-				.droppable( {
-				activeClass : 'ui-state-hover',
-				hoverClass : 'ui-state-active',
-				drop : function(event, ui) {
-					user_id = $(ui.draggable).attr("id").slice(10);
-					grp_id = $(this).attr("id").slice(8);
-					QaGroupMembersAdd(content_id, grp_id, user_id, bindQaGm(content_id));
-				}
-				});
+		$(".ui-droppable").droppable( {
+		activeClass : 'ui-state-hover',
+		hoverClass : 'ui-state-active',
+		drop : function(event, ui) {
+			user_id = $(ui.draggable).attr("id").slice(10);
+			grp_id = $(this).attr("id").slice(8);
+			QaGroupMembersAdd(content_id, grp_id, user_id, bindQaGm(content_id));
+		}
+		});
 	}
 	// Refresh Txn info
 	, QaTxnGet() ];
@@ -177,119 +175,152 @@ $(document).ready(function() {
 		QaTxnGet();
 	}
 	
-	// Bind dateselection to datepicker
-	$(function() {
-		$('.dateselection').live('click', function() {
-			$(this).datepicker( {
-				showOn : 'focus'
-			}).focus();
-		});
-		
-		// Bind Add Txn button to QaTxnAdd
-		$('#new_txn_submit').live('click', function() {
-			QaTxnAdd('new_txn_');
-		});
-		
-		// Bind Delete Txn button to QaTxnDelete
-		$('.txn_delete').live('click', function() {
-			txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
-			QaTxnDelete(txn_id);
-		});
-		
-		// Bind Sort Txns link to QaTxnSort
-		$('.txn_title').live('click', function() {
-			sort_by_id = this.id;
-			QaTxnGet('quick_accounts_txn_div', this.id, 1);
-		});
-		
-		// Bind Show Acct dropdown to QaTxnShow
-		$('#show_acct').live('change', function() {
-			QaTxnGet('quick_accounts_txn_div', sort_by_id, 0, this.value);
-		});
-		
-		// Bind BankSays Checkbox to QaTxnEdit
-		$('.txn_banksays_check').live('click', function() {
-			txn_id = this.getAttribute('id').slice(this.getAttribute('id')
-					.lastIndexOf('_') + 1);
-			QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document
-					.getElementById('show_acct').value, txn_id);
-		});
-		
-		// Bind Txn History to QaTxnShowHistory
-		$('.txn_show_history').live('click', function() {
-			txn_id = this.getAttribute('id').slice(this.getAttribute('id')
-					.lastIndexOf('_') + 1);
-			cell_id = 'txn_history_' + txn_id;
-			row_id = document.getElementById('txn_history_row_' + txn_id);
-			table = document.getElementById('txnh_table_' + txn_id);
-			if (row_id && row_id.getAttribute('style')) {
-				row_id.removeAttribute('style');
-				if (!(table)) QaTxnGetHistory(cell_id, txn_id); // Only
-			} else {
-				row_id.setAttribute('style', 'display:none;');
-			}
-		});
-		
-		// Bind Txn Notes to QaTxnShowNotes
-		$('.txn_show_notes').live('click', function() {
-			txn_id = this.getAttribute('id').slice(this.getAttribute('id')
-					.lastIndexOf('_') + 1);
-			cell_id = 'txn_notes_' + txn_id;
-			row_id = document.getElementById('txn_notes_row_' + txn_id);
-			table = document.getElementById('txnn_table_' + txn_id);
-			if (row_id && row_id.getAttribute('style')) {
-				row_id.removeAttribute('style');
-				if (!(table)) QaTxnGetNotes(cell_id, txn_id);
-			} else {
-				row_id.setAttribute('style', 'display:none;');
-			}
-		});
-		
-		// Bind Txn Modification to change save icon
-		$('.txn_acct_select_odd, .txn_acct_select_even, .txn_input')
-				.live('change', function() {
-					txn_id = this.getAttribute('id').slice(this
-							.getAttribute('id').lastIndexOf('_') + 1);
-					element = document.getElementById('txn_save_' + txn_id);
-					if (element) element
-							.setAttribute('class', 'ui-icon-special ' + element
-									.getAttribute('class'));
-					element = document
-							.getElementById('txn_save_anchor_' + txn_id);
-					if (element) element
-							.setAttribute('class', 'txn_save ' + element
-									.getAttribute('class'));
-					else element.setAttribute('class', 'txn_save');
-				});
-		
-		// Bind Txn Save to QaTxnEdit
-		$('.txn_save').live('click', function() {
-			txn_id = this.getAttribute('id').slice(this.getAttribute('id')
-					.lastIndexOf('_') + 1);
-			QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document
-					.getElementById('show_acct').value, txn_id);
-		});
-		
-		// Bind Txn Save to QaTxnEdit
-		/*
-		 * $('.txn_save').live( 'click', function() { txn_id =
-		 * this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_')+1);
-		 * QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0,
-		 * document.getElementById('show_acct').value, txn_id); });
-		 */
-
-		/*
-		 * $('.accordion .head').click(function() {
-		 * $(this).next().toggle('slow'); return false; }).next().hide();//
-		 * 
-		 * $('.accordion').accordion();
-		 */
-
+	// Bind Txn Add focus to Special color
+	$('#txn_add').live('focusin', function() {
+		document.getElementById('new_txn_submit')
+				.setAttribute('class', 'ui-icon-special ui-icon-plusthick ui-float-left');
+	}).live('focusout', function() {
+		document.getElementById('new_txn_submit')
+				.setAttribute('class', 'ui-icon ui-icon-plusthick ui-float-left');
 	});
+	
+	// Bind dateselection to datepicker on focus and only bind it one time
+	$('.dateselection').live('focus', function() {
+		if (!this.getAttribute('linked')) {
+			$(this).datepicker( {
+			showOn : 'focus',
+			dateFormat : $('#date_format').val()
+			});
+			this.setAttribute('linked', 'true');
+		}
+	}).live('focusout', function() {
+		$(this).datepicker('hide');
+	});
+	
+	// Bind Add Txn button to QaTxnAdd
+	$('#new_txn_submit').live('click', function() {
+		QaTxnAdd('new_txn_');
+	});
+	
+	// Bind Delete Txn button to QaTxnDelete
+	$('.txn_delete').live('click', function() {
+		txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_') + 1);
+		if (confirm("Are you sure that you want to delete this transaction?")) QaTxnDelete(txn_id);
+	});
+	
+	// Bind Sort Txns link to QaTxnSort
+	$('.txn_title').live('click', function() {
+		sort_by_id = this.id;
+		QaTxnGet('quick_accounts_txn_div', this.id, 1);
+	});
+	
+	// Bind Show Acct dropdown to QaTxnShow
+	$('#show_acct').live('change', function() {
+		QaTxnGet('quick_accounts_txn_div', sort_by_id, 0, this.value);
+	});
+	
+	// Bind BankSays Checkbox to QaTxnEdit
+	$('.txn_banksays_check')
+			.live('click', function() {
+				txn_id = this.getAttribute('id')
+						.slice(this.getAttribute('id').lastIndexOf('_') + 1);
+				QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document
+						.getElementById('show_acct').value, txn_id);
+			});
+	
+	// Bind Txn History to QaTxnShowHistory
+	$('.txn_show_history').live('click', function() {
+		txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_') + 1);
+		cell_id = 'txn_history_' + txn_id;
+		row_id = document.getElementById('txn_history_row_' + txn_id);
+		table = document.getElementById('txnh_table_' + txn_id);
+		if (row_id && row_id.getAttribute('style')) {
+			row_id.removeAttribute('style');
+			if (!(table)) QaTxnGetHistory(cell_id, txn_id); // Only
+		} else {
+			row_id.setAttribute('style', 'display:none;');
+		}
+	});
+	
+	// Bind Txn Notes to QaTxnShowNotes
+	$('.txn_show_notes').live('click', function() {
+		txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_') + 1);
+		cell_id = 'txn_notes_' + txn_id;
+		row_id = document.getElementById('txn_notes_row_' + txn_id);
+		table = document.getElementById('txnn_table_' + txn_id);
+		if (row_id && row_id.getAttribute('style')) {
+			row_id.removeAttribute('style');
+			if (!(table)) QaTxnGetNotes(cell_id, txn_id);
+		} else {
+			row_id.setAttribute('style', 'display:none;');
+		}
+	});
+	
+	// Bind Txn Trash Bin to QaTxnGetTrash
+	$('.txn_show_trash').live('click', function() {
+		content = document.getElementById('txn_actions_content');
+		table = document.getElementById('txnt_table');
+		show_acct = document.getElementById('show_acct');
+		if (content && content.getAttribute('style')) {
+			content.removeAttribute('style');
+			if (!(table)) QaTxnGetTrash(sort_by_id, 0, show_acct.value);
+		} else {
+			content.setAttribute('style', 'display:none;');
+		}
+	});
+	
+	// Bind Txn Modification to change save icon
+	$('.txn_acct_select_odd, .txn_acct_select_even, .txn_input').live('change', function() {
+		txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_') + 1);
+		element = document.getElementById('txn_save_' + txn_id);
+		if (element) element.setAttribute('class', 'ui-icon-special ' + element
+				.getAttribute('class'));
+		element = document.getElementById('txn_save_anchor_' + txn_id);
+		if (element) element.setAttribute('class', 'txn_save ' + element.getAttribute('class'));
+		else element.setAttribute('class', 'txn_save');
+	});
+	
+	// Bind Txn Save to QaTxnEdit
+	$('.txn_save')
+			.live('click', function() {
+				txn_id = this.getAttribute('id')
+						.slice(this.getAttribute('id').lastIndexOf('_') + 1);
+				QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document
+						.getElementById('show_acct').value, txn_id);
+			});
+	
+	// Bind TxnH Make Active to QaTxnRestore
+	$('.txnh_make_active')
+			.live('click', function() {
+				txn_id = this.getAttribute('id')
+						.slice(this.getAttribute('id').lastIndexOf('_') + 1);
+				active_txn_id = $('#txnh_make_inactive_' + txn_id).val();
+				QaTxnDelete(active_txn_id, 'force_fail_reload');
+				QaTxnhEdit('quick_accounts_txn_div', sort_by_id, 0, document
+						.getElementById('show_acct').value, txn_id);
+			});
+	
+	// Bind TxnT Make Active to QaTxnRestore
+	$('.txnt_make_active').live('click', function() {
+		txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_') + 1);
+		QaTxnRestore(txn_id);
+	});
+	
+	/*
+	 * $('.accordion .head').click(function() { $(this).next().toggle('slow');
+	 * return false; }).next().hide();//
+	 * 
+	 * $('.accordion').accordion();
+	 */
+
 });
 
 function QaTxnEdit(content_id, sort_id, change_dir, show_acct, txn_id) {
 	QaTxnAdd('txn_', '_' + txn_id, txn_id);
+}
+
+function QaTxnhEdit(content_id, sort_id, change_dir, show_acct, txn_id) {
+	QaTxnAdd('txnh_', '_' + txn_id);
 }
 
 function QaTxnGetHistory(content_id, txn_id) {
@@ -300,6 +331,18 @@ function QaTxnGetHistory(content_id, txn_id) {
 function QaTxnGetNotes(content_id, txn_id) {
 	var post_data = "txn_id=" + escape(txn_id);
 	AjaxIt('QaTxnGetNotes', content_id, post_data);
+}
+
+function QaTxnGetTrash(sort_id, change_dir, show_acct, content_id) {
+	if (!content_id) content_id = 'txn_actions_content';
+	if (sort_id) {
+		sort_dir = (document.getElementById(sort_id + '_DESC')) ? ((change_dir) ? 'ASC' : 'DESC') : ((change_dir) ? 'DESC' : 'ASC');
+		var post_data = "sort_id=" + escape(sort_id) + "&sort_dir=" + escape(sort_dir);
+		if (show_acct || show_acct == 0) var post_data = post_data + "&show_acct=" + escape(show_acct);
+	} else {
+		if (show_acct || show_acct == 0) var post_data = "show_acct=" + escape(show_acct);
+	}
+	AjaxIt('QaTxnGetTrash', content_id, post_data);
 }
 
 function QaTxnDelete(txn_id, content_id) {
@@ -320,8 +363,15 @@ function QaTxnGet(content_id, sort_id, change_dir, show_acct) {
 	AjaxIt('QaTxnGet', content_id, post_data);
 }
 
+function QaTxnRestore(txn_id, content_id) {
+	if (!content_id) content_id = 'quick_accounts_txn_div';
+	var post_data = "txn_id=" + escape(txn_id);
+	AjaxIt('QaTxnRestore', content_id, post_data);
+}
+
 function QaTxnAdd(prefix, postfix, current_txn_id, focus_id, content_id) {
 	if (!content_id) content_id = 'quick_accounts_txn_div';
+	if (!focus_id) focus_id = 'new_txn_type';
 	if (!prefix) prefix = '';
 	if (!postfix) postfix = '';
 	if (document.getElementById(prefix + 'banksays' + postfix)) {
@@ -335,8 +385,7 @@ function QaTxnAdd(prefix, postfix, current_txn_id, focus_id, content_id) {
 		parent_id = 'null';
 	}
 	if (!current_txn_id) current_txn_id = 'null';
-	var post_data = "acct=" + escape(document
-			.getElementById(prefix + 'acct' + postfix).value) + "&date=" + escape(document
+	var post_data = "acct=" + escape(document.getElementById(prefix + 'acct' + postfix).value) + "&date=" + escape(document
 			.getElementById(prefix + 'date' + postfix).value) + "&type=" + escape(document
 			.getElementById(prefix + 'type' + postfix).value) + "&establishment=" + escape(document
 			.getElementById(prefix + 'establishment' + postfix).value) + "&note=" + escape(document

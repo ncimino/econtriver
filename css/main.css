@@ -9,7 +9,7 @@ a:link, a:visited, a:hover, a:active {
 
 body {
     position: relative;
-    min-width: 1000px;
+    min-width: 1200px;
     font-family: Verdana, Arial, Helvetica, sans-serif;
     margin: 8px;
 }
@@ -37,7 +37,7 @@ div#page {
 }
 
 div#banner_ie_limiter {
-    width: 1000px;
+    width: 1200px;
     height: 0px;
 }
 
@@ -183,18 +183,23 @@ table.txnh {
 	margin: 10px;
 }
 
-.txn, .txnh {
+table.txnt, #trash_bin {
+    border: solid #007 1px;
+	margin: 10px;
+}
+
+.txn, .txnh, .txnt {
     border-collapse: collapse;
 }
 
-.txn_col, .txnh_col {
+.txn_col, .txnh_col, .txnt_col {
     border-left: dotted black 1px;
     padding: 0px;
 }
 
 .txn_actions {
     margin-bottom: 1em;
-	width: 1000px;
+	width: 1200px;
 }
 
 .number {
@@ -223,6 +228,12 @@ table.txnh {
     font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
+.txnt_acct_select_even {
+    border: 0px hidden;
+    margin: 0px;
+    padding: 0px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
 
 .txn_acct_select_odd {
     background-color: #eee;
@@ -234,6 +245,14 @@ table.txnh {
 
 .txnh_acct_select_odd {
     background-color: #fdd;
+    border: 0px hidden;
+    margin: 0px;
+    padding: 0px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+.txnt_acct_select_odd {
+    background-color: #DDF;
     border: 0px hidden;
     margin: 0px;
     padding: 0px;
@@ -252,6 +271,10 @@ tr.txnh_row:nth-child(odd) {
 	background-color:#fdd; 
 }
 
+tr.txnt_row:nth-child(odd), #trash_bin {
+	background-color:#DDF; 
+}
+
 tr#txn_table_1, #new_txn_acct {
 	background-color: #FFC;
 }
@@ -264,6 +287,10 @@ tr#txn_table_1, #new_txn_acct {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	/*display:block;
 	min-width: 1em;/**/
+}
+
+.dateselection {
+	width: 8em;
 }
 
 .credit, .debit {

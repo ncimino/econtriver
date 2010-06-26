@@ -53,11 +53,10 @@ function enterSubmit(exec, thisevent) {
 }
 
 // onkeyup="enterFocus(event,2)"
-function enterFocus(event, number) {
+function enterFocus(event, Id) {
 	if (event.keyCode == 13) {
-		var wow = document.getElementById(number);
+		var wow = document.getElementById(Id);
 		wow.focus();
-
 	}
 }
 
@@ -115,10 +114,10 @@ function sendPostRequest(url, content_id, post_data, focus_id, after_load) {
 		url : url,
 		data : post_data,
 		beforeSend : function() {
-			document.getElementById(content_id).innerHTML = "Loading...";
+			if (document.getElementById(content_id)) document.getElementById(content_id).innerHTML = "Loading...";
 		},
 		success : function(msg) {
-			document.getElementById(content_id).innerHTML = msg;
+			if (document.getElementById(content_id)) document.getElementById(content_id).innerHTML = msg;
 			QaHideMsgs();
 			if (focus_id)
 				focus(focus_id);
