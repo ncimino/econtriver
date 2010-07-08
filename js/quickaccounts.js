@@ -185,17 +185,21 @@ $(document).ready(function() {
 	});
 	
 	// Bind dateselection to datepicker on focus and only bind it one time
-	$('.dateselection').live('focus', function() {
-		if (!this.getAttribute('linked')) {
+	/*
+	$('.dateselection')
+	.live('focus', function() {
+		if (this.getAttribute('class').indexOf("hasDatepicker") == -1) {
+			alert('linked');
 			$(this).datepicker( {
 			showOn : 'focus',
 			dateFormat : $('#date_format').val()
 			});
-			this.setAttribute('linked', 'true');
 		}
-	}).live('focusout', function() {
+	})
+	.live('focusout', function() {
 		$(this).datepicker('hide');
 	});
+	//*/
 	
 	// Bind Add Txn button to QaTxnAdd
 	$('#new_txn_submit').live('click', function() {
@@ -295,7 +299,7 @@ $(document).ready(function() {
 				txn_id = this.getAttribute('id')
 						.slice(this.getAttribute('id').lastIndexOf('_') + 1);
 				active_txn_id = $('#txnh_make_inactive_' + txn_id).val();
-				QaTxnDelete(active_txn_id, 'force_fail_reload');
+				QaTxnDelete(active_txn_id, 'no_reload_no_log');
 				QaTxnhEdit('quick_accounts_txn_div', sort_by_id, 0, document
 						.getElementById('show_acct').value, txn_id);
 			});
@@ -305,15 +309,27 @@ $(document).ready(function() {
 		txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_') + 1);
 		QaTxnRestore(txn_id);
 	});
-	
-	/*
-	 * $('.accordion .head').click(function() { $(this).next().toggle('slow');
-	 * return false; }).next().hide();//
-	 * 
-	 * $('.accordion').accordion();
-	 */
 
 });
+
+function bindQaTxn() {
+	return function() {
+		$('.dateselection').datepicker({
+			showOn : 'focus',
+			dateFormat : $('#date_format').val()
+		});
+		$("input.autocomplete").autocomplete({
+			minLength: 2,
+		    source: ["c++", "java", "php", "coldfusion", "javascript", "asp", "ruby"]
+		});
+	};
+}
+
+function bindQaTxnGetNotes(txn_id) {
+	return function() {
+		$('#txnn_' + txn_id).tabs();
+	};
+}
 
 function QaTxnEdit(content_id, sort_id, change_dir, show_acct, txn_id) {
 	QaTxnAdd('txn_', '_' + txn_id, txn_id);
@@ -329,8 +345,9 @@ function QaTxnGetHistory(content_id, txn_id) {
 }
 
 function QaTxnGetNotes(content_id, txn_id) {
-	var post_data = "txn_id=" + escape(txn_id);
-	AjaxIt('QaTxnGetNotes', content_id, post_data);
+	txn_parent_id = $('#txn_parent_id_' + txn_id).val();
+	var post_data = "txn_id=" + escape(txn_id) + "&txn_parent_id=" + escape(txn_parent_id);
+	AjaxIt('QaTxnGetNotes', content_id, post_data, '', bindQaTxnGetNotes(txn_parent_id));
 }
 
 function QaTxnGetTrash(sort_id, change_dir, show_acct, content_id) {
@@ -342,13 +359,14 @@ function QaTxnGetTrash(sort_id, change_dir, show_acct, content_id) {
 	} else {
 		if (show_acct || show_acct == 0) var post_data = "show_acct=" + escape(show_acct);
 	}
-	AjaxIt('QaTxnGetTrash', content_id, post_data);
+	AjaxIt('QaTxnGetTrash', content_id, post_data, '', bindQaTxn());
 }
 
 function QaTxnDelete(txn_id, content_id) {
 	if (!content_id) content_id = 'quick_accounts_txn_div';
-	var post_data = "txn_id=" + escape(txn_id);
-	AjaxIt('QaTxnDelete', content_id, post_data);
+	var log = (content_id == 'no_reload_no_log') ? false : true;
+	var post_data = "txn_id=" + escape(txn_id) + "&log=" + escape(log);
+	AjaxIt('QaTxnDelete', content_id, post_data, '', bindQaTxn());
 }
 
 function QaTxnGet(content_id, sort_id, change_dir, show_acct) {
@@ -360,13 +378,19 @@ function QaTxnGet(content_id, sort_id, change_dir, show_acct) {
 	} else {
 		if (show_acct || show_acct == 0) var post_data = "show_acct=" + escape(show_acct);
 	}
-	AjaxIt('QaTxnGet', content_id, post_data);
+	AjaxIt('QaTxnGet', content_id, post_data, '', bindQaTxn());
 }
 
 function QaTxnRestore(txn_id, content_id) {
 	if (!content_id) content_id = 'quick_accounts_txn_div';
 	var post_data = "txn_id=" + escape(txn_id);
-	AjaxIt('QaTxnRestore', content_id, post_data);
+	AjaxIt('QaTxnRestore', content_id, post_data, '', bindQaTxn());
+}
+
+function QaTxnAddNotes(txn_id, note, content_id) {
+	if (!content_id) content_id = 'quick_accounts_txn_div';
+	var post_data = "txn_id=" + escape(txn_id) + "&note=" + escape(note);
+	AjaxIt('QaTxnAddNotes', content_id, post_data, '', bindQaTxn());
 }
 
 function QaTxnAdd(prefix, postfix, current_txn_id, focus_id, content_id) {
@@ -392,5 +416,5 @@ function QaTxnAdd(prefix, postfix, current_txn_id, focus_id, content_id) {
 			.getElementById(prefix + 'note' + postfix).value) + "&credit=" + escape(document
 			.getElementById(prefix + 'credit' + postfix).value) + "&debit=" + escape(document
 			.getElementById(prefix + 'debit' + postfix).value) + "&parent_id=" + escape(parent_id) + "&banksays=" + escape(banksays) + "&current_txn_id=" + escape(current_txn_id);
-	AjaxIt('QaTxnAdd', content_id, post_data, focus_id, '');
+	AjaxIt('QaTxnAdd', content_id, post_data, focus_id, bindQaTxn());
 }
