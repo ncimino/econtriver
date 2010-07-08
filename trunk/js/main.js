@@ -16,7 +16,8 @@ function showElement(id, speed) {
 
 // onclick='focus(id)'
 function focus(id) {
-	document.getElementById(id).focus();
+	if(document.getElementById(id)) document.getElementById(id).focus();
+	else return false;
 }
 
 var lastTimeout;
@@ -29,9 +30,9 @@ function timedHide(id, time) {
 function enterCall(event, call) {
 	if (event.keyCode == 13) {
 		call();
-		return true;
+		return event;
 	} else {
-		return false;
+		return event;
 	}
 }
 
@@ -53,11 +54,10 @@ function enterSubmit(exec, thisevent) {
 }
 
 // onkeyup="enterFocus(event,2)"
-function enterFocus(event, Id) {
-	if (event.keyCode == 13) {
-		var wow = document.getElementById(Id);
-		wow.focus();
-	}
+function enterFocus(event, id) {
+	return enterCall(event,function(){focus(id);});
+	//if (event.keyCode == 13) document.getElementById(id).focus()
+	//return event;
 }
 
 // onfocus='clearField(this,"Some Value")'
@@ -122,7 +122,7 @@ function sendPostRequest(url, content_id, post_data, focus_id, after_load) {
 			if (focus_id)
 				focus(focus_id);
 			if (after_load) {
-				if (after_load.length == 1) {
+				if (! isArray(after_load)) {
 					$(after_load);
 				} else {
 					for (i=0;i<after_load.length;i++)
@@ -133,4 +133,8 @@ function sendPostRequest(url, content_id, post_data, focus_id, after_load) {
 			}
 		}
 	});
+}
+
+function isArray(obj) {
+	return (obj.constructor.toString().indexOf("Array") != -1);
 }

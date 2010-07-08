@@ -43,12 +43,22 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function getShowAcct() {
 		if ($acct_id = QaSettings::getSetting('show_acct',$this->user->getUserId(),$this->DB)) {
-			$this->showAcct = $acct_id;
+			$this->showAcct = ($this->verifyAcctIsValid($acct_id)) ? $acct_id : FALSE;
 		}
 	}
+	
+	function verifyAcctIsValid($acct_id) {
+		$this->getActiveAccounts();
+		$return = false;
+		while ($acct = $this->DB->fetch($this->activeAccounts)) {
+			if ($acct['id'] == $acct_id) $return = true;
+		}
+		return $return;
+	}
 
-	function getActiveAccounts () {
-		$sql = "SELECT q_acct.*
+	function getActiveAccounts() {
+		if (!isset($this->activeAccounts)) {
+			$sql = "SELECT q_acct.*
 				FROM q_acct,q_owners,q_share,q_user_groups
 				WHERE ( q_acct.id=q_owners.acct_id
 				  AND q_owners.owner_id={$this->user->getUserId()}
@@ -60,7 +70,9 @@ class AjaxQaTxns extends AjaxQaWidget {
 				  AND q_acct.active=1 )
 				GROUP BY q_acct.id
 				ORDER BY q_acct.name ASC;";
-		$this->activeAccounts = $this->DB->query($sql);
+			$this->activeAccounts = $this->DB->query($sql);
+		}
+		$this->DB->resetRowPointer($this->activeAccounts);
 	}
 
 	function getTxnHistory($txn_id) {
@@ -78,6 +90,27 @@ class AjaxQaTxns extends AjaxQaWidget {
 	}
 
 	function getTxnTrash() {
+		$this->getParentTxns();
+		if ($this->DB->num($this->parentTxns) != 0) {
+			$sql = "";
+			while($parent = $this->DB->fetch($this->parentTxns)) {
+				if ($sql != "") $sql .= " UNION ";
+				$sql .= "SELECT q_txn.*,user.handle
+				FROM q_txn,user,q_acct
+				WHERE {$parent['id']} = q_txn.parent_txn_id
+				  AND q_txn.user_id = user.user_id
+				  AND q_txn.acct_id = q_acct.id
+				  AND q_txn.active = 0
+				  AND q_txn.entered = (SELECT max(q_txn.entered) FROM q_txn WHERE {$parent['id']} = q_txn.parent_txn_id)";
+			}
+			$sql .= " ORDER BY entered DESC;";
+			return $this->inactiveTxns = $this->DB->query($sql);
+		} else {
+			return $this->inactiveTxns = false;
+		}
+	}
+
+	function getTxnMoved() {
 		$this->getParentTxns();
 		if ($this->DB->num($this->parentTxns) != 0) {
 			$sql = "";
@@ -130,16 +163,24 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function buildActions() {
 		$divActions = new HTMLDiv($this->container,'txn_actions_id','txn_actions');
-		
+
 		$jsDateFormat = ($this->user->getDateFormat() == "Y-m-d") ? "yy-mm-dd" : "mm/dd/yy"; // else "m/d/Y"
-		
 		new HTMLInputHidden($divActions,'date_format',$jsDateFormat,'date_format');
+
+		$h3View = new HTMLHeading($divActions,5,'View Account: ');
+		$h3View->setStyle('float: left;margin: 4px;padding 0px;');
+		$selectAcct = new HTMLSelect($divActions,'show_acct','show_acct');
+		new HTMLOption($selectAcct,'All Accounts',0);
+		while($result = $this->DB->fetch($this->activeAccounts)) {
+			$selected = ($result['id'] == $this->showAcct) ? TRUE : FALSE;
+			new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
+		}
 
 		$divActionButtons = new HTMLDiv($divActions,'txn_actions_buttons');
 		$divActionButtons->setStyle('float: right;');
 
-		$h3Actions = new HTMLHeading($divActionButtons,5,'Actions');
-		$h3Actions->setStyle('float: left;margin: 0px;padding 0px;');
+		$h3Actions = new HTMLHeading($divActionButtons,5,'Actions: ');
+		$h3Actions->setStyle('float: left;margin: 2px;padding 0px;');
 
 		$trashTxn = new HTMLAnchor($divActionButtons,'#','','.txn_show_trash_anchor','txn_show_trash');
 		$trashTxn->setTitle('Trash Bin');
@@ -151,13 +192,6 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 		$divActionContent = new HTMLDiv($divActions,'txn_actions_content');
 		$divActionContent->setAttribute('style','display:none;');
-
-		$selectAcct = new HTMLSelect($divActions,'show_acct','show_acct');
-		new HTMLOption($selectAcct,'All Accounts',0);
-		while($result = $this->DB->fetch($this->activeAccounts)) {
-			$selected = ($result['id'] == $this->showAcct) ? TRUE : FALSE;
-			new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
-		}
 	}
 
 	function buildTxnsTable() {
@@ -237,8 +271,11 @@ class AjaxQaTxns extends AjaxQaWidget {
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
 		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_date',$this->newTxnValues['date'],'new_txn_date','dateselection txn_input');
-		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_type\')');
-		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_type',$this->newTxnValues['type'],'new_txn_type','txn_input');
+		// Seems to be breaking datepicker return=tab
+		//$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_type\')');
+		// This doesn't work as a workaround
+		//$txn_current_tag->setAttribute('onchange',"focus('new_txn_type')");
+		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_type',$this->newTxnValues['type'],'new_txn_type','txn_input autocomplete');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_establishment\')');
 		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_establishment',$this->newTxnValues['establishment'],'new_txn_establishment','txn_input');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_note\')');
@@ -296,7 +333,6 @@ class AjaxQaTxns extends AjaxQaWidget {
 				$checked = ($txn['banksays']) ? TRUE : FALSE;
 				new HTMLInputCheckbox($tableTxn->cells[$row][$col],'txn_banksays_'.$txn['id'],'txn_banksays_'.$txn['id'],'txn_banksays_check',$checked);
 				$parent_id = ($txn['parent_txn_id']) ? $txn['parent_txn_id'] : $txn['id'];
-				new HTMLInputHidden($tableTxn->cells[$row][$col],'txn_parent_id_'.$txn['id'],$parent_id,'txn_parent_id_'.$txn['id']);
 				new HTMLText($tableTxn->cells[$row][$col++],number_format(round($currentBankSays,2),2));
 
 				$currentBalance = $currentBalance + $txn['debit'] - $txn['credit'];
@@ -322,6 +358,8 @@ class AjaxQaTxns extends AjaxQaWidget {
 				$deleteTxn = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_delete_anchor_'.$txn['id'],'txn_delete');
 				$deleteTxn->setTitle('Delete');
 				new HTMLSpan($deleteTxn,'','txn_delete_'.$txn['id'],'ui-icon ui-icon-trash ui-float-left');
+
+				new HTMLInputHidden($tableTxn->cells[$row][$col],'txn_parent_id_'.$txn['id'],$parent_id,'txn_parent_id_'.$txn['id']);
 
 				$row++;
 
@@ -421,6 +459,18 @@ class AjaxQaTxns extends AjaxQaWidget {
 		return $acctsToShow;
 	}
 
+	function getAcctName($acct_id = NULL) {
+		$acct_id = ($acct_id == NULL) ? $this->showAcct : $acct_id;
+		if ($acct_id == 0) {
+			return 'All Accounts';
+		} else {
+			$sql = "SELECT q_acct.name FROM q_acct WHERE q_acct.id = {$acct_id};";
+			$this->DB->query($sql);
+			$result = $this->DB->fetch();
+			return $result['name'];
+		}
+	}
+
 	function insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays) {
 		if (!empty($credit) and !empty($debit)) {
 			$this->infoMsg->addMessage(-1,'Credit and debit have values, this transaction cannot be added.');
@@ -444,6 +494,22 @@ class AjaxQaTxns extends AjaxQaWidget {
 				$this->DB->query($sql);
 			}
 			return $return;
+		}
+	}
+
+	private function insertTxnNote($parent_txn_id, $note, $editable=TRUE) {
+		$edited = ($editable) ? "null" : "1";
+		$clean_note = Normalize::tags($note);
+		$sql = "INSERT INTO q_txn_notes (user_id,txn_id,posted,note,edited)
+				VALUES ({$this->user->getUserId()}, $parent_txn_id, {$this->user->getTime()}, '$clean_note', $edited);";
+		return $this->DB->query($sql);
+	}
+
+	public function addTxnNote($parent_txn_id, $note) {
+		if ($this->insertTxnNote($parent_txn_id, $note)) {
+			$this->infoMsg->addMessage(2,'Note was successfully added.');
+		} else {
+			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to add the note.');
 		}
 	}
 
@@ -476,12 +542,29 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$this->newTxnValues['date'] = $date; // Even if the entry was added correctly we want the date to stay the same
 	}
 
-	function dropEntries($current_txn_id) {
-		$this->makeTxnInactive($current_txn_id);
+	function getTxnParentId($current_txn_id) {
+		$sql = "SELECT parent_txn_id FROM q_txn
+					WHERE id = $current_txn_id;";
+		$result = $this->DB->fetch($this->DB->query($sql));
+		return $result['parent_txn_id'];
+	}
+
+	function dropEntries($current_txn_id, $log) {
+		if ($this->makeTxnInactive($current_txn_id)) {
+			$this->infoMsg->addMessage(2,'Transaction was successfully moved to the trash bin.');
+			if ($log == 'true') $this->insertTxnNote($this->getTxnParentId($current_txn_id), "Deleted Transaction", FALSE);
+		} else {
+			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to move the transaction to the trash.');
+		}
 	}
 
 	function restoreEntries($current_txn_id) {
-		$this->makeTxnActive($current_txn_id);
+		if ($this->makeTxnActive($current_txn_id)) {
+			$this->infoMsg->addMessage(2,'Transaction was successfully restored.');
+			$this->insertTxnNote($this->getTxnParentId($current_txn_id), "Restored Transaction", FALSE);
+		} else {
+			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to restore the transaction.');
+		}
 	}
 
 	function getTxnActiveStatus($current_txn_id) {
@@ -595,30 +678,33 @@ class AjaxQaTxns extends AjaxQaWidget {
 		new HTMLText($tableTxn->cells[$row][$col++],'Actions');
 	}
 
-	function buildTxnNotesTable($txn_id) {
-		$this->getTxnNotes($txn_id);
-		$this->getUserGroups();
-		$group_num = $this->DB->num($this->userGroups);
-		$this->getTxnGroupNotes($txn_id,$group_num);
-		$this->buildTxnNotes($this->container);
+	function buildTxnNotesTable($parent_txn_id) {
+		$this->getTxnNotes($parent_txn_id);
+		$this->getUserGroups($parent_txn_id);
+		$this->getTxnGroupNotes($parent_txn_id);
+		$this->buildTxnNotes($this->container,$parent_txn_id);
 		$this->printHTML();
 	}
 
-	function getTxnNotes($txn_id) {
+	function getTxnNotes($parent_txn_id) {
 		$sql = "SELECT q_txn_notes.*,user.handle
 				FROM q_txn_notes,user
-				WHERE q_txn_notes.txn_id={$txn_id}
+				WHERE q_txn_notes.txn_id={$parent_txn_id}
 				  AND q_txn_notes.user_id = user.user_id
 				ORDER BY q_txn_notes.posted DESC;";
 		$this->txnNotes = $this->DB->query($sql);
 	}
 
-	function getUserGroups() {
+	function getUserGroups($parent_txn_id) {
 		$sql = "SELECT q_user_groups.group_id,q_group.name
-				FROM q_user_groups,q_group
+				FROM q_user_groups,q_group,q_share,q_txn
 				WHERE q_user_groups.active = 1
-				  AND q_group.id = q_user_groups.group_id
 				  AND q_user_groups.user_id = {$this->user->getUserId()}
+				  AND q_user_groups.group_id = q_group.id
+				  AND q_user_groups.group_id = q_share.group_id
+				  AND q_share.acct_id = q_txn.acct_id
+				  AND q_txn.parent_txn_id = $parent_txn_id
+				  AND q_txn.active = 1
 				ORDER BY q_group.name ASC;";
 		$this->userGroups = $this->DB->query($sql);
 	}
@@ -643,36 +729,95 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$this->txnGroupNotes = $this->DB->query($sql);
 	}
 
-	function buildTxnNotes($parentElement) {
+	function buildTxnNotes($parentElement,$parent_txn_id) {
+		$tab = 0;
+		$notesDiv = new HTMLDiv($parentElement,'txnn_'.$parent_txn_id,'txnn');
+		//$numNotesSections = $this->DB->num($this->userGroups) + 1;
+		$list = new UnorderedList($notesDiv,1);
+		new HTMLAnchor($list->items[$tab],'#tab-'.$parent_txn_id.'-'.++$tab,'Transaction Notes');
+		$notes = new HTMLDiv($notesDiv,'tab-'.$parent_txn_id.'-'.$tab);
+		$numNotes = $this->DB->num($this->txnNotes);
+		if ($numNotes != 0) {
+			$txnNoteTable = new Table($notes,$numNotes+1,3);
+			$this->buildNotesTitles($txnNoteTable,$row=0);
+			$this->DB->resetRowPointer($this->txnNotes);
+			while ($current_note = $this->DB->fetch($this->txnNotes)) {
+				new HTMLText($txnNoteTable->cells[++$row][$col=0],date($this->user->getDateFormat().' g:i:s a',$current_note['posted']));
+				new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['handle']);
+				new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['note']);
+				if ($current_note['edited'] == 1 ) new HTMLText($txnNoteTable->cells[$row][$col],' - [system]');
+				else new HTMLText($txnNoteTable->cells[$row][$col],' - Edit');
+			}
+		} else {
+			new HTMLText($notes,"There weren't any notes found for this transaction.");
+		}
+		if ($this->DB->num($this->userGroups) != 0) {
+			$this->DB->resetRowPointer($this->userGroups);
+			while ($current_group = $this->DB->fetch($this->userGroups)) {
+				$list->addItem();
+				new HTMLAnchor($list->items[$tab],'#tab-'.$parent_txn_id.'-'.++$tab,$current_group['name'].' Notes');
+				$notes = new HTMLDiv($notesDiv,'tab-'.$parent_txn_id.'-'.$tab);
+				$numNotes = $this->DB->num($this->txnGroupNotes);
+				if ($numNotes != 0) {
+					$txnNoteTable = new Table($notes,$numNotes+1,3);
+					$this->buildNotesTitles($txnNoteTable,$row=0);
+					$this->DB->resetRowPointer($this->txnGroupNotes);
+					while ($current_note = $this->DB->fetch($this->txnGroupNotes)) {
+						new HTMLText($txnNoteTable->cells[++$row][$col=0],date($this->user->getDateFormat().' g:i:s a',$current_note['posted']));
+						new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['handle']);
+						new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['note']);
+					}
+				} else {
+					new HTMLText($notes,"There weren't any notes found for group {$current_group['name']}.");
+				}
+			}
+		}
+	}
+
+	function buildTxnNotes_accord($parentElement) {
 		$notesDiv = new HTMLDiv($parentElement,'txnn','accordion');
 		$notesHeading = new HTMLHeading($notesDiv,3,'','txnn_txn_heading');
-		new HTMLSpan($notesHeading,'','','ui-icon ui-icon-triangle-1-s');
+		//new HTMLSpan($notesHeading,'','','ui-icon ui-icon-triangle-1-s');
 		new HTMLAnchor($notesHeading,'#','Transaction Notes');
-		$notes = new HTMLDiv($notesDiv,'txnn_txn');
-		new HTMLText($notes,'Transaction Notes...');
+		$notes = new HTMLDiv($notesDiv);
+		new HTMLParagraph($notes,'Transaction Notes...');
+		/*
+		 $txnNoteTable = new Table($txnNotesDiv,$this->DB->num($this->txnNotes)+1,3);
+		 $this->buildNotesTitles($txnNoteTable,$row=0);
+		 while ($current_note = $this->DB->fetch($this->txnNotes)) {
+			new HTMLText($txnNoteTable->cells[++$row][$col=0],date($this->user->getDateFormat().' g:i:s a',$current_note['posted']));
+			new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['handle']);
+			new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['note']);
+			}//*/
 		if ($this->DB->num($this->userGroups) != 0) {
 			$this->DB->resetRowPointer($this->userGroups);
 			while ($current_group = $this->DB->fetch($this->userGroups)) {
 				$notesHeading = new HTMLHeading($notesDiv,3,'','txnn_grp_heading_'.$current_group['group_id']);
-				new HTMLSpan($notesHeading,'','','ui-icon ui-icon-triangle-1-e');
+				//new HTMLSpan($notesHeading,'','','ui-icon ui-icon-triangle-1-e');
 				new HTMLAnchor($notesHeading,'#',$current_group['name'].' Notes');
 				$notes = new HTMLDiv($notesDiv,'txnn_grp_'.$current_group['group_id']);
-				new HTMLText($notes,'Group Notes...');
+				new HTMLParagraph($notes,'Group Notes...');
 			}
 		}
+	}
+
+	function buildNotesTitles($table,$row) {
+		new HTMLText($table->cells[$row][0],'Date');
+		new HTMLText($table->cells[$row][1],'User');
+		new HTMLText($table->cells[$row][2],'Note');
 	}
 
 	function buildTxnTrashTable() {
 		$this->getActiveAccounts();
 		$this->getTxnTrash();
-		new HTMLHeading($this->container,3,'Trash Bin');
+		new HTMLHeading($this->container,3,'Trash Bin for: '.$this->getAcctName());
 		if ($this->DB->num($this->inactiveTxns) != 0) {
 			$rows = $this->DB->num($this->inactiveTxns);
 			$tableTxn = new Table($this->container,$rows+1,11,'txnt_table','txnt');
 			$this->buildTxnHistoryTitles($tableTxn,$row = 0);
 			$this->buildTxnTrash($tableTxn,++$row);
 		} else {
-			$divTrashBin = new HTMLDiv($this->container,'trash_bin',''); 
+			$divTrashBin = new HTMLDiv($this->container,'trash_bin','');
 			new HTMLText($divTrashBin,'There are no items in your trash bin, for the selected account(s). Try changing the account you are viewing.');
 		}
 		$this->printHTML();
