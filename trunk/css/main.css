@@ -294,7 +294,7 @@ tr#txn_table_1, #new_txn_acct {
 }
 
 .credit, .debit {
-	width: 5em;
+	width: 6em;
 }
 
 a.txn_title:link, a.txn_title:visited, a.txn_title:hover, a.txn_title:active {
