@@ -1,19 +1,14 @@
 <?php
 class AjaxQaTxns extends AjaxQaWidget {
-	private $activeAccounts; // MySQL result
-	private $userGroups; // MySQL result
-	private $txnHistory; // MySQL result
-	private $txnNotes; // MySQL result
-	private $txnGroupNotes; // MySQL result
-	private $activeTxns; // MySQL result
-	private $inactiveTxns; // MySQL result
-	private $parentTxns; // MySQL result
-	private $activeTxnsSum = 0; // MySQL result
-	private $activeTxnsBankSaysSum = 0; // MySQL result
-	private $newTxnValues = array();
-	private $sortDir = 'DESC';
-	private $sortField = 'q_txn.date';
-	private $showAcct = 0;
+	protected $activeAccounts; // MySQL result
+	protected $activeTxns; // MySQL result
+	protected $activeTxnsSum; // MySQL result
+	protected $activeTxnsBankSaysSum; // MySQL result
+
+	protected $newTxnValues = array();
+	protected $sortDir = 'DESC';
+	protected $sortField = 'q_txn.date';
+	protected $showAcct = 0;
 
 	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$showAcct=NULL,$showMsgDiv=TRUE) {
 		parent::__construct($showMsgDiv);
@@ -46,7 +41,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 			$this->showAcct = ($this->verifyAcctIsValid($acct_id)) ? $acct_id : FALSE;
 		}
 	}
-	
+
 	function verifyAcctIsValid($acct_id) {
 		$this->getActiveAccounts();
 		$return = false;
@@ -54,6 +49,124 @@ class AjaxQaTxns extends AjaxQaWidget {
 			if ($acct['id'] == $acct_id) $return = true;
 		}
 		return $return;
+	}
+
+	function convIdToField($input) {
+		switch($input) {
+			case 'q_acct.name': 				$return = 'txn_title_acctname';	break;
+			case 'txn_title_acctname' :			$return = 'q_acct.name'; break;
+			case 'user.handle':					$return = 'txn_title_handle'; break;
+			case 'txn_title_handle' :			$return = 'user.handle'; break;
+			case 'q_txn.entered':				$return = 'txn_title_entered'; break;
+			case 'txn_title_entered' :			$return = 'q_txn.entered'; break;
+			case 'q_txn.date':					$return = 'txn_title_date'; break;
+			case 'txn_title_date' :				$return = 'q_txn.date'; break;
+			case 'q_txn.type':					$return = 'txn_title_type'; break;
+			case 'txn_title_type' :				$return = 'q_txn.type'; break;
+			case 'q_txn.establishment':			$return = 'txn_title_establishment'; break;
+			case 'txn_title_establishment' :	$return = 'q_txn.establishment'; break;
+			case 'q_txn.note':					$return = 'txn_title_note'; break;
+			case 'txn_title_note' :				$return = 'q_txn.note'; break;
+			case 'q_txn.credit':				$return = 'txn_title_credit'; break;
+			case 'txn_title_credit' :			$return = 'q_txn.credit'; break;
+			case 'q_txn.debit':					$return = 'txn_title_debit'; break;
+			case 'txn_title_debit' :			$return = 'q_txn.debit'; break;
+		}
+		return $return;
+	}
+
+	function addSortableTitle($parentElement,$title,$fieldName,$id) {
+		if ($this->sortField == $fieldName) {
+			$nextSortDir = ($this->sortDir == 'DESC') ? 'ASC' : 'DESC';
+			$link = new HTMLAnchor($parentElement,"#",'',$id,'txn_title');
+			$curArrow = ($this->sortDir == 'DESC') ? 'ui-icon ui-icon-carat-1-s ui-float-right' : 'ui-icon ui-icon-carat-1-n ui-float-right';
+			new HTMLSpan($link,'',$id.'_'.$this->sortDir,$curArrow);
+		} else {
+			$link = new HTMLAnchor($parentElement,"#",'',$id,'txn_title');
+		}
+		new HTMLText($link,$title);
+	}
+
+	function getSqlAcctsToShow() {
+		if ($this->showAcct) {
+			$acctsToShow = "q_txn.acct_id = ".$this->showAcct;
+		} else {
+			$i = 0;
+			$this->DB->resetRowPointer($this->activeAccounts);
+			while($result = $this->DB->fetch($this->activeAccounts)) {
+				if ($i == 0 ) $acctsToShow = "";
+				elseif ($i < $this->DB->num($this->activeAccounts)) $acctsToShow .= " OR ";
+				$acctsToShow .= "q_txn.acct_id = ".$result['id'];
+				$i++;
+			}
+		}
+		return $acctsToShow;
+	}
+
+	function getAcctName($acct_id = NULL) {
+		$acct_id = ($acct_id == NULL) ? $this->showAcct : $acct_id;
+		if ($acct_id == 0) {
+			return 'All Accounts';
+		} else {
+			$sql = "SELECT q_acct.name FROM q_acct WHERE q_acct.id = {$acct_id};";
+			$this->DB->query($sql);
+			$result = $this->DB->fetch();
+			return $result['name'];
+		}
+	}
+
+	function getTxnParentId($current_txn_id) {
+		$sql = "SELECT parent_txn_id FROM q_txn
+					WHERE id = $current_txn_id;";
+		$result = $this->DB->fetch($this->DB->query($sql));
+		return $result['parent_txn_id'];
+	}
+
+	function dropEntries($current_txn_id, $log) {
+		if ($this->makeTxnInactive($current_txn_id)) {
+			$this->infoMsg->addMessage(2,'Transaction was successfully moved to the trash bin.');
+			if ($log == 'true') $this->insertTxnNote($this->getTxnParentId($current_txn_id), "Deleted Transaction", FALSE);
+		} else {
+			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to move the transaction to the trash.');
+		}
+	}
+
+	function makeTxnInactive($current_txn_id) {
+		$sql = "UPDATE q_txn SET active = 0 WHERE q_txn.id = $current_txn_id;";
+		return $this->DB->query($sql);
+	}
+
+	function restoreEntries($current_txn_id) {
+		if ($this->makeTxnActive($current_txn_id)) {
+			$this->infoMsg->addMessage(2,'Transaction was successfully restored.');
+			$this->insertTxnNote($this->getTxnParentId($current_txn_id), "Restored Transaction", FALSE);
+		} else {
+			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to restore the transaction.');
+		}
+	}
+
+	function makeTxnActive($current_txn_id) {
+		$sql = "UPDATE q_txn SET active = 1 WHERE q_txn.id = $current_txn_id;";
+		return $this->DB->query($sql);
+	}
+
+	private function insertTxnNote($parent_txn_id, $note, $editable=TRUE) {
+		$edited = ($editable) ? "null" : "1";
+		$clean_note = Normalize::tags($note);
+		$sql = "INSERT INTO q_txn_notes (user_id,txn_id,posted,note,edited)
+				VALUES ({$this->user->getUserId()}, $parent_txn_id, {$this->user->getTime()}, '$clean_note', $edited);";
+		return $this->DB->query($sql);
+	}
+
+	function buildWidget() {
+		$this->getActiveAccounts();
+		if ($this->DB->num($this->activeAccounts)) {
+			$this->buildActions();
+			$this->buildTxnsTable();
+		} else {
+			new HTMLText($this->container,'There are no active accounts. You must have an active account before you can add transactions.');
+		}
+		$this->printHTML();
 	}
 
 	function getActiveAccounts() {
@@ -73,92 +186,6 @@ class AjaxQaTxns extends AjaxQaWidget {
 			$this->activeAccounts = $this->DB->query($sql);
 		}
 		$this->DB->resetRowPointer($this->activeAccounts);
-	}
-
-	function getTxnHistory($txn_id) {
-		$sql = "SELECT q_txn.parent_txn_id
-				FROM q_txn
-				WHERE q_txn.id = {$txn_id};";
-		$parent = $this->DB->fetch($this->DB->query($sql));
-		$sql = "SELECT q_txn.*,user.handle
-				FROM q_txn,user
-				WHERE ( q_txn.id={$parent['parent_txn_id']}
-				   OR q_txn.parent_txn_id={$parent['parent_txn_id']} )
-				  AND q_txn.user_id = user.user_id
-				ORDER BY q_txn.entered DESC;";
-		$this->txnHistory = $this->DB->query($sql);
-	}
-
-	function getTxnTrash() {
-		$this->getParentTxns();
-		if ($this->DB->num($this->parentTxns) != 0) {
-			$sql = "";
-			while($parent = $this->DB->fetch($this->parentTxns)) {
-				if ($sql != "") $sql .= " UNION ";
-				$sql .= "SELECT q_txn.*,user.handle
-				FROM q_txn,user,q_acct
-				WHERE {$parent['id']} = q_txn.parent_txn_id
-				  AND q_txn.user_id = user.user_id
-				  AND q_txn.acct_id = q_acct.id
-				  AND q_txn.active = 0
-				  AND q_txn.entered = (SELECT max(q_txn.entered) FROM q_txn WHERE {$parent['id']} = q_txn.parent_txn_id)";
-			}
-			$sql .= " ORDER BY entered DESC;";
-			return $this->inactiveTxns = $this->DB->query($sql);
-		} else {
-			return $this->inactiveTxns = false;
-		}
-	}
-
-	function getTxnMoved() {
-		$this->getParentTxns();
-		if ($this->DB->num($this->parentTxns) != 0) {
-			$sql = "";
-			while($parent = $this->DB->fetch($this->parentTxns)) {
-				if ($sql != "") $sql .= " UNION ";
-				$sql .= "SELECT q_txn.*,user.handle
-				FROM q_txn,user,q_acct
-				WHERE {$parent['id']} = q_txn.parent_txn_id
-				  AND q_txn.user_id = user.user_id
-				  AND q_txn.acct_id = q_acct.id
-				  AND q_txn.active = 0
-				  AND q_txn.entered = (SELECT max(q_txn.entered) FROM q_txn WHERE {$parent['id']} = q_txn.parent_txn_id)";
-			}
-			$sql .= " ORDER BY entered DESC;";
-			return $this->inactiveTxns = $this->DB->query($sql);
-		} else {
-			return $this->inactiveTxns = false;
-		}
-	}
-
-	function getSqlParentTxnsToShow() {
-		$str_of_parent_ids = " ";
-		while($parent = $this->DB->fetch($this->parentTxns)) {
-			if ($str_of_parent_ids != " ") $str_of_parent_ids .= "OR ";
-			$str_of_parent_ids .= "q_txn.parent_txn_id=".$parent['id']." ";
-		}
-		return $str_of_parent_ids;
-	}
-
-	function getParentTxns() {
-		$sql = "SELECT q_txn.*
-				FROM q_txn, q_acct 
-				WHERE ({$this->getSqlAcctsToShow()})
-				AND q_txn.active = 0
-				AND q_txn.acct_id = q_acct.id 
-				AND q_txn.parent_txn_id = q_txn.id;";
-		return $this->parentTxns = $this->DB->query($sql);
-	}
-
-	function buildWidget() {
-		$this->getActiveAccounts();
-		if ($this->DB->num($this->activeAccounts)) {
-			$this->buildActions();
-			$this->buildTxnsTable();
-		} else {
-			new HTMLText($this->container,'There are no active accounts. You must have an active account before you can add transactions.');
-		}
-		$this->printHTML();
 	}
 
 	function buildActions() {
@@ -206,28 +233,57 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$this->buildTxns($tableTxn,2);
 	}
 
-	function convIdToField($input) {
-		switch($input) {
-			case 'q_acct.name': 				$return = 'txn_title_acctname';	break;
-			case 'txn_title_acctname' :			$return = 'q_acct.name'; break;
-			case 'user.handle':					$return = 'txn_title_handle'; break;
-			case 'txn_title_handle' :			$return = 'user.handle'; break;
-			case 'q_txn.entered':				$return = 'txn_title_entered'; break;
-			case 'txn_title_entered' :			$return = 'q_txn.entered'; break;
-			case 'q_txn.date':					$return = 'txn_title_date'; break;
-			case 'txn_title_date' :				$return = 'q_txn.date'; break;
-			case 'q_txn.type':					$return = 'txn_title_type'; break;
-			case 'txn_title_type' :				$return = 'q_txn.type'; break;
-			case 'q_txn.establishment':			$return = 'txn_title_establishment'; break;
-			case 'txn_title_establishment' :	$return = 'q_txn.establishment'; break;
-			case 'q_txn.note':					$return = 'txn_title_note'; break;
-			case 'txn_title_note' :				$return = 'q_txn.note'; break;
-			case 'q_txn.credit':				$return = 'txn_title_credit'; break;
-			case 'txn_title_credit' :			$return = 'q_txn.credit'; break;
-			case 'q_txn.debit':					$return = 'txn_title_debit'; break;
-			case 'txn_title_debit' :			$return = 'q_txn.debit'; break;
-		}
-		return $return;
+	function getTxns() {
+		$sql = "SELECT q_txn.*,user.handle FROM q_txn,user,q_acct
+					WHERE ({$this->getSqlAcctsToShow()})
+					  AND q_txn.active = 1
+					  AND q_txn.user_id = user.user_id
+					  AND q_txn.acct_id = q_acct.id
+					GROUP BY q_txn.id
+					ORDER BY {$this->sortField} {$this->sortDir},q_txn.type ASC,q_txn.establishment ASC,q_txn.note ASC,q_txn.entered ASC;"; // Need to add next lvl search for consistent results
+		return $this->activeTxns = $this->DB->query($sql);
+	}
+
+	function getTxnsSum() {
+		return $this->activeTxnsSum = $this->getCreditSum() - $this->getDebitSum();
+	}
+
+	function getTxnsBankSaysSum() {
+		return $this->activeTxnsBankSaysSum = $this->getCreditBankSaysSum() - $this->getDebitBankSaysSum();
+	}
+
+	function getCreditSum() {
+		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
+					WHERE ({$this->getSqlAcctsToShow()})
+					  AND q_txn.active = 1;";
+		$result = $this->DB->fetch($this->DB->query($sql));
+		return $result['total'];
+	}
+
+	function getCreditBankSaysSum() {
+		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
+					WHERE ({$this->getSqlAcctsToShow()})
+					  AND q_txn.active = 1
+					  AND q_txn.banksays = 1;";
+		$result = $this->DB->fetch($this->DB->query($sql));
+		return $result['total'];
+	}
+
+	function getDebitSum() {
+		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
+					WHERE ({$this->getSqlAcctsToShow()})
+					  AND q_txn.active = 1;";
+		$result = $this->DB->fetch($this->DB->query($sql));
+		return $result['total'];
+	}
+
+	function getDebitBankSaysSum() {
+		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
+					WHERE ({$this->getSqlAcctsToShow()})
+					  AND q_txn.active = 1
+					  AND q_txn.banksays = 1;";
+		$result = $this->DB->fetch($this->DB->query($sql));
+		return $result['total'];
 	}
 
 	function buildTxnTitles($tableTxn,$row) {
@@ -245,18 +301,6 @@ class AjaxQaTxns extends AjaxQaWidget {
 		new HTMLText($tableTxn->cells[$row][$col++],'Balance');
 		new HTMLText($tableTxn->cells[$row][$col++],'Bank Says');
 		new HTMLText($tableTxn->cells[$row][$col++],'Actions');
-	}
-
-	function addSortableTitle($parentElement,$title,$fieldName,$id) {
-		if ($this->sortField == $fieldName) {
-			$nextSortDir = ($this->sortDir == 'DESC') ? 'ASC' : 'DESC';
-			$link = new HTMLAnchor($parentElement,"#",'',$id,'txn_title');
-			$curArrow = ($this->sortDir == 'DESC') ? 'ui-icon ui-icon-carat-1-s ui-float-right' : 'ui-icon ui-icon-carat-1-n ui-float-right';
-			new HTMLSpan($link,'',$id.'_'.$this->sortDir,$curArrow);
-		} else {
-			$link = new HTMLAnchor($parentElement,"#",'',$id,'txn_title');
-		}
-		new HTMLText($link,$title);
 	}
 
 	function buildNewTxns($tableTxn,$row) {
@@ -390,129 +434,6 @@ class AjaxQaTxns extends AjaxQaWidget {
 		}
 	}
 
-	function getTxns() {
-		$sql = "SELECT q_txn.*,user.handle FROM q_txn,user,q_acct
-					WHERE ({$this->getSqlAcctsToShow()})
-					  AND q_txn.active = 1
-					  AND q_txn.user_id = user.user_id
-					  AND q_txn.acct_id = q_acct.id
-					GROUP BY q_txn.id
-					ORDER BY {$this->sortField} {$this->sortDir},q_txn.type ASC,q_txn.establishment ASC,q_txn.note ASC,q_txn.entered ASC;"; // Need to add next lvl search for consistent results
-		return $this->activeTxns = $this->DB->query($sql);
-	}
-
-	function getTxnsSum() {
-		return $this->activeTxnsSum = $this->getCreditSum() - $this->getDebitSum();
-	}
-
-	function getTxnsBankSaysSum() {
-		return $this->activeTxnsBankSaysSum = $this->getCreditBankSaysSum() - $this->getDebitBankSaysSum();
-	}
-
-	function getCreditSum() {
-		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
-					WHERE ({$this->getSqlAcctsToShow()})
-					  AND q_txn.active = 1;";
-		$result = $this->DB->fetch($this->DB->query($sql));
-		return $result['total'];
-	}
-
-	function getCreditBankSaysSum() {
-		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
-					WHERE ({$this->getSqlAcctsToShow()})
-					  AND q_txn.active = 1
-					  AND q_txn.banksays = 1;";
-		$result = $this->DB->fetch($this->DB->query($sql));
-		return $result['total'];
-	}
-
-	function getDebitSum() {
-		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
-					WHERE ({$this->getSqlAcctsToShow()})
-					  AND q_txn.active = 1;";
-		$result = $this->DB->fetch($this->DB->query($sql));
-		return $result['total'];
-	}
-
-	function getDebitBankSaysSum() {
-		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
-					WHERE ({$this->getSqlAcctsToShow()})
-					  AND q_txn.active = 1
-					  AND q_txn.banksays = 1;";
-		$result = $this->DB->fetch($this->DB->query($sql));
-		return $result['total'];
-	}
-
-	function getSqlAcctsToShow() {
-		if ($this->showAcct) {
-			$acctsToShow = "q_txn.acct_id = ".$this->showAcct;
-		} else {
-			$i = 0;
-			$this->DB->resetRowPointer($this->activeAccounts);
-			while($result = $this->DB->fetch($this->activeAccounts)) {
-				if ($i == 0 ) $acctsToShow = "";
-				elseif ($i < $this->DB->num($this->activeAccounts)) $acctsToShow .= " OR ";
-				$acctsToShow .= "q_txn.acct_id = ".$result['id'];
-				$i++;
-			}
-		}
-		return $acctsToShow;
-	}
-
-	function getAcctName($acct_id = NULL) {
-		$acct_id = ($acct_id == NULL) ? $this->showAcct : $acct_id;
-		if ($acct_id == 0) {
-			return 'All Accounts';
-		} else {
-			$sql = "SELECT q_acct.name FROM q_acct WHERE q_acct.id = {$acct_id};";
-			$this->DB->query($sql);
-			$result = $this->DB->fetch();
-			return $result['name'];
-		}
-	}
-
-	function insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays) {
-		if (!empty($credit) and !empty($debit)) {
-			$this->infoMsg->addMessage(-1,'Credit and debit have values, this transaction cannot be added.');
-			return false;
-		} elseif (empty($credit) and empty($debit)) {
-			$this->infoMsg->addMessage(-1,'Credit and debit do not have values, this transaction cannot be added.');
-			return false;
-		} else {
-			$txn_type = (!empty($credit)) ? 'credit' : 'debit';
-			$value = (!empty($credit)) ? $credit : $debit;
-			$value = str_replace('$', '', $value);
-			$banksays = ($banksays == 'on') ? 1 : 0;
-			//$parent_id = ($parent_id == 'null') ? 0 : $parent_id;
-			$entered = $this->user->getTime();
-			$sql = "INSERT INTO q_txn (acct_id,user_id,entered,date,type,establishment,note,$txn_type,parent_txn_id,banksays,active)
-				VALUES ($acct,$user_id,$entered,$date,'$type','$establishment','$note',$value,$parent_id,$banksays,1);";
-			$return = $this->DB->query($sql);
-			if ($parent_id == 'null') {
-				$last_record_id = $this->DB->lastId();
-				$sql = "UPDATE q_txn SET parent_txn_id = $last_record_id WHERE id = $last_record_id;";
-				$this->DB->query($sql);
-			}
-			return $return;
-		}
-	}
-
-	private function insertTxnNote($parent_txn_id, $note, $editable=TRUE) {
-		$edited = ($editable) ? "null" : "1";
-		$clean_note = Normalize::tags($note);
-		$sql = "INSERT INTO q_txn_notes (user_id,txn_id,posted,note,edited)
-				VALUES ({$this->user->getUserId()}, $parent_txn_id, {$this->user->getTime()}, '$clean_note', $edited);";
-		return $this->DB->query($sql);
-	}
-
-	public function addTxnNote($parent_txn_id, $note) {
-		if ($this->insertTxnNote($parent_txn_id, $note)) {
-			$this->infoMsg->addMessage(2,'Note was successfully added.');
-		} else {
-			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to add the note.');
-		}
-	}
-
 	function addEntries($acct,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays,$current_txn_id) {
 		if ($this->validateNewTxn($date,$credit,$debit)) {
 			$datestamp = strtotime($date);
@@ -542,46 +463,6 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$this->newTxnValues['date'] = $date; // Even if the entry was added correctly we want the date to stay the same
 	}
 
-	function getTxnParentId($current_txn_id) {
-		$sql = "SELECT parent_txn_id FROM q_txn
-					WHERE id = $current_txn_id;";
-		$result = $this->DB->fetch($this->DB->query($sql));
-		return $result['parent_txn_id'];
-	}
-
-	function dropEntries($current_txn_id, $log) {
-		if ($this->makeTxnInactive($current_txn_id)) {
-			$this->infoMsg->addMessage(2,'Transaction was successfully moved to the trash bin.');
-			if ($log == 'true') $this->insertTxnNote($this->getTxnParentId($current_txn_id), "Deleted Transaction", FALSE);
-		} else {
-			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to move the transaction to the trash.');
-		}
-	}
-
-	function restoreEntries($current_txn_id) {
-		if ($this->makeTxnActive($current_txn_id)) {
-			$this->infoMsg->addMessage(2,'Transaction was successfully restored.');
-			$this->insertTxnNote($this->getTxnParentId($current_txn_id), "Restored Transaction", FALSE);
-		} else {
-			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to restore the transaction.');
-		}
-	}
-
-	function getTxnActiveStatus($current_txn_id) {
-		$sql = "SELECT q_txn.active FROM q_txn WHERE q_txn.id = $current_txn_id;";
-		return $this->DB->query($sql);
-	}
-
-	function makeTxnInactive($current_txn_id) {
-		$sql = "UPDATE q_txn SET active = 0 WHERE q_txn.id = $current_txn_id;";
-		return $this->DB->query($sql);
-	}
-
-	function makeTxnActive($current_txn_id) {
-		$sql = "UPDATE q_txn SET active = 1 WHERE q_txn.id = $current_txn_id;";
-		return $this->DB->query($sql);
-	}
-
 	function validateNewTxn($date,$credit,$debit) {
 		if (!strtotime($date)) {
 			$this->infoMsg->addMessage(0,'Date was incorrectly formatted.');
@@ -601,269 +482,34 @@ class AjaxQaTxns extends AjaxQaWidget {
 		}
 	}
 
-	function buildTxnHistoryTable($txn_id) {
-		$this->getActiveAccounts();
-		$this->getTxnHistory($txn_id);
-		$rows = $this->DB->num($this->txnHistory);
-		new HTMLHeading($this->container,3,'History');
-		$tableTxn = new Table($this->container,$rows + 1,11,'txnh_table_'.$txn_id,'txnh');
-		$this->buildTxnHistoryTitles($tableTxn,$row = 0);
-		$this->buildTxnHistory($tableTxn,++$row,$txn_id);
-		$this->printHTML();
+	function getTxnActiveStatus($current_txn_id) {
+		$sql = "SELECT q_txn.active FROM q_txn WHERE q_txn.id = $current_txn_id;";
+		return $this->DB->query($sql);
 	}
 
-	function buildTxnHistory($tableTxn,$row = 0,$active_txn_id) {
-		if ($this->txnHistory) {
-			while($txn = $this->DB->fetch($this->txnHistory)) {
-				$col = 0;
-				$oddOrEven = ($row % 2 == 0) ? "odd" : "even";
-				$current_txn = ($row == 1) ? " current_txn" : "";
-				$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'txnh_acct_'.$txn['id'],'txnh_acct_'.$txn['id'],'txnh_acct_select_'.$oddOrEven.$current_txn);
-				$this->DB->resetRowPointer($this->activeAccounts);
-				while($result = $this->DB->fetch($this->activeAccounts)) {
-					$selected = ($txn['acct_id'] == $result['id']) ? TRUE : FALSE;
-					new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
-				}
-
-				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable');
-				new HTMLText($tableTxn->cells[$row][$col++],$txn['handle']);
-
-				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable number');
-				new HTMLText($tableTxn->cells[$row][$col++],date($this->user->getDateFormat().' g:i:s a',$txn['entered']));
-
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnh_date_'.$txn['id'],date($this->user->getDateFormat(),$txn['date']),'txnh_date_'.$txn['id'],'dateselection txn_input number');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnh_type_'.$txn['id'],$txn['type'],'txnh_type_'.$txn['id'],'txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnh_establishment_'.$txn['id'],$txn['establishment'],'txnh_establishment_'.$txn['id'],'txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnh_note_'.$txn['id'],$txn['note'],'txnh_note_'.$txn['id'],'txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnh_credit_'.$txn['id'],$txn['credit'],'txnh_credit_'.$txn['id'],'txn_input number credit');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnh_debit_'.$txn['id'],$txn['debit'],'txnh_debit_'.$txn['id'],'txn_input number debit');
-
-				$checked = ($txn['banksays']) ? TRUE : FALSE;
-				$checkBox = new HTMLInputCheckbox($tableTxn->cells[$row][$col],'txnh_banksays_'.$txn['id'],'txnh_banksays_'.$txn['id'],'txnh_banksays_check',$checked);
-				$checkBox->setAttribute('disabled','disabled');
-				$parent_id = ($txn['parent_txn_id']) ? $txn['parent_txn_id'] : $txn['id'];
-				new HTMLInputHidden($tableTxn->cells[$row][$col++],'txnh_parent_id_'.$txn['id'],$parent_id,'txnh_parent_id_'.$txn['id']);
-
-				if ($row == 1) {
-					for($i=0;$i<=$col;$i++) {
-						$tableTxn->cells[$row][$i]->setClass($tableTxn->cells[$row][$i]->getClass().$current_txn);
-					}
-				} else {
-					$makeActive = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txnh_make_active_anchor_'.$txn['id'],'txnh_make_active');
-					$makeActive->setTitle('Make Active');
-					new HTMLSpan($makeActive,'','txnh_make_active_'.$txn['id'],'ui-icon ui-icon-arrowreturnthick-1-n ui-float-left');
-					new HTMLInputHidden($tableTxn->cells[$row][$col],'txnh_make_inactive_'.$txn['id'],$active_txn_id,'txnh_make_inactive_'.$txn['id']);
-				}
-
-				$row++;
-			}
+	function insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays) {
+		if (!empty($credit) and !empty($debit)) {
+			$this->infoMsg->addMessage(-1,'Credit and debit have values, this transaction cannot be added.');
+			return false;
+		} elseif (empty($credit) and empty($debit)) {
+			$this->infoMsg->addMessage(-1,'Credit and debit do not have values, this transaction cannot be added.');
+			return false;
 		} else {
-			$this->infoMsg->addMessage(-1,'There was a problem retrieving the transaction data.');
-		}
-	}
-
-	function buildTxnHistoryTitles($tableTxn,$row = 0) {
-		$col = 0;
-
-		new HTMLText($tableTxn->cells[$row][$col++],'Account');
-		new HTMLText($tableTxn->cells[$row][$col++],'User');
-		new HTMLText($tableTxn->cells[$row][$col++],'Entered');
-		new HTMLText($tableTxn->cells[$row][$col++],'Date');
-		new HTMLText($tableTxn->cells[$row][$col++],'Type');
-		new HTMLText($tableTxn->cells[$row][$col++],'Establishment');
-		new HTMLText($tableTxn->cells[$row][$col++],'Note');
-		new HTMLText($tableTxn->cells[$row][$col++],'Credit');
-		new HTMLText($tableTxn->cells[$row][$col++],'Debit');
-		new HTMLText($tableTxn->cells[$row][$col++],'Bank');
-		new HTMLText($tableTxn->cells[$row][$col++],'Actions');
-	}
-
-	function buildTxnNotesTable($parent_txn_id) {
-		$this->getTxnNotes($parent_txn_id);
-		$this->getUserGroups($parent_txn_id);
-		$this->getTxnGroupNotes($parent_txn_id);
-		$this->buildTxnNotes($this->container,$parent_txn_id);
-		$this->printHTML();
-	}
-
-	function getTxnNotes($parent_txn_id) {
-		$sql = "SELECT q_txn_notes.*,user.handle
-				FROM q_txn_notes,user
-				WHERE q_txn_notes.txn_id={$parent_txn_id}
-				  AND q_txn_notes.user_id = user.user_id
-				ORDER BY q_txn_notes.posted DESC;";
-		$this->txnNotes = $this->DB->query($sql);
-	}
-
-	function getUserGroups($parent_txn_id) {
-		$sql = "SELECT q_user_groups.group_id,q_group.name
-				FROM q_user_groups,q_group,q_share,q_txn
-				WHERE q_user_groups.active = 1
-				  AND q_user_groups.user_id = {$this->user->getUserId()}
-				  AND q_user_groups.group_id = q_group.id
-				  AND q_user_groups.group_id = q_share.group_id
-				  AND q_share.acct_id = q_txn.acct_id
-				  AND q_txn.parent_txn_id = $parent_txn_id
-				  AND q_txn.active = 1
-				ORDER BY q_group.name ASC;";
-		$this->userGroups = $this->DB->query($sql);
-	}
-
-	function getTxnGroupNotes($txn_id,$group_num=NULL) {
-		$group_num = ($group_num === NULL) ? $this->DB->num($this->userGroups) : $group_num;
-		if ($group_num == 0) {
-			$group_ids = " q_group_notes.group_id <> q_group_notes.group_id "; // No group ID ever equals 0
-		} else {
-			$current_group_id = $this->DB->fetch($this->userGroups);
-			$group_ids = "q_group_notes.group_id = {$current_group_id['group_id']} ";
-			while ($current_group_id = $this->DB->fetch($this->userGroups)){
-				$group_ids .= ' OR q_group_notes.group_id='.$current_group_id['group_id'];
+			$txn_type = (!empty($credit)) ? 'credit' : 'debit';
+			$value = (!empty($credit)) ? $credit : $debit;
+			$value = str_replace('$', '', $value);
+			$banksays = ($banksays == 'on') ? 1 : 0;
+			$entered = $this->user->getTime();
+			$sql = "INSERT INTO q_txn (acct_id,user_id,entered,date,type,establishment,note,$txn_type,parent_txn_id,banksays,active)
+				VALUES ($acct,$user_id,$entered,$date,'$type','$establishment','$note',$value,$parent_id,$banksays,1);";
+			$return = $this->DB->query($sql);
+			if ($parent_id == 'null') {
+				$last_record_id = $this->DB->lastId();
+				$sql = "UPDATE q_txn SET parent_txn_id = $last_record_id WHERE id = $last_record_id;";
+				$this->DB->query($sql);
 			}
-		}
-		$sql = "SELECT q_group_notes.*,user.handle
-				FROM q_group_notes,user
-				WHERE q_group_notes.txn_id={$txn_id}
-				  AND ($group_ids)
-				  AND q_group_notes.user_id = user.user_id
-				ORDER BY q_group_notes.posted DESC;";
-		$this->txnGroupNotes = $this->DB->query($sql);
-	}
-
-	function buildTxnNotes($parentElement,$parent_txn_id) {
-		$tab = 0;
-		$notesDiv = new HTMLDiv($parentElement,'txnn_'.$parent_txn_id,'txnn');
-		//$numNotesSections = $this->DB->num($this->userGroups) + 1;
-		$list = new UnorderedList($notesDiv,1);
-		new HTMLAnchor($list->items[$tab],'#tab-'.$parent_txn_id.'-'.++$tab,'Transaction Notes');
-		$notes = new HTMLDiv($notesDiv,'tab-'.$parent_txn_id.'-'.$tab);
-		$numNotes = $this->DB->num($this->txnNotes);
-		if ($numNotes != 0) {
-			$txnNoteTable = new Table($notes,$numNotes+1,3);
-			$this->buildNotesTitles($txnNoteTable,$row=0);
-			$this->DB->resetRowPointer($this->txnNotes);
-			while ($current_note = $this->DB->fetch($this->txnNotes)) {
-				new HTMLText($txnNoteTable->cells[++$row][$col=0],date($this->user->getDateFormat().' g:i:s a',$current_note['posted']));
-				new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['handle']);
-				new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['note']);
-				if ($current_note['edited'] == 1 ) new HTMLText($txnNoteTable->cells[$row][$col],' - [system]');
-				else new HTMLText($txnNoteTable->cells[$row][$col],' - Edit');
-			}
-		} else {
-			new HTMLText($notes,"There weren't any notes found for this transaction.");
-		}
-		if ($this->DB->num($this->userGroups) != 0) {
-			$this->DB->resetRowPointer($this->userGroups);
-			while ($current_group = $this->DB->fetch($this->userGroups)) {
-				$list->addItem();
-				new HTMLAnchor($list->items[$tab],'#tab-'.$parent_txn_id.'-'.++$tab,$current_group['name'].' Notes');
-				$notes = new HTMLDiv($notesDiv,'tab-'.$parent_txn_id.'-'.$tab);
-				$numNotes = $this->DB->num($this->txnGroupNotes);
-				if ($numNotes != 0) {
-					$txnNoteTable = new Table($notes,$numNotes+1,3);
-					$this->buildNotesTitles($txnNoteTable,$row=0);
-					$this->DB->resetRowPointer($this->txnGroupNotes);
-					while ($current_note = $this->DB->fetch($this->txnGroupNotes)) {
-						new HTMLText($txnNoteTable->cells[++$row][$col=0],date($this->user->getDateFormat().' g:i:s a',$current_note['posted']));
-						new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['handle']);
-						new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['note']);
-					}
-				} else {
-					new HTMLText($notes,"There weren't any notes found for group {$current_group['name']}.");
-				}
-			}
+			return $return;
 		}
 	}
-
-	function buildTxnNotes_accord($parentElement) {
-		$notesDiv = new HTMLDiv($parentElement,'txnn','accordion');
-		$notesHeading = new HTMLHeading($notesDiv,3,'','txnn_txn_heading');
-		//new HTMLSpan($notesHeading,'','','ui-icon ui-icon-triangle-1-s');
-		new HTMLAnchor($notesHeading,'#','Transaction Notes');
-		$notes = new HTMLDiv($notesDiv);
-		new HTMLParagraph($notes,'Transaction Notes...');
-		/*
-		 $txnNoteTable = new Table($txnNotesDiv,$this->DB->num($this->txnNotes)+1,3);
-		 $this->buildNotesTitles($txnNoteTable,$row=0);
-		 while ($current_note = $this->DB->fetch($this->txnNotes)) {
-			new HTMLText($txnNoteTable->cells[++$row][$col=0],date($this->user->getDateFormat().' g:i:s a',$current_note['posted']));
-			new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['handle']);
-			new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['note']);
-			}//*/
-		if ($this->DB->num($this->userGroups) != 0) {
-			$this->DB->resetRowPointer($this->userGroups);
-			while ($current_group = $this->DB->fetch($this->userGroups)) {
-				$notesHeading = new HTMLHeading($notesDiv,3,'','txnn_grp_heading_'.$current_group['group_id']);
-				//new HTMLSpan($notesHeading,'','','ui-icon ui-icon-triangle-1-e');
-				new HTMLAnchor($notesHeading,'#',$current_group['name'].' Notes');
-				$notes = new HTMLDiv($notesDiv,'txnn_grp_'.$current_group['group_id']);
-				new HTMLParagraph($notes,'Group Notes...');
-			}
-		}
-	}
-
-	function buildNotesTitles($table,$row) {
-		new HTMLText($table->cells[$row][0],'Date');
-		new HTMLText($table->cells[$row][1],'User');
-		new HTMLText($table->cells[$row][2],'Note');
-	}
-
-	function buildTxnTrashTable() {
-		$this->getActiveAccounts();
-		$this->getTxnTrash();
-		new HTMLHeading($this->container,3,'Trash Bin for: '.$this->getAcctName());
-		if ($this->DB->num($this->inactiveTxns) != 0) {
-			$rows = $this->DB->num($this->inactiveTxns);
-			$tableTxn = new Table($this->container,$rows+1,11,'txnt_table','txnt');
-			$this->buildTxnHistoryTitles($tableTxn,$row = 0);
-			$this->buildTxnTrash($tableTxn,++$row);
-		} else {
-			$divTrashBin = new HTMLDiv($this->container,'trash_bin','');
-			new HTMLText($divTrashBin,'There are no items in your trash bin, for the selected account(s). Try changing the account you are viewing.');
-		}
-		$this->printHTML();
-	}
-
-	function buildTxnTrash($tableTxn,$row = 0) {
-		if ($this->inactiveTxns) {
-			while($txn = $this->DB->fetch($this->inactiveTxns)) {
-				$col = 0;
-				$oddOrEven = ($row % 2 == 0) ? "odd" : "even";
-				$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'txnt_acct_'.$txn['id'],'txnt_acct_'.$txn['id'],'txnt_acct_select_'.$oddOrEven);
-				$this->DB->resetRowPointer($this->activeAccounts);
-				while($result = $this->DB->fetch($this->activeAccounts)) {
-					$selected = ($txn['acct_id'] == $result['id']) ? TRUE : FALSE;
-					new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
-				}
-
-				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable');
-				new HTMLText($tableTxn->cells[$row][$col++],$txn['handle']);
-
-				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable number');
-				new HTMLText($tableTxn->cells[$row][$col++],date($this->user->getDateFormat(),$txn['entered']));
-
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnt_date_'.$txn['id'],date($this->user->getDateFormat(),$txn['date']),'txnt_date_'.$txn['id'],'dateselection txn_input number');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnt_type_'.$txn['id'],$txn['type'],'txnt_type_'.$txn['id'],'txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnt_establishment_'.$txn['id'],$txn['establishment'],'txnt_establishment_'.$txn['id'],'txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnt_note_'.$txn['id'],$txn['note'],'txnt_note_'.$txn['id'],'txn_input');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnt_credit_'.$txn['id'],$txn['credit'],'txnt_credit_'.$txn['id'],'txn_input number credit');
-				new HTMLInputText($tableTxn->cells[$row][$col++],'txnt_debit_'.$txn['id'],$txn['debit'],'txnt_debit_'.$txn['id'],'txn_input number debit');
-
-				$checked = ($txn['banksays']) ? TRUE : FALSE;
-				$checkBox = new HTMLInputCheckbox($tableTxn->cells[$row][$col],'txnt_banksays_'.$txn['id'],'txnt_banksays_'.$txn['id'],'txnt_banksays_check',$checked);
-				$checkBox->setAttribute('disabled','disabled');
-				$parent_id = ($txn['parent_txn_id']) ? $txn['parent_txn_id'] : $txn['id'];
-				new HTMLInputHidden($tableTxn->cells[$row][$col++],'txnt_parent_id_'.$txn['id'],$parent_id,'txnt_parent_id_'.$txn['id']);
-
-				$makeActive = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txnt_make_active_anchor_'.$txn['id'],'txnt_make_active');
-				$makeActive->setTitle('Make Active');
-				new HTMLSpan($makeActive,'','txnt_make_active_'.$txn['id'],'ui-icon ui-icon-arrowreturnthick-1-n ui-float-left');
-					
-				$row++;
-			}
-		} else {
-			$this->infoMsg->addMessage(-1,'There was a problem retrieving the trash data.');
-		}
-	}
-
 }
 ?>
