@@ -122,10 +122,14 @@ class AjaxQaTxns extends AjaxQaWidget {
 		return $result['parent_txn_id'];
 	}
 
-	function dropEntries($current_txn_id, $log) {
+	function dropEntries($current_txn_id, $log, $current_txn_id=FALSE) {
 		if ($this->makeTxnInactive($current_txn_id)) {
-			$this->infoMsg->addMessage(2,'Transaction was successfully moved to the trash bin.');
-			if ($log == 'true') $this->insertTxnNote($this->getTxnParentId($current_txn_id), "Deleted Transaction", FALSE);
+			if ($current_txn_id) { // If current_txn_id is defined, then the transaction was made active
+				//$this->infoMsg->addMessage(2,'Transaction was successfully made active.');
+			} else {
+				$this->infoMsg->addMessage(2,'Transaction was successfully moved to the trash bin.');
+				if ($log == 'true') $this->insertTxnNote($this->getTxnParentId($current_txn_id), "Deleted Transaction", FALSE);
+			}
 		} else {
 			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to move the transaction to the trash.');
 		}
@@ -434,20 +438,27 @@ class AjaxQaTxns extends AjaxQaWidget {
 		}
 	}
 
-	function addEntries($acct,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays,$current_txn_id) {
+	function addEntries($acct,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays,$current_txn_id,$active_txn_id=FALSE) {
+		$return=FALSE;
 		if ($this->validateNewTxn($date,$credit,$debit)) {
 			$datestamp = strtotime($date);
 			$this->getTxnActiveStatus($current_txn_id);
 			$txnActiveStatus = $this->DB->fetch();
-			if (($this->DB->num() >= 1) and ($txnActiveStatus['active'] == 0)) {
+			if (($this->DB->num() >= 1) and ($txnActiveStatus['active'] == 0)) { // If current txn id exists, but is inactive
 				$this->infoMsg->addMessage(0,'This entry was modified before you submitted this change. Please resubmit your changes.');
 			} elseif ($this->insertTxn($acct,$this->user->getUserId(),$datestamp,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays)) {
 				if ($current_txn_id != 'null') {
 					if ($this->makeTxnInactive($current_txn_id)) {
 						$this->infoMsg->addMessage(2,'Transaction was successfully modified.');
+						$return=TRUE; // Transaction was modified, and done so successfully
 					}
 				} else {
-					$this->infoMsg->addMessage(2,'Transaction was successfully added.');
+					if ($active_txn_id) {
+						$this->infoMsg->addMessage(2,'Transaction was successfully made active.');
+					} else {
+						$this->infoMsg->addMessage(2,'Transaction was successfully added.');
+					}
+					$return=TRUE; // Transaction was added, and done so successfully
 				}
 			} else {
 				$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to add the transaction.');
@@ -461,6 +472,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 			$this->newTxnValues['debit'] = $debit;
 		}
 		$this->newTxnValues['date'] = $date; // Even if the entry was added correctly we want the date to stay the same
+		return $return;
 	}
 
 	function validateNewTxn($date,$credit,$debit) {
