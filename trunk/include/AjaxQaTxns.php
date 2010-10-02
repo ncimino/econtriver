@@ -323,11 +323,11 @@ class AjaxQaTxns extends AjaxQaWidget {
 		//$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_type\')');
 		// This doesn't work as a workaround
 		//$txn_current_tag->setAttribute('onchange',"focus('new_txn_type')");
-		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_type',$this->newTxnValues['type'],'new_txn_type','txn_input autocomplete');
+		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_type',$this->newTxnValues['type'],'new_txn_type','txn_input autocomplete_type');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_establishment\')');
-		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_establishment',$this->newTxnValues['establishment'],'new_txn_establishment','txn_input');
+		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_establishment',$this->newTxnValues['establishment'],'new_txn_establishment','txn_input autocomplete_establishment');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_note\')');
-		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_note',$this->newTxnValues['note'],'new_txn_note','txn_input');
+		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_note',$this->newTxnValues['note'],'new_txn_note','txn_input autocomplete_note');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_credit\')');
 		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_credit',$this->newTxnValues['credit'],'new_txn_credit','txn_input credit');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_debit\')');
