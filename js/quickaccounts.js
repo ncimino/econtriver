@@ -260,11 +260,9 @@ $(document).ready(function() {
 	$('.txn_acct_select_odd, .txn_acct_select_even, .txn_input').live('change', function() {
 		txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_') + 1);
 		element = document.getElementById('txn_save_' + txn_id);
-		if (element) element.setAttribute('class', 'ui-icon-special ' + element
-				.getAttribute('class'));
+		if (element) element.setAttribute('class', 'ui-icon-special ui-icon-disk ui-float-left');
 		element = document.getElementById('txn_save_anchor_' + txn_id);
-		if (element) element.setAttribute('class', 'txn_save ' + element.getAttribute('class'));
-		else element.setAttribute('class', 'txn_save');
+		if (element) element.setAttribute('class', 'txn_save');
 	});
 	
 	// Bind Txn Save to QaTxnEdit
@@ -294,20 +292,20 @@ $(document).ready(function() {
 function bindQaTxn() {
 	return function() {
 		$('.dateselection').datepicker( {
-		showOn : 'focus',
-		dateFormat : $('#date_format').val()
+			showOn : 'focus',
+			dateFormat : $('#date_format').val()
 		});
 		$("input.autocomplete_type").autocomplete( {
-		minLength : 2,
-        source : QaTxnGetAutoCompleteValues('type').split("--QaAjaxDelimeter--") 
+			minLength : 2,
+	        source : QaTxnGetAutoCompleteValues('type').split("--QaAjaxDelimeter--") 
 		});
 		$("input.autocomplete_establishment").autocomplete( {
-		minLength : 2,
-        source : QaTxnGetAutoCompleteValues('establishment').split("--QaAjaxDelimeter--") 
+			minLength : 2,
+	        source : QaTxnGetAutoCompleteValues('establishment').split("--QaAjaxDelimeter--") 
 		});
 		$("input.autocomplete_note").autocomplete( {
-		minLength : 2,
-        source : QaTxnGetAutoCompleteValues('note').split("--QaAjaxDelimeter--") 
+			minLength : 2,
+	        source : QaTxnGetAutoCompleteValues('note').split("--QaAjaxDelimeter--") 
 		});
 	};
 }
@@ -354,8 +352,7 @@ function QaTxnGetTrash(sort_id, change_dir, show_acct, content_id) {
 
 function QaTxnDelete(txn_id, content_id) {
 	if (!content_id) content_id = 'quick_accounts_txn_div';
-	var log = (content_id == 'no_reload_no_log') ? false : true;
-	var post_data = "txn_id=" + escape(txn_id) + "&log=" + escape(log);
+	var post_data = "txn_id=" + escape(txn_id) + "&log=true";
 	AjaxIt('QaTxnDelete', content_id, post_data, '', bindQaTxn());
 }
 

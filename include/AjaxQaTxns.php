@@ -122,16 +122,17 @@ class AjaxQaTxns extends AjaxQaWidget {
 		return $result['parent_txn_id'];
 	}
 
-	function dropEntries($current_txn_id, $log, $current_txn_id=FALSE) {
-		if ($this->makeTxnInactive($current_txn_id)) {
+	function dropEntries($active_txn_id, $log, $current_txn_id=FALSE) {
+		if ($this->makeTxnInactive($active_txn_id)) {
 			if ($current_txn_id) { // If current_txn_id is defined, then the transaction was made active
+				// This occurs when restoring a previous revision of the same transaction. The current must be made inactive.
 				//$this->infoMsg->addMessage(2,'Transaction was successfully made active.');
 			} else {
 				$this->infoMsg->addMessage(2,'Transaction was successfully moved to the trash bin.');
-				if ($log == 'true') $this->insertTxnNote($this->getTxnParentId($current_txn_id), "Deleted Transaction", FALSE);
+				if ($log == 'true') $this->insertTxnNote($this->getTxnParentId($active_txn_id), "Deleted Transaction", FALSE);
 			}
 		} else {
-			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to move the transaction to the trash.');
+			$this->infoMsg->addMessage(-1,'An unexpected error occurred while trying to move the transaction to the trash.');
 		}
 	}
 
@@ -145,7 +146,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 			$this->infoMsg->addMessage(2,'Transaction was successfully restored.');
 			$this->insertTxnNote($this->getTxnParentId($current_txn_id), "Restored Transaction", FALSE);
 		} else {
-			$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to restore the transaction.');
+			$this->infoMsg->addMessage(-1,'An unexpected error occurred while trying to restore the transaction.');
 		}
 	}
 
@@ -464,13 +465,13 @@ class AjaxQaTxns extends AjaxQaWidget {
 				$this->infoMsg->addMessage(-1,'An unexpected error occured while trying to add the transaction.');
 			}
 		} elseif ($current_txn_id == 'null') {
-			$this->newTxnValues['acct'] = $acct;
 			$this->newTxnValues['type'] = $type;
 			$this->newTxnValues['establishment'] = $establishment;
 			$this->newTxnValues['note'] = $note;
 			$this->newTxnValues['credit'] = $credit;
 			$this->newTxnValues['debit'] = $debit;
 		}
+		$this->newTxnValues['acct'] = $acct; // Even if the entry was added correctly we want the account to stay the same
 		$this->newTxnValues['date'] = $date; // Even if the entry was added correctly we want the date to stay the same
 		return $return;
 	}
