@@ -345,7 +345,7 @@ div.ui-datepicker{
 	text-indent: -99999px;
 	width: 16px;
 	height: 16px;
-	background-image: url(../images/ui/ui-icons_ffd27a_256x240.png);
+	background-image: url(images/ui-icons_ffd27a_256x240.png);
 }
 
 .ui-icon-special {
@@ -355,5 +355,5 @@ div.ui-datepicker{
 	text-indent: -99999px;
 	width: 16px;
 	height: 16px;
-	background-image: url(../images/ui/ui-icons_228ef1_256x240.png);
+	background-image: url(images/ui-icons_228ef1_256x240.png);
 }
