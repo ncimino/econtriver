@@ -71,6 +71,8 @@ class AjaxQaTxns extends AjaxQaWidget {
 			case 'txn_title_credit' :			$return = 'q_txn.credit'; break;
 			case 'q_txn.debit':					$return = 'txn_title_debit'; break;
 			case 'txn_title_debit' :			$return = 'q_txn.debit'; break;
+			case 'q_txn.banksays':			    $return = 'txn_title_banksays'; break;
+			case 'txn_title_banksays' :			$return = 'q_txn.banksays'; break;
 		}
 		return $return;
 	}
@@ -190,7 +192,9 @@ class AjaxQaTxns extends AjaxQaWidget {
 				ORDER BY q_acct.name ASC;";
 			$this->activeAccounts = $this->DB->query($sql);
 		}
-		$this->DB->resetRowPointer($this->activeAccounts);
+		if ($this->DB->num($this->activeAccounts)) { //:BUG:Fixes issue 28
+			$this->DB->resetRowPointer($this->activeAccounts);
+		}
 	}
 
 	function buildActions() {
@@ -304,7 +308,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Credit','q_txn.credit',$this->convIdToField('q_txn.credit'));
 		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Debit','q_txn.debit',$this->convIdToField('q_txn.debit'));
 		new HTMLText($tableTxn->cells[$row][$col++],'Balance');
-		new HTMLText($tableTxn->cells[$row][$col++],'Bank Says');
+		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Bank Says','q_txn.banksays',$this->convIdToField('q_txn.banksays')); //:BUG:Fixes issue 42
 		new HTMLText($tableTxn->cells[$row][$col++],'Actions');
 	}
 
