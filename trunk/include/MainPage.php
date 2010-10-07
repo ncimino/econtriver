@@ -16,22 +16,23 @@ class MainPage {
 	function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
 
 		$divMenu = new HTMLDiv($parentElement,self::getQaMenuId(),self::getQaMenuClass());
-
-		$aManageAccounts = new HTMLAnchor($divMenu,'#','Manage Accounts','accounts_link');
-		$aManageAccounts->setAttribute('onclick',"QaAccountGet('".self::getQaManageId()."');");
-		new HTMLText($divMenu,' | ');
-		$aManageGroups = new HTMLAnchor($divMenu,'#','Manage Groups');
-		$aManageGroups->setAttribute('onclick',"QaGroupGet('".self::getQaManageId()."');");
-		new HTMLText($divMenu,' | ');
-		$aAccountSharing = new HTMLAnchor($divMenu,'#','Account Sharing');
-		$aAccountSharing->setAttribute('onclick',"QaSharedAccountsGet('".self::getQaManageId()."');");
-		new HTMLText($divMenu,' | ');
-		$aGroupMembership = new HTMLAnchor($divMenu,'#','Group Membership');
-		$aGroupMembership->setAttribute('onclick',"QaGroupMembersGet('".self::getQaManageId()."');");
-
-		new HTMLDiv($parentElement,self::getQaManageId(),self::getQaManageClass());
-		
+		self::buildAccountManagementMenu($divMenu);
+		new HTMLDiv($parentElement,self::getQaManageId(),self::getQaManageClass());		
 		new HTMLDiv($parentElement,self::getQaTxnId(),self::getQaTxnClass());
+	}
+	
+	function buildAccountManagementMenu($parentElement) {
+		$aManageAccounts = new HTMLAnchor($parentElement,'#','Manage Accounts','accounts_link');
+		$aManageAccounts->setAttribute('onclick',"QaAccountGet('".self::getQaManageId()."');");
+		new HTMLText($parentElement,' | ');
+		$aManageGroups = new HTMLAnchor($parentElement,'#','Manage Groups');
+		$aManageGroups->setAttribute('onclick',"QaGroupGet('".self::getQaManageId()."');");
+		new HTMLText($parentElement,' | ');
+		$aAccountSharing = new HTMLAnchor($parentElement,'#','Account Sharing');
+		$aAccountSharing->setAttribute('onclick',"QaSharedAccountsGet('".self::getQaManageId()."');");
+		new HTMLText($parentElement,' | ');
+		$aGroupMembership = new HTMLAnchor($parentElement,'#','Group Membership');
+		$aGroupMembership->setAttribute('onclick',"QaGroupMembersGet('".self::getQaManageId()."');");
 	}
 }
 ?>
