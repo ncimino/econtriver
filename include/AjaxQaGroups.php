@@ -223,7 +223,8 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 	function buildCreateGroupForm($parentElement) {
 		$divAddGroup = new HTMLDiv($parentElement,'',$this->getCreateGrpClass());
 		new HTMLHeading($divAddGroup,5,'Add Group:');
-		$aAddGroupInput = new HTMLInputText($divAddGroup,$this->getCreateGrpInName(),$this->grpName,$this->getCreateGrpInId(),$this->getCreateGrpClass());
+		$inputAddGroup = new HTMLInputText($divAddGroup,$this->getCreateGrpInName(),$this->grpName,$this->getCreateGrpInId(),$this->getCreateGrpClass());
+		$inputAddGroup->setAttribute('onkeypress',"enterCall(event,function() {QaGroupAdd('{$this->parentId}','{$this->getCreateGrpInId()}');})");
 		$aAddGroup = new HTMLAnchor($divAddGroup,'#','Add Group');
 		$aAddGroup->setAttribute('onclick',"QaGroupAdd('{$this->parentId}','{$this->getCreateGrpInId()}');");
 	}
