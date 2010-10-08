@@ -78,7 +78,7 @@ class Registration {
 		$sendEmail = new SendEmail();
 		$sendEmail->addTo($this->user->getEmail());
 		$sendEmail->setFrom($this->siteInfo->getFromEmail());
-		$sendEmail->setSubject("eContriver - Account Recovery");
+		$sendEmail->setSubject("eContriver - Account Registration");
 		$sendEmail->setContent($email->printPage());
 		return $sendEmail->send();
 	}

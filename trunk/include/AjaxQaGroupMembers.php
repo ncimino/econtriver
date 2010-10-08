@@ -223,7 +223,7 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 			$contactsA = new HTMLAnchor($contactsP,'#','','','');
 			$contactsA->setAttribute('onclick',"QaContactDrop('quick_accounts_manage_div','{$contact['contact_id']}');");
 			$contactsSpan = new HTMLSpan($contactsA,'','','ui-icon ui-icon-circle-close');
-			$contactsSpan->setStyle('float: right;');//*/
+			$contactsSpan->setStyle('float: right;');
 			$i++;
 		}
 	}
@@ -232,6 +232,7 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		$divAddContact = new HTMLDiv($parentElement);
 		new HTMLHeading($divAddContact,5,'Add Contact:');
 		$inputAddContact = new HTMLInputText($divAddContact,'contact','Email or User name','contact');
+		$inputAddContact->setAttribute('onkeypress',"enterCall(event,function() {QaContactAdd('{$this->parentId}','".self::getContactInputId()."');})");
 		$aAddContact = new HTMLAnchor($divAddContact,'#','Add Contact');
 		$aAddContact->setAttribute('onclick',"QaContactAdd('{$this->parentId}','".self::getContactInputId()."');");
 	}

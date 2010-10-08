@@ -214,7 +214,8 @@ class AjaxQaAccounts extends AjaxQaWidget {
 	function buildCreateAccountForm($parentElement) {
 		$divAddAccount = new HTMLDiv($parentElement,'',$this->getCreateAcctClass());
 		new HTMLHeading($divAddAccount,5,'Add Account:');
-		new HTMLInputText($divAddAccount,$this->getCreateAcctInName(),$this->acctName,$this->getCreateAcctInId(),$this->getCreateAcctClass());
+		$inputAddAccount = new HTMLInputText($divAddAccount,$this->getCreateAcctInName(),$this->acctName,$this->getCreateAcctInId(),$this->getCreateAcctClass());
+		$inputAddAccount->setAttribute('onkeypress',"enterCall(event,function() {QaAccountAdd('{$this->parentId}','{$this->getCreateAcctInId()}');})");
 		$aAddAccount = new HTMLAnchor($divAddAccount,'#','Add Account');
 		$aAddAccount->setAttribute('onclick',"QaAccountAdd('{$this->parentId}','{$this->getCreateAcctInId()}');");
 	}
