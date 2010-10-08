@@ -71,8 +71,7 @@ class AjaxQaTxnNotes extends AjaxQaTxns {
 		$notesDiv = new HTMLDiv($parentElement,'txnn_'.$parent_txn_id,'txnn');
 		$list = new UnorderedList($notesDiv,1);
 		$this->buildNotesTab($notesDiv,$this->txnNotes,"Transaction",$tab=1,$parent_txn_id,$list);
-		if ($this->DB->num($this->userGroups) != 0) {
-			$this->DB->resetRowPointer($this->userGroups);
+		if ($this->DB->resetRowPointer($this->userGroups)) {
 			while ($current_group = $this->DB->fetch($this->userGroups)) {
 				$list->addItem();
 				$this->buildNotesTab($notesDiv,$this->txnGroupNotes,$current_group['name'],++$tab,$parent_txn_id,$list);
@@ -83,11 +82,9 @@ class AjaxQaTxnNotes extends AjaxQaTxns {
 	function buildNotesTab($parentElement,$notesResult,$name,$tabNumber,$parentTxnId,$list) {
 		new HTMLAnchor($list->items[$tabNumber-1],'#tab-'.$parentTxnId.'-'.$tabNumber,$name.' Notes');
 		$notes = new HTMLDiv($parentElement,'tab-'.$parentTxnId.'-'.$tabNumber);
-		$numNotes = $this->DB->num($notesResult);
-		if ($numNotes != 0) {
-			$txnNoteTable = new Table($notes,$numNotes+1,3);
+		if ($this->DB->resetRowPointer($notesResult)) {
+			$txnNoteTable = new Table($notes,$this->DB->num($notesResult)+1,3);
 			$this->buildNotesTitles($txnNoteTable,$row=0);
-			$this->DB->resetRowPointer($notesResult);
 			while ($current_note = $this->DB->fetch($notesResult)) {
 				new HTMLText($txnNoteTable->cells[++$row][$col=0],date($this->user->getDateFormat().' g:i:s a',$current_note['posted']));
 				new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['handle']);

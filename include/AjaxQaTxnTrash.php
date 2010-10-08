@@ -2,18 +2,20 @@
 class AjaxQaTxnTrash extends AjaxQaTxns {
 	private $inactiveTxns; // MySQL result
 	private $parentTxns; // MySQL result
+	private $numberOfColumns = 11;
+	private $titleRowHeight = 1;
 
 	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$showAcct=NULL,$showMsgDiv=TRUE) {
 		parent::__construct($parentId,$sortId=NULL,$sortDir=NULL,$showAcct=NULL,$showMsgDiv=TRUE);
 	}
 
 	function buildTrashWidget() {
-		$this->getActiveAccounts();
+		$this->activeAccounts = AjaxQaGetAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
 		$this->getTxnTrash();
-		new HTMLHeading($this->container,3,'Trash Bin for: '.$this->getAcctName());
+		new HTMLHeading($this->container,3,'Trash Bin for: '.AjaxQaGetAccounts::getAccountNameById($this->showAcct,$this->DB,TRUE));
 		if ($this->DB->num($this->inactiveTxns) != 0) {
 			$rows = $this->DB->num($this->inactiveTxns);
-			$tableTxn = new Table($this->container,$rows+1,11,'txnt_table','txnt');
+			$tableTxn = new Table($this->container,$rows+$this->titleRowHeight,$this->numberOfColumns,'txnt_table','txnt');
 			$this->buildTxnTrashTitles($tableTxn,$row = 0);
 			$this->buildTxnTrash($tableTxn,++$row);
 		} else {
@@ -47,44 +49,12 @@ class AjaxQaTxnTrash extends AjaxQaTxns {
 	function getParentTxns() {
 		$sql = "SELECT q_txn.*
 				FROM q_txn, q_acct 
-				WHERE ({$this->getSqlAcctsToShow()})
+				WHERE (".AjaxQaGetAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->DB).")
 				AND q_txn.active = 0
 				AND q_txn.acct_id = q_acct.id 
 				AND q_txn.parent_txn_id = q_txn.id;";
 		return $this->parentTxns = $this->DB->query($sql);
 	}
-	
-	/*
-	function getTxnMoved() {
-		$this->getParentTxns();
-		if ($this->DB->num($this->parentTxns) != 0) {
-			$sql = "";
-			while($parent = $this->DB->fetch($this->parentTxns)) {
-				if ($sql != "") $sql .= " UNION ";
-				$sql .= "SELECT q_txn.*,user.handle
-				FROM q_txn,user,q_acct
-				WHERE {$parent['id']} = q_txn.parent_txn_id
-				  AND q_txn.user_id = user.user_id
-				  AND q_txn.acct_id = q_acct.id
-				  AND q_txn.active = 0
-				  AND q_txn.entered = (SELECT max(q_txn.entered) FROM q_txn WHERE {$parent['id']} = q_txn.parent_txn_id)";
-			}
-			$sql .= " ORDER BY entered DESC;";
-			return $this->inactiveTxns = $this->DB->query($sql);
-		} else {
-			return $this->inactiveTxns = false;
-		}
-	}
-
-	 function getSqlParentTxnsToShow() {
-		$str_of_parent_ids = " ";
-		while($parent = $this->DB->fetch($this->parentTxns)) {
-			if ($str_of_parent_ids != " ") $str_of_parent_ids .= "OR ";
-			$str_of_parent_ids .= "q_txn.parent_txn_id=".$parent['id']." ";
-		}
-		return $str_of_parent_ids;
-	}
-	*/
 
 	function buildTxnTrashTitles($tableTxn,$row = 0) {
 		$col = 0;

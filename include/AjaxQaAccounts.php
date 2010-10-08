@@ -106,47 +106,10 @@ class AjaxQaAccounts extends AjaxQaWidget {
 		return $this->DB->query($sql);
 	}
 
-	function getAccountNameById($id) {
-		$sql = "SELECT name FROM q_acct
-        		WHERE id = {$id};";
-		$this->DB->query($sql);
-		$return = $this->DB->fetch();
-		return $return['name'];
-	}
-
-	function getOwnedAccounts() {
-		$sql = "SELECT * FROM q_acct,q_owners
-		        WHERE q_acct.id = acct_id 
-		          AND owner_id = {$this->user->getUserId()}
-		          AND active = 1;";
-		$this->ownedAccounts = $this->DB->query($sql);
-	}
-
-	function getSharedAccounts() {
-		$sql = "SELECT * FROM q_acct,q_share,q_user_groups,q_owners
-		        WHERE q_share.acct_id=q_acct.id
-		          AND q_user_groups.group_id=q_share.group_id
-		          AND q_user_groups.user_id = {$this->user->getUserId()}
-		          AND q_user_groups.active = 1
-		          AND q_acct.active = 1
-		          AND q_owners.acct_id = q_acct.id
-		          AND q_owners.owner_id <> {$this->user->getUserId()}
-		        GROUP BY q_acct.id;";
-		$this->sharedAccounts = $this->DB->query($sql);
-	}
-
-	function getDeletedAccounts() {
-		$sql = "SELECT * FROM q_acct,q_owners
-        WHERE q_acct.id = acct_id 
-          AND owner_id = {$this->user->getUserId()}
-          AND active = 0;";
-		$this->deletedAccounts = $this->DB->query($sql);
-	}
-
 	function buildWidget() {
-		$this->getOwnedAccounts();
-		$this->getSharedAccounts();
-		$this->getDeletedAccounts();
+		$this->ownedAccounts = AjaxQaGetAccounts::getOwnedAccounts($this->user->getUserId(),$this->DB);
+		$this->sharedAccounts = AjaxQaGetAccounts::getSharedAccounts($this->user->getUserId(),$this->DB);
+		$this->deletedAccounts  = AjaxQaGetAccounts::getDeletedAccounts($this->user->getUserId(),$this->DB);
 		$divQuickAccounts = new HTMLDiv($this->container,self::getFsId());
 		new HTMLLegend($divQuickAccounts,'Account Management');
 		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
@@ -187,7 +150,7 @@ class AjaxQaAccounts extends AjaxQaWidget {
 		$tableListAccounts = new Table($parentElement,$this->DB->num($queryResult),$cols,$tableName);
 		$i = 0;
 		while ($account = $this->DB->fetch($queryResult)) {
-			$accountName = (empty($account['name'])) ? $this->getAccountNameById($this->getEditAcctId()) : $account['name'];
+			$accountName = (empty($account['name'])) ? AjaxQaGetAccounts::getAccountNameById($this->getEditAcctId(),$this) : $account['name'];
 			$inputId = $this->getEditAcctNameInId().'_'.$account['id'];
 			$inputName = $this->getEditAcctNameInName().'_'.$account['id'];
 
