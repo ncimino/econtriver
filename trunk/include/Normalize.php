@@ -6,18 +6,18 @@ class Normalize {
 	static function mysql($value) { return mysql_real_escape_string($value); }
 	static function tags($value) { return strip_tags($value); }
 	static function accountNames($value,$infoMsg) {
-		if (preg_match('/^[a-zA-Z0-9_ ]+$/',$value)) {
+		if (preg_match('/^[a-zA-Z0-9_ -]+$/',$value)) {
 			return true;
 		} else {
-			$infoMsg->addMessage(0,'Account names can only contain numbers, letters, spaces, and underscores.');
+			$infoMsg->addMessage(0,'Account names can only contain numbers, letters, spaces, hyphens, and underscores.');
 			return false;
 		}
 	}
 	static function groupNames($value,$infoMsg) {
-		if (preg_match('/^[a-zA-Z0-9_ ]+$/',$value)) {
+		if (preg_match('/^[a-zA-Z0-9_ -]+$/',$value)) {
 			return true;
 		} else {
-			$infoMsg->addMessage(0,'Group names can contain only numbers, letters, spaces, and underscores.');
+			$infoMsg->addMessage(0,'Group names can contain only numbers, letters, spaces, hyphens, and underscores.');
 			return false;
 		}
 	}

@@ -1,10 +1,15 @@
 <?php
 class Registration {
 	private $focusId = 'reg_email_input';
+	private $siteInfo;
+	private $infoMsg;
 	private $user;
 
-	function __construct($parentElement,$infoMsg,$user) {
+	function __construct($parentElement,$infoMsg,$siteInfo,$user) {
 		$this->user = $user;
+		$this->infoMsg = $infoMsg;
+		$this->siteInfo = $siteInfo;
+		
 		$this->user->setInputNames('reg_email','handle','reg_pw','ver_pw','timezone','format');
 		$this->user->setFromPost();
 		 
@@ -15,7 +20,8 @@ class Registration {
 
 		if (isset($_POST['register']) and $_POST['register']) { // if true the user submitted a registration form
 			if ($this->addUser()) {
-				new HTMLText($parentElement,'Registration successful.');
+				$this->sendRegistrationEmail();
+				new HTMLText($parentElement,'Registration successful. Please login.');
 				new HTMLScript($parentElement,"document.getElementById(\"email_input\").value=\"" . $user->getHandle() . "\";");
 				$this->focusId='password_input';
 				$FormReg->remove();
@@ -57,5 +63,23 @@ class Registration {
 			$this->focusId = NULL;
 			return TRUE;
 		}
+	}
+	
+	function sendRegistrationEmail() {
+		$email = new EmailDocument($this->siteInfo,$this->user,"eContriver - Account Registration");
+
+		$h4SubTitle = new HTMLHeading($email->content,4,"Welcome to eContriver!");
+		$h4SubTitle->setAttribute('style','color:gray;');
+		new HTMLParagraph($email->content,'Thank you for registering with eContriver.');
+		new HTMLParagraph($email->content,'To access the site you can follow this link directly:');
+		$mainLink = $this->siteInfo->getSiteHTTP();
+		new HTMLAnchor($email->content,$mainLink,'eContriver');
+
+		$sendEmail = new SendEmail();
+		$sendEmail->addTo($this->user->getEmail());
+		$sendEmail->setFrom($this->siteInfo->getFromEmail());
+		$sendEmail->setSubject("eContriver - Account Recovery");
+		$sendEmail->setContent($email->printPage());
+		return $sendEmail->send();
 	}
 }
