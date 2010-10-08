@@ -30,26 +30,26 @@ class AjaxQaTxns extends AjaxQaWidget {
 		}
 	}
 
-	function setShowAcct($acct_id) {
-		if (QaSettings::setSetting('show_acct',$this->user->getUserId(),$acct_id,$this->DB)) {
-			$this->showAcct = $acct_id;
+	function setShowAcct($acctId) {
+		if (QaSettings::setSetting('show_acct',$this->user->getUserId(),$acctId,$this->DB)) {
+			$this->showAcct = $acctId;
 		}
 	}
 
 	function getShowAcct() {
-		if ($acct_id = QaSettings::getSetting('show_acct',$this->user->getUserId(),$this->DB)) {
-			$this->showAcct = ($this->verifyAcctIsValid($acct_id)) ? $acct_id : FALSE;
+		if ($acctId = QaSettings::getSetting('show_acct',$this->user->getUserId(),$this->DB)) {
+			$this->showAcct = (AjaxQaGetAccounts::getAccountNameById($acctId,$this->DB)) ? $acctId : FALSE;
 		}
 	}
 
-	function verifyAcctIsValid($acct_id) {
+	/*function verifyAcctIsValid($acctId) {
 		$this->getActiveAccounts();
 		$return = false;
 		while ($acct = $this->DB->fetch($this->activeAccounts)) {
-			if ($acct['id'] == $acct_id) $return = true;
+			if ($acct['id'] == $acctId) $return = true;
 		}
 		return $return;
-	}
+	}*/
 
 	function convIdToField($input) {
 		switch($input) {
@@ -89,22 +89,20 @@ class AjaxQaTxns extends AjaxQaWidget {
 		new HTMLText($link,$title);
 	}
 
-	function getSqlAcctsToShow() {
-		if ($this->showAcct) {
-			$acctsToShow = "q_txn.acct_id = ".$this->showAcct;
-		} else {
-			$i = 0;
-			$this->DB->resetRowPointer($this->activeAccounts);
-			while($result = $this->DB->fetch($this->activeAccounts)) {
-				if ($i == 0 ) $acctsToShow = "";
-				elseif ($i < $this->DB->num($this->activeAccounts)) $acctsToShow .= " OR ";
-				$acctsToShow .= "q_txn.acct_id = ".$result['id'];
-				$i++;
-			}
+	/*
+	function getOwnedAccounts() {//Need to call the Owned accounts from AjaxQaAccount
+		$i = 0;
+		$this->DB->resetRowPointer($this->activeAccounts);
+		while($result = $this->DB->fetch($this->activeAccounts)) {
+			if ($i == 0 ) $acctsToShow = "";
+			elseif ($i < $this->DB->num($this->activeAccounts)) $acctsToShow .= " OR ";
+			$acctsToShow .= "q_txn.acct_id = ".$result['id'];
+			$i++;
 		}
 		return $acctsToShow;
-	}
+	}//*/
 
+	/*
 	function getAcctName($acct_id = NULL) {
 		$acct_id = ($acct_id == NULL) ? $this->showAcct : $acct_id;
 		if ($acct_id == 0) {
@@ -115,7 +113,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 			$result = $this->DB->fetch();
 			return $result['name'];
 		}
-	}
+	}//*/
 
 	function getTxnParentId($current_txn_id) {
 		$sql = "SELECT parent_txn_id FROM q_txn
@@ -166,7 +164,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 	}
 
 	function buildWidget() {
-		$this->getActiveAccounts();
+		$this->activeAccounts = AjaxQaGetAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
 		if ($this->DB->num($this->activeAccounts)) {
 			$this->buildActions();
 			$this->buildTxnsTable();
@@ -174,27 +172,6 @@ class AjaxQaTxns extends AjaxQaWidget {
 			new HTMLText($this->container,'There are no active accounts. You must have an active account before you can add transactions.');
 		}
 		$this->printHTML();
-	}
-
-	function getActiveAccounts() {
-		if (!isset($this->activeAccounts)) {
-			$sql = "SELECT q_acct.*
-				FROM q_acct,q_owners,q_share,q_user_groups
-				WHERE ( q_acct.id=q_owners.acct_id
-				  AND q_owners.owner_id={$this->user->getUserId()}
-				  AND q_acct.active=1 ) 
-				  OR ( q_acct.id=q_share.acct_id
-				  AND q_share.group_id=q_user_groups.group_id
-				  AND q_user_groups.user_id={$this->user->getUserId()}
-				  AND q_user_groups.active=1
-				  AND q_acct.active=1 )
-				GROUP BY q_acct.id
-				ORDER BY q_acct.name ASC;";
-			$this->activeAccounts = $this->DB->query($sql);
-		}
-		if ($this->DB->num($this->activeAccounts)) { //:BUG:Fixes issue 28
-			$this->DB->resetRowPointer($this->activeAccounts);
-		}
 	}
 
 	function buildActions() {
@@ -205,12 +182,8 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 		$h3View = new HTMLHeading($divActions,5,'View Account: ');
 		$h3View->setStyle('float: left;margin: 4px;padding 0px;');
-		$selectAcct = new HTMLSelect($divActions,'show_acct','show_acct');
-		new HTMLOption($selectAcct,'All Accounts',0);
-		while($result = $this->DB->fetch($this->activeAccounts)) {
-			$selected = ($result['id'] == $this->showAcct) ? TRUE : FALSE;
-			new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
-		}
+
+		$this->buildAcctsDropDown($divActions,'show_acct','show_acct',NULL,$this->showAcct,$userSelectable=TRUE,$allAccounts=TRUE);
 
 		$divActionButtons = new HTMLDiv($divActions,'txn_actions_buttons');
 		$divActionButtons->setStyle('float: right;');
@@ -230,6 +203,18 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$divActionContent->setAttribute('style','display:none;');
 	}
 
+	function buildAcctsDropDown($parentElement,$name=NULL,$id=NULL,$class=NULL,$selectedAcct=NULL,$userSelectable=FALSE,$allAccounts=FALSE) {
+		$selectAcct = new HTMLSelect($parentElement,$name,$id,$class);
+		if ($allAccounts) {
+			new HTMLOption($selectAcct,'All Accounts',0);
+		}
+		$this->DB->resetRowPointer($this->activeAccounts);
+		while($result = $this->DB->fetch($this->activeAccounts)) {
+			$selected = ($result['id'] == $selectedAcct) ? TRUE : FALSE;
+			new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
+		}
+	}
+
 	function buildTxnsTable() {
 		$divNew = new HTMLDiv($this->container,'txn_id','txn');
 		$this->getTxns();
@@ -244,7 +229,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function getTxns() {
 		$sql = "SELECT q_txn.*,user.handle FROM q_txn,user,q_acct
-					WHERE ({$this->getSqlAcctsToShow()})
+					WHERE (".AjaxQaGetAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->DB).")
 					  AND q_txn.active = 1
 					  AND q_txn.user_id = user.user_id
 					  AND q_txn.acct_id = q_acct.id
@@ -263,7 +248,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function getCreditSum() {
 		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
-					WHERE ({$this->getSqlAcctsToShow()})
+					WHERE (".AjaxQaGetAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->DB).")
 					  AND q_txn.active = 1;";
 		$result = $this->DB->fetch($this->DB->query($sql));
 		return $result['total'];
@@ -271,7 +256,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function getCreditBankSaysSum() {
 		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
-					WHERE ({$this->getSqlAcctsToShow()})
+					WHERE (".AjaxQaGetAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->DB).")
 					  AND q_txn.active = 1
 					  AND q_txn.banksays = 1;";
 		$result = $this->DB->fetch($this->DB->query($sql));
@@ -280,7 +265,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function getDebitSum() {
 		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
-					WHERE ({$this->getSqlAcctsToShow()})
+					WHERE (".AjaxQaGetAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->DB).")
 					  AND q_txn.active = 1;";
 		$result = $this->DB->fetch($this->DB->query($sql));
 		return $result['total'];
@@ -288,7 +273,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function getDebitBankSaysSum() {
 		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
-					WHERE ({$this->getSqlAcctsToShow()})
+					WHERE (".AjaxQaGetAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->DB).")
 					  AND q_txn.active = 1
 					  AND q_txn.banksays = 1;";
 		$result = $this->DB->fetch($this->DB->query($sql));
@@ -314,13 +299,8 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function buildNewTxns($tableTxn,$row) {
 		$col = 0;
-		$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'new_txn_acct','new_txn_acct','txn_input');
-		$this->DB->resetRowPointer($this->activeAccounts);
-		$selectedAcct = ($this->newTxnValues['acct']) ? $this->newTxnValues['acct'] : $this->showAcct;
-		while($result = $this->DB->fetch($this->activeAccounts)) {
-			$selected = ($selectedAcct == $result['id']) ? TRUE : FALSE; // Will select currently shown account
-			new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
-		}
+		$selectedAcct = ($this->newTxnValues['acct']) ? $this->newTxnValues['acct'] : $this->showAcct; // If a txn was entered use that
+		$this->buildAcctsDropDown($tableTxn->cells[$row][$col++],'new_txn_acct','new_txn_acct','txn_input',$selectedAcct);
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
 		new HTMLText($tableTxn->cells[$row][$col++],'-');
 		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_date',$this->newTxnValues['date'],'new_txn_date','dateselection txn_input');
@@ -347,7 +327,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 		$submitNewSpan = new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick ui-float-left');
 		$submitNewSpan->setAttribute('tabindex','101');
-		
+
 		$splitNew = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_split');
 		//$splitNew->setAttribute('onkeyup','enterCall(event,function() {QaTxnAdd(\'new_txn_\');})');
 		$splitNew->setTitle("Split");
@@ -361,12 +341,8 @@ class AjaxQaTxns extends AjaxQaWidget {
 			while($txn = $this->DB->fetch($this->activeTxns)) {
 				$col = 0;
 				$oddOrEven = ($row % 2 == 0) ? "odd" : "even";
-				$selectAcct = new HTMLSelect($tableTxn->cells[$row][$col++],'txn_acct_'.$txn['id'],'txn_acct_'.$txn['id'],'txn_acct_select_'.$oddOrEven);
-				$this->DB->resetRowPointer($this->activeAccounts);
-				while($result = $this->DB->fetch($this->activeAccounts)) {
-					$selected = ($txn['acct_id'] == $result['id']) ? TRUE : FALSE;
-					new HTMLOption($selectAcct,$result['name'],$result['id'],$selected);
-				}
+
+				$this->buildAcctsDropDown($tableTxn->cells[$row][$col++],'txn_acct_'.$txn['id'],'txn_acct_'.$txn['id'],'txn_acct_select_'.$oddOrEven,$txn['acct_id']);
 
 				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable');
 				new HTMLText($tableTxn->cells[$row][$col++],$txn['handle']);

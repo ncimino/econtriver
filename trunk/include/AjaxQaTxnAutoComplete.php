@@ -15,7 +15,7 @@ class AjaxQaTxnAutoComplete extends AjaxQaTxns {
 
 	function pullAutoCompleteValues() {
 		$sql = "SELECT DISTINCT q_txn.{$this->txnAutoCompleteFieldId} FROM q_txn,user,q_acct
-					WHERE ({$this->getSqlAcctsToShow()})
+					WHERE (".AjaxQaGetAccounts::getSqlActiveAccounts($this->activeAccounts,$this->DB).")
 					  AND q_txn.active = 1
 					  AND q_txn.user_id = user.user_id
 					  AND q_txn.acct_id = q_acct.id

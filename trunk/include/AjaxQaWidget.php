@@ -1,5 +1,5 @@
 <?php
-class AjaxQaWidget {
+abstract class AjaxQaWidget {
 	protected $DB;
 	protected $siteInfo;
 	protected $infoMsg;
