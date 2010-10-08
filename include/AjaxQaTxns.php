@@ -338,12 +338,16 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_debit\')');
 		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_debit',$this->newTxnValues['debit'],'new_txn_debit','txn_input debit');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'txn_add\')');
-		new HTMLText($tableTxn->cells[$row][$col++],'-');
-		new HTMLText($tableTxn->cells[$row][$col++],'-');
+		$txn_current_tag->setAttribute('tabindex','100'); // Need to build class for handling tabindex
+		new HTMLText($tableTxn->cells[$row][$col++],'-'); // Balance
+		new HTMLText($tableTxn->cells[$row][$col++],'-'); // Bank Says
 		$submitNew = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_add');
 		$submitNew->setAttribute('onkeyup','enterCall(event,function() {QaTxnAdd(\'new_txn_\');})');
 		$submitNew->setTitle("Add");
-		new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick ui-float-left');
+
+		$submitNewSpan = new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick ui-float-left');
+		$submitNewSpan->setAttribute('tabindex','101');
+		
 		$splitNew = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_split');
 		//$splitNew->setAttribute('onkeyup','enterCall(event,function() {QaTxnAdd(\'new_txn_\');})');
 		$splitNew->setTitle("Split");
@@ -378,11 +382,11 @@ class AjaxQaTxns extends AjaxQaWidget {
 				new HTMLInputText($tableTxn->cells[$row][$col++],'txn_debit_'.$txn['id'],$txn['debit'],'txn_debit_'.$txn['id'],'txn_input number debit');
 
 				$posNeg = (round($currentBalance,2)>=0) ? ' positive' : ' negative';
-				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' number'.$posNeg);
+				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' number balance'.$posNeg);
 				new HTMLText($tableTxn->cells[$row][$col++],number_format(round($currentBalance,2),2));
 
 				$posNeg = (round($currentBankSays,2)>=0) ? ' positive' : ' negative';
-				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' number'.$posNeg);
+				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' number bank_says'.$posNeg);
 				$checked = ($txn['banksays']) ? TRUE : FALSE;
 				new HTMLInputCheckbox($tableTxn->cells[$row][$col],'txn_banksays_'.$txn['id'],'txn_banksays_'.$txn['id'],'txn_banksays_check',$checked);
 				$parent_id = ($txn['parent_txn_id']) ? $txn['parent_txn_id'] : $txn['id'];
@@ -391,6 +395,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 				$currentBalance = $currentBalance + $txn['debit'] - $txn['credit'];
 				if ($checked) $currentBankSays = $currentBankSays + $txn['debit'] - $txn['credit'];
 
+				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' per_txn_actions');
 				if ($txn['id'] != $txn['parent_txn_id']) {
 					$showHistory = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_show_history_anchor_'.$txn['id'],'txn_show_history');
 					new HTMLSpan($showHistory,'','txn_show_history_'.$txn['id'],'ui-icon ui-icon-clock ui-float-left');
@@ -484,14 +489,14 @@ class AjaxQaTxns extends AjaxQaWidget {
 		if (!strtotime($date)) {
 			$this->infoMsg->addMessage(0,'Date was incorrectly formatted.');
 			return FALSE;
-		} elseif (empty($credit) and empty($debit)) {
+		} elseif (($credit == NULL) and ($debit == NULL)) {
 			$this->infoMsg->addMessage(0,'Credit or Debit require a value.');
 			return FALSE;
-		} elseif (!empty($credit) and !empty($debit)) {
+		} elseif (($credit != NULL) and ($debit != NULL)) {
 			$this->infoMsg->addMessage(0,'Credit and Debit cannot both have values.');
 			return FALSE;
 		} elseif (!(Normalize::validateCash($credit) and Normalize::validateCash($debit))) {
-			$txnType = (!empty($credit)) ? 'Credit' : 'Debit';
+			$txnType = ($debit == NULL) ? 'Credit' : 'Debit';
 			$this->infoMsg->addMessage(0,$txnType.' value is invalid.');
 			return FALSE;
 		} else {
@@ -505,15 +510,15 @@ class AjaxQaTxns extends AjaxQaWidget {
 	}
 
 	function insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays) {
-		if (!empty($credit) and !empty($debit)) {
+		if (($credit != NULL) and ($debit != NULL)) {
 			$this->infoMsg->addMessage(-1,'Credit and debit have values, this transaction cannot be added.');
 			return false;
-		} elseif (empty($credit) and empty($debit)) {
+		} elseif (($credit == NULL) and ($debit == NULL)) {
 			$this->infoMsg->addMessage(-1,'Credit and debit do not have values, this transaction cannot be added.');
 			return false;
 		} else {
-			$txn_type = (!empty($credit)) ? 'credit' : 'debit';
-			$value = (!empty($credit)) ? $credit : $debit;
+			$txn_type = ($debit == NULL) ? 'credit' : 'debit';
+			$value = ($debit == NULL) ? $credit : $debit;
 			$value = str_replace('$', '', $value);
 			$banksays = ($banksays == 'on') ? 1 : 0;
 			$entered = $this->user->getTime();

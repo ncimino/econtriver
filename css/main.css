@@ -12,6 +12,8 @@ body {
     min-width: 1200px;
     font-family: Verdana, Arial, Helvetica, sans-serif;
     margin: 8px;
+	background-image:url('../images/y_fade_bg.gif');
+	background-repeat:repeat-x;
 }
 
 form, div, p, a, h1 {
@@ -72,6 +74,16 @@ div#login, div#txn_actions_buttons {
     border: #DD0 1px solid;
     background-color: #FFC;
     padding: 2px;
+}
+
+.submit_as_text {
+   border: none;
+   background-color: transparent;
+   padding: 0;
+   text-decoration: underline;
+   color: gray;
+   cursor: pointer;
+   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
 div#logo {
@@ -204,6 +216,19 @@ table.txnt, #trash_bin {
 
 .number {
     text-align: right;
+	min-width: 80px;
+}
+
+.balance {
+	min-width: 100px;
+}
+
+.bank_says {
+	min-width: 120px;
+}
+
+.per_txn_actions {
+	min-width: 70px;
 }
 
 .positive {

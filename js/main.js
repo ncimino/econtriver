@@ -26,7 +26,7 @@ function timedHide(id, time) {
 	lastTimeout = setTimeout("hideElement(" + id + ")", time);
 }
 
-// onkeypress="enterCall(event,myFunction('test');"
+// onkeypress="enterCall(event,function() {QaTxnAdd('new_txn_');})"
 function enterCall(event, call) {
 	if (event.keyCode == 13) {
 		call();
