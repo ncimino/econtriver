@@ -63,8 +63,8 @@ class DBCon {
 	}
 
 	public function num($result="") {
-		if (empty($result)){ $result = $this->result; }
-		return mysql_num_rows($result);
+		if (empty($result)){ $result = $this->result; } 
+		return (empty($result)) ? FALSE : mysql_num_rows($result);
 	}
 
 	public function lastId() {

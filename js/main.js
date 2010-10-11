@@ -114,7 +114,7 @@ function sendPostRequest(url, content_id, post_data, focus_id, after_load) {
 		url : url,
 		data : post_data,
 		beforeSend : function() {
-			if (document.getElementById(content_id)) document.getElementById(content_id).innerHTML = "Loading...";
+			if (document.getElementById(content_id)) document.getElementById(content_id).innerHTML = "<span class=\"ui-icon ui-autocomplete-loading ui-float-left\"></span>&nbsp;Loading...";
 		},
 		success : function(msg) {
 			if (document.getElementById(content_id)) document.getElementById(content_id).innerHTML = msg;

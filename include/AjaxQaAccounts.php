@@ -28,7 +28,7 @@ class AjaxQaAccounts extends AjaxQaWidget {
 
 	function addEntries($name) {
 		if ($escapedName = $this->checkAccountName($name)) {
-			if ($this->insertAccount($escapedName) and $this->insertOwner()) {
+			if (AjaxQaModifyAccounts::insertAccount($escapedName,$this->DB) and AjaxQaModifyAccounts::insertOwner($this->DB->lastID(),$this->user->getUserId(),$this->DB)) {
 				$this->infoMsg->addMessage(2,'Account was successfully created.');
 			}
 		} else {
@@ -38,20 +38,20 @@ class AjaxQaAccounts extends AjaxQaWidget {
 
 	function updateEntries($name,$acctId) {
 		if (!empty($acctId) and $sanitizedName = $this->checkAccountName($name)) {
-			if ($this->updateAccount($sanitizedName,$acctId)) {
+			if (AjaxQaModifyAccounts::updateAccount($sanitizedName,$acctId,$this->user->getUserId(),$this->DB)) {
 				$this->infoMsg->addMessage(2,'Account was successfully updated.');
 			}
 		}
 	}
 
 	function dropEntries($acctId) {
-		if (!empty($acctId) and $this->dropAccount($acctId)) {
+		if (!empty($acctId) and AjaxQaModifyAccounts::dropAccount($acctId,$this->user->getUserId(),$this->DB)) {
 			$this->infoMsg->addMessage(2,'Account was successfully deleted.');
 		}
 	}
 
 	function restoreEntries($acctId) {
-		if (!empty($acctId) and $this->restoreAccount($acctId)) {
+		if (!empty($acctId) and AjaxQaModifyAccounts::restoreAccount($acctId,$this->user->getUserId(),$this->DB)) {
 			$this->infoMsg->addMessage(2,'Account was successfully restored.');
 		}
 	}
@@ -66,55 +66,17 @@ class AjaxQaAccounts extends AjaxQaWidget {
 		}
 	}
 
-	function insertAccount($acctName) {
-		$accountNameEscaped = Normalize::mysql($acctName);
-		$sql = "INSERT INTO q_acct (name,active)
-				VALUES ('{$accountNameEscaped}',1);";
-		return $this->DB->query($sql);
-	}
-
-	function insertOwner() {
-		$sql = "INSERT INTO q_owners (acct_id,owner_id)
-				VALUES ({$this->DB->lastID()},{$this->user->getUserId()});";
-		return $this->DB->query($sql);
-	}
-
-	function dropAccount($acctId) {
-		$sql = "UPDATE q_acct,q_owners SET active = 0 
-				WHERE q_acct.id = {$acctId} 
-				  AND acct_id = q_acct.id 
-				  AND owner_id = {$this->user->getUserId()};";
-		return $this->DB->query($sql);
-	}
-
-	function restoreAccount($acctId) {
-		$sql = "UPDATE q_acct,q_owners 
-				  SET active = 1 
-				WHERE q_acct.id = {$acctId} 
-				  AND acct_id = q_acct.id 
-				  AND owner_id = {$this->user->getUserId()};";
-		return $this->DB->query($sql);
-	}
-
-	function updateAccount($name,$acctId) {
-		$accountNameEscaped = Normalize::mysql($name);
-		$sql = "UPDATE q_acct,q_owners 
-				  SET name = '{$accountNameEscaped}' 
-				WHERE q_acct.id = {$acctId} 
-				  AND acct_id = q_acct.id 
-				  AND owner_id = {$this->user->getUserId()};";
-		return $this->DB->query($sql);
-	}
-
 	function buildWidget() {
-		$this->ownedAccounts = AjaxQaGetAccounts::getOwnedAccounts($this->user->getUserId(),$this->DB);
-		$this->sharedAccounts = AjaxQaGetAccounts::getSharedAccounts($this->user->getUserId(),$this->DB);
-		$this->deletedAccounts  = AjaxQaGetAccounts::getDeletedAccounts($this->user->getUserId(),$this->DB);
-		$divQuickAccounts = new HTMLDiv($this->container,self::getFsId());
-		new HTMLLegend($divQuickAccounts,'Account Management');
+		$this->ownedAccounts = AjaxQaSelectAccounts::getOwnedAccounts($this->user->getUserId(),$this->DB);
+		$this->sharedAccounts = AjaxQaSelectAccounts::getSharedAccounts($this->user->getUserId(),$this->DB);
+		$this->deletedAccounts  = AjaxQaSelectAccounts::getDeletedAccounts($this->user->getUserId(),$this->DB);
+		$divQuickAccounts = new HTMLFieldset($this->container,self::getFsId());
+		$lClose = new HTMLLegend($divQuickAccounts,'Account Management',NULL,'manage_title');
+		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$lClose->setAttribute('title','Close');
 		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
-		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-closethick');
+		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$this->buildCreateAccountForm($divQuickAccounts);
 		$this->buildOwnedAccountsTable($divQuickAccounts);
 		$this->buildSharedAccountsTable($divQuickAccounts);
@@ -150,7 +112,7 @@ class AjaxQaAccounts extends AjaxQaWidget {
 		$tableListAccounts = new Table($parentElement,$this->DB->num($queryResult),$cols,$tableName);
 		$i = 0;
 		while ($account = $this->DB->fetch($queryResult)) {
-			$accountName = (empty($account['name'])) ? AjaxQaGetAccounts::getAccountNameById($this->getEditAcctId(),$this) : $account['name'];
+			$accountName = (empty($account['name'])) ? AjaxQaSelectAccounts::getAccountNameById($this->getEditAcctId(),$this) : $account['name'];
 			$inputId = $this->getEditAcctNameInId().'_'.$account['id'];
 			$inputName = $this->getEditAcctNameInName().'_'.$account['id'];
 

@@ -12,7 +12,7 @@ body {
     min-width: 1200px;
     font-family: Verdana, Arial, Helvetica, sans-serif;
     margin: 8px;
-	background-image:url('../images/y_fade_bg.gif');
+	background-image:url('images/y_fade_bg.gif');
 	background-repeat:repeat-x;
 }
 
@@ -39,7 +39,7 @@ div#page {
 }
 
 div#banner_ie_limiter {
-    width: 1200px;
+    /*width: 1200px;*/
     height: 0px;
 }
 
@@ -113,10 +113,12 @@ img {
 
 .quick_accounts_manage {
     padding: 4px;
-    /*
-     padding: 8px;
-     margin: 8px;
-     /**/
+}
+
+.manage_title {
+	cursor: pointer;
+	color: gray;
+	font-weight: bold;
 }
 
 .quick_groups, .quick_accts, .quick_shares {
@@ -182,7 +184,7 @@ td.split_grp_acct_col {
 
 #quick_accts_close_id {
     position: absolute;
-    top: 0.5em;
+    top: 1em;
     right: 0.5em;
 }
 
@@ -381,4 +383,8 @@ div.ui-datepicker{
 	width: 16px;
 	height: 16px;
 	background-image: url(images/ui-icons_228ef1_256x240.png);
+}
+
+.ui-state-red {
+	background-image: url(images/ui-icons_cd0a0a_256x240.png);
 }

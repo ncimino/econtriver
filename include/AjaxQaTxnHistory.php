@@ -7,7 +7,7 @@ class AjaxQaTxnHistory extends AjaxQaTxns {
 	}
 
 	function buildHistoryWidget($txn_id) {
-		$this->activeAccounts = AjaxQaGetAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
+		$this->activeAccounts = AjaxQaSelectAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
 		$this->getTxnHistory($txn_id);
 		$rows = $this->DB->num($this->txnHistory);
 		new HTMLHeading($this->container,3,'History');

@@ -114,11 +114,13 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 		$this->getActiveGroups();
 		$this->getSharedAccounts();
 		$this->getOwnedAccounts();
-		$divQuickAccounts = new HTMLDiv($this->container,self::getFsId());
-		new HTMLLegend($divQuickAccounts,'Account Sharing');
+		$divQuickAccounts = new HTMLFieldset($this->container,self::getFsId(),'manage_title');		
+		$lClose = new HTMLLegend($divQuickAccounts,'Account Sharing');
+		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$lClose->setAttribute('title','Close');
 		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
-		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-closethick');
+		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$tableSplit = new Table($divQuickAccounts,1,3,'',self::getSplitGroupAcctClass());
 		$this->buildOwnedAccountsTable($tableSplit->cells[0][0]);
 		$this->buildSharedAccountsTable($tableSplit->cells[0][0]);

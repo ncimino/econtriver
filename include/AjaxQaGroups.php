@@ -167,12 +167,13 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 	function buildWidget() {
 		$this->getActiveGroups();
 		$this->getInactiveGroups();
-		$divQuickAccounts = new HTMLDiv($this->container,self::getFsId());
-		//new HTMLHeading($divQuickAccounts,4,'Group Management');
-		new HTMLLegend($divQuickAccounts,'Group Management');
+		$divQuickAccounts = new HTMLFieldset($this->container,self::getFsId(),'manage_title');
+		$lClose = new HTMLLegend($divQuickAccounts,'Group Management');
+		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$lClose->setAttribute('title','Close');
 		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
-		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-closethick');
+		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$this->buildCreateGroupForm($divQuickAccounts);
 		$this->buildActiveGroupsTable($divQuickAccounts);
 		$this->buildInactiveGroupsTable($divQuickAccounts);
