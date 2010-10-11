@@ -5,7 +5,7 @@ class QaSettings {
 		if (QaSettings::getSetting($name,$userId,$DBObj) === FALSE) {
 			$sql = "INSERT INTO q_settings (user_id,name,value) VALUES ($userId,'$name',$value);";
 		} else {
-			$sql = "UPDATE q_settings SET value = $value WHERE user_id = $userId AND name = '$name';";
+			$sql = "UPDATE q_settings SET value = '$value' WHERE user_id = $userId AND name = '$name';";
 		}
 		return $DBObj->query($sql);
 	}

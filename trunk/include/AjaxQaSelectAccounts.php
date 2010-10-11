@@ -1,5 +1,5 @@
 <?php
-class AjaxQaGetAccounts {
+class AjaxQaSelectAccounts {
 	function getAccountNameById($id,$db,$allowAllAccounts=FALSE) {
 		if ($allowAllAccounts and ($id == 0)) {
 			return "All Accounts";
@@ -42,12 +42,13 @@ class AjaxQaGetAccounts {
 	}
 
 	function getActiveAccounts($userId,$db) {
-		$sql = "SELECT q_acct.*
+		$sql = "SELECT q_acct.*,q_owners.owner_id
 				FROM q_acct,q_owners,q_share,q_user_groups
 				WHERE ( q_acct.id=q_owners.acct_id
 				  AND q_owners.owner_id={$userId}
 				  AND q_acct.active=1 ) 
 				  OR ( q_acct.id=q_share.acct_id
+				  AND q_acct.id=q_owners.acct_id
 				  AND q_share.group_id=q_user_groups.group_id
 				  AND q_user_groups.user_id={$userId}
 				  AND q_user_groups.active=1
@@ -66,15 +67,34 @@ class AjaxQaGetAccounts {
 			$activeAccountSql .= "q_txn.acct_id = ".$result['id'];
 			$i++;
 		}
+		return (empty($activeAccountSql)) ? FALSE : $activeAccountSql;
+	}
+
+	function getSqlActiveSharedAccountsByOwner($ownerId,$activeAccountsResult,$db) {
+		$i = 0;
+		$db->resetRowPointer($activeAccountsResult);
+		while($result = $db->fetch($activeAccountsResult)) {
+			if ($result['owner_id'] == $ownerId) {
+				if ($i == 0 ) $activeAccountSql = "";
+				elseif ($i < $db->num($activeAccountsResult)) $activeAccountSql .= " OR ";
+				$activeAccountSql .= "q_txn.acct_id = ".$result['id'];
+				$i++;
+			}
+		}
 		return $activeAccountSql;
 	}
 
-	function getSqlAcctsToShow($showAcct=FALSE,$activeAccountsResult,$db) {
-		if ($showAcct) {
+	function getSqlAcctsToShow($showAcct=FALSE,$activeAccountsResult,$userId,$db) {
+		$userIdentifier = 'u';
+		if (strstr($showAcct,$userIdentifier)) { //:KLUDGE: Checks to see if userIdentifier (u) is in $acctId
+			$showAccountsForUserId = str_replace($userIdentifier,"",$showAcct);
+			$acctsToShow = AjaxQaSelectAccounts::getSqlActiveSharedAccountsByOwner($showAccountsForUserId,$activeAccountsResult,$db);
+		} elseif ($showAcct) {
 			$acctsToShow = "q_txn.acct_id = ".$showAcct;
 		} else {
-			$acctsToShow = AjaxQaGetAccounts::getSqlActiveAccounts($activeAccountsResult,$db);		}
-			return $acctsToShow;
+			$acctsToShow = AjaxQaSelectAccounts::getSqlActiveAccounts($activeAccountsResult,$db);
+		}
+		return $acctsToShow;
 	}
 }
 ?>

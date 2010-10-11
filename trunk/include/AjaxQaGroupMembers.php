@@ -33,10 +33,10 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 	}
 
 	function addContact($contactName) {
-		$userId = $this->findContact($contactName);
+		$userId = AjaxQaSelectGroupMembers::findContact($contactName,$this->DB);
 		if (!$userId) {
 			$this->infoMsg->addMessage(0,'User was not found.');
-		} elseif ($this->insertContact($userId)) {
+		} elseif (($this->insertContact($this->user->getUserId(),$userId)) and (($this->insertContact($userId,$this->user->getUserId())))) {
 			$this->infoMsg->addMessage(2,'Contact was successfully added.');
 		} else {
 			$this->infoMsg->addMessage(0,'You are already affiliated with this contact.');
@@ -55,33 +55,17 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		}
 	}
 
-	function insertContact($userId) {
-		$this->getContact($userId);
-		if ($this->DB->num() == 0) {
-			$sql = "INSERT INTO contacts (owner_id,contact_id) VALUES ('{$this->user->getUserId()}','{$userId}');";
+	function insertContact($ownerId,$contactId) {
+		if ($this->DB->num(AjaxQaSelectGroupMembers::getContact($ownerId,$contactId,$this->DB)) == 0) {
+			$sql = "INSERT INTO contacts (owner_id,contact_id) VALUES ('{$ownerId}','{$contactId}');";
 			return $this->DB->query($sql);
 		} else {
 			return false;
 		}
 	}
 
-	function findContact($contactName) {
-		$byHandle = $this->DB->query("SELECT user_id FROM user WHERE handle='".mysql_real_escape_string($contactName)."';");
-		$byEmail = $this->DB->query("SELECT user_id FROM user WHERE email='".mysql_real_escape_string($contactName)."';");
-		if ($this->DB->num($byHandle) > 0) {
-			$fetch = $this->DB->fetch($byHandle);
-			return $fetch['user_id'];
-		} elseif ($this->DB->num($byEmail) > 0) {
-			$fetch = $this->DB->fetch($byEmail);
-			return $fetch['user_id'];
-		} else {
-			return false;
-		}
-	}
-
 	function insertShare($userId,$grpId) {
-		$this->getShare($userId,$grpId);
-		if ($this->DB->num() == 0) {
+		if ($this->DB->num(AjaxQaSelectGroupMembers::getShare($userId,$grpId,$this->DB)) == 0) {
 			$sql = "INSERT INTO q_user_groups (user_id,group_id,active) VALUES ('{$userId}','{$grpId}',1);";
 			return $this->DB->query($sql);
 		} else {
@@ -89,75 +73,21 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		}
 	}
 
-	function getShare($userId,$grpId) {
-		$sql = "SELECT id FROM q_user_groups WHERE user_id='{$userId}' AND group_id='{$grpId}';";
-		return $this->DB->query($sql);
-	}
-
-	function getContact($userId) {
-		$sql = "SELECT id FROM contacts WHERE owner_id='{$this->user->getUserId()}' AND contact_id='{$userId}';";
-		return $this->DB->query($sql);
-	}
-
 	function deleteContact($userId) {
 		$sql = "DELETE FROM contacts WHERE owner_id='{$this->user->getUserId()}' AND contact_id='{$userId}';";
 		return $this->DB->query($sql);
 	}
 
-	function dropShare($userId,$grpId) {
-		// This method is not currently being used.
-		// If it is implemented, then a check should be added to see if the user doing the removal is also a member - security check
-		/*
-		 $sql = "UPDATE q_user_groups
-			SET active = 0
-			WHERE q_user_groups.user_id = {$userId}
-			AND q_user_groups.group_id = {$grpId};";
-			return $this->DB->query($sql);//*/
-		return false;
-	}
-
-	function getActiveGroups() {
-		$sql = "SELECT * FROM q_group,q_user_groups
-        WHERE q_group.id = group_id 
-          AND user_id = {$this->user->getUserId()}
-          AND active = 1;";
-		$this->activeGroups = $this->DB->query($sql);
-	}
-
-	function getAssociatedActiveContacts($grpId) {
-		$sql = "SELECT q_user_groups.*,user.handle FROM q_user_groups,user
-        WHERE q_user_groups.group_id = {$grpId}
-          AND q_user_groups.user_id = user.user_id
-          AND q_user_groups.active = 1
-        ORDER BY user.handle ASC;";
-		$this->activeShares = $this->DB->query($sql);
-	}
-	
-	function getAssociatedInactiveContacts($grpId) {
-		$sql = "SELECT q_user_groups.*,user.handle FROM q_user_groups,user
-        WHERE q_user_groups.group_id = {$grpId}
-          AND q_user_groups.user_id = user.user_id
-          AND q_user_groups.active = 0
-        ORDER BY user.handle ASC;";
-		$this->inactiveShares = $this->DB->query($sql);
-	}
-
-	function getContacts() {
-		$sql = "SELECT contacts.*,user.handle FROM contacts,user
-        WHERE contacts.owner_id = {$this->user->getUserId()}
-          AND contacts.contact_id = user.user_id
-        ORDER BY user.handle ASC;";
-		$this->contacts = $this->DB->query($sql);
-	}
-
 	function buildWidget() {
-		$this->getActiveGroups();
-		$this->getContacts();
-		$divQuickAccounts = new HTMLDiv($this->container,self::getFsId());
-		new HTMLLegend($divQuickAccounts,'Group Memberships');
+		$this->activeGroups = AjaxQaSelectGroupMembers::getActiveGroups($this->user->getUserId(),$this->DB);
+		$this->contacts = AjaxQaSelectGroupMembers::getContacts($this->user->getUserId(),$this->DB);
+		$divQuickAccounts = new HTMLFieldset($this->container,self::getFsId(),'manage_title');
+		$lClose = new HTMLLegend($divQuickAccounts,'Group Memberships');
+		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$lClose->setAttribute('title','Close');
 		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
-		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-closethick');
+		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$tableSplit = new Table($divQuickAccounts,1,2,'',self::getSplitGroupMemberClass());
 		$this->buildActiveGroupsTable($tableSplit->cells[0][0]);
 		$this->buildAddContactForm($tableSplit->cells[0][1]);
@@ -181,20 +111,15 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 			$groupClass = $this->getGrpClass().' ui-droppable';
 			$groupAccount = new HTMLDiv($tableListAccounts->cells[$i][0],$groupId,$groupClass);
 			new HTMLParagraph($groupAccount,$group['name']);
-			$this->getAssociatedActiveContacts($group['group_id']);
-			while ($contact = $this->DB->fetch()) {
+			$this->activeShares = AjaxQaSelectGroupMembers::getAssociatedActiveContacts($group['group_id'],$this->DB);
+			$this->inactiveShares = AjaxQaSelectGroupMembers::getAssociatedInactiveContacts($group['group_id'],$this->DB);
+			while ($contact = $this->DB->fetch($this->activeShares)) {
 				$contactId = $this->getContactId().'_'.$contact['user_id'];
 				$contactClass = $this->getContactClass().' ui-draggable sub-item';
 				$sharesDiv = new HTMLDiv($tableListAccounts->cells[$i][0],$contactId,$contactClass);
 				$sharesP = new HTMLParagraph($sharesDiv,$contact['handle']);
-				/*
-				 $sharesA = new HTMLAnchor($sharesP,'#','','','');
-				 $sharesA->setAttribute('onclick',"QaGroupMembersDrop('quick_accounts_manage_div','{$group['id']}','{$contact['user_id']}');");
-				 $sharesSpan = new HTMLSpan($sharesA,'','','ui-icon ui-icon-circle-close');
-				 $sharesSpan->setStyle('float: right;');//*/
 			}
-			$this->getAssociatedInactiveContacts($group['group_id']);
-			while ($contact = $this->DB->fetch()) {
+			while ($contact = $this->DB->fetch($this->inactiveShares)) {
 				$contactId = $this->getContactId().'_'.$contact['user_id'];
 				$contactClass = $this->getContactClass().' ui-draggable sub-item';
 				$sharesDiv = new HTMLDiv($tableListAccounts->cells[$i][0],$contactId,$contactClass);

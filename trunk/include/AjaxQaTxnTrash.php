@@ -10,9 +10,9 @@ class AjaxQaTxnTrash extends AjaxQaTxns {
 	}
 
 	function buildTrashWidget() {
-		$this->activeAccounts = AjaxQaGetAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
+		$this->activeAccounts = AjaxQaSelectAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
 		$this->getTxnTrash();
-		new HTMLHeading($this->container,3,'Trash Bin for: '.AjaxQaGetAccounts::getAccountNameById($this->showAcct,$this->DB,TRUE));
+		new HTMLHeading($this->container,3,'Trash Bin for: '.AjaxQaSelectAccounts::getAccountNameById($this->showAcct,$this->DB,TRUE));
 		if ($this->DB->num($this->inactiveTxns) != 0) {
 			$rows = $this->DB->num($this->inactiveTxns);
 			$tableTxn = new Table($this->container,$rows+$this->titleRowHeight,$this->numberOfColumns,'txnt_table','txnt');
@@ -49,7 +49,7 @@ class AjaxQaTxnTrash extends AjaxQaTxns {
 	function getParentTxns() {
 		$sql = "SELECT q_txn.*
 				FROM q_txn, q_acct 
-				WHERE (".AjaxQaGetAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->DB).")
+				WHERE (".AjaxQaSelectAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB).")
 				AND q_txn.active = 0
 				AND q_txn.acct_id = q_acct.id 
 				AND q_txn.parent_txn_id = q_txn.id;";
