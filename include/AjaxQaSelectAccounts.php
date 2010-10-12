@@ -1,7 +1,11 @@
 <?php
 class AjaxQaSelectAccounts {
+
 	function getAccountNameById($id,$db,$allowAllAccounts=FALSE) {
-		if ($allowAllAccounts and ($id == 0)) {
+		if (self::isAcctUserGroup($id)) { //:KLUDGE: Checks to see if user was selected
+			$user = User::selectUserById(self::extractUserId($id),$db);
+			return $user['handle']."'s Accounts";
+		} elseif ($allowAllAccounts and ($id == 0)) {
 			return "All Accounts";
 		} else {
 			$sql = "SELECT name FROM q_acct
@@ -29,6 +33,19 @@ class AjaxQaSelectAccounts {
 		          AND q_acct.active = 1
 		          AND q_owners.acct_id = q_acct.id
 		          AND q_owners.owner_id <> {$userId}
+		        GROUP BY q_acct.id;";
+		return $db->query($sql);
+	}
+
+	function getSharedAccountsForOwner($ownerId,$userId,$db) {
+		$sql = "SELECT * FROM q_acct,q_share,q_user_groups,q_owners
+		        WHERE q_share.acct_id=q_acct.id
+		          AND q_user_groups.group_id=q_share.group_id
+		          AND q_user_groups.user_id = {$userId}
+		          AND q_user_groups.active = 1
+		          AND q_acct.active = 1
+		          AND q_owners.acct_id = q_acct.id
+		          AND q_owners.owner_id = {$ownerId}
 		        GROUP BY q_acct.id;";
 		return $db->query($sql);
 	}
@@ -85,16 +102,24 @@ class AjaxQaSelectAccounts {
 	}
 
 	function getSqlAcctsToShow($showAcct=FALSE,$activeAccountsResult,$userId,$db) {
-		$userIdentifier = 'u';
-		if (strstr($showAcct,$userIdentifier)) { //:KLUDGE: Checks to see if userIdentifier (u) is in $acctId
-			$showAccountsForUserId = str_replace($userIdentifier,"",$showAcct);
-			$acctsToShow = AjaxQaSelectAccounts::getSqlActiveSharedAccountsByOwner($showAccountsForUserId,$activeAccountsResult,$db);
+		if (self::isAcctUserGroup($showAcct)) { //:KLUDGE: Checks to see if user was selected
+			$acctsToShow = AjaxQaSelectAccounts::getSqlActiveSharedAccountsByOwner(self::extractUserId($showAcct),$activeAccountsResult,$db);
 		} elseif ($showAcct) {
 			$acctsToShow = "q_txn.acct_id = ".$showAcct;
 		} else {
 			$acctsToShow = AjaxQaSelectAccounts::getSqlActiveAccounts($activeAccountsResult,$db);
 		}
 		return $acctsToShow;
+	}
+
+	function isAcctUserGroup($acct) {
+		$userIdentifier = 'u';
+		return strstr($acct,$userIdentifier);
+	}
+
+	function extractUserId($acct) {
+		$userIdentifier = 'u';
+		return str_replace($userIdentifier,"",$acct);
 	}
 }
 ?>

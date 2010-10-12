@@ -1,5 +1,6 @@
 <?php
 abstract class AjaxQaWidget {
+	protected $tabIndex;
 	protected $DB;
 	protected $siteInfo;
 	protected $infoMsg;
@@ -12,8 +13,9 @@ abstract class AjaxQaWidget {
 	static function getQaMsgsClass() { return 'info_messages'; }
 	static function getQaMsgsId() { return 'widget_info_messages'; }
 
-	function __construct($show_msg_div=TRUE) {
+	function __construct($show_msg_div=TRUE,$tabStartIndex=0) {
 		$this->show_msg_div = $show_msg_div;
+		$this->tabIndex = new TabIndex($tabStartIndex);
 		$this->DB = new DBCon();
 		$this->siteInfo = new SiteInfo();
 		$this->infoMsg = new InfoMsg();

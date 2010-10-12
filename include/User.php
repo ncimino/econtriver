@@ -37,8 +37,12 @@ class User {
 
 	public function getUserById($id=NULL) {
 		if(empty($id) and isset($this->currentUser['user_id'])) { $id = $this->currentUser['user_id']; }
-		$this->DB->query("SELECT * FROM user WHERE user_id='".mysql_real_escape_string($id)."';");
-		return $this->DB->fetch();
+		return self::selectUserById($id,$this->DB);
+	}
+	
+	public static function selectUserById($id,$db) {
+		$db->query("SELECT * FROM user WHERE user_id='".mysql_real_escape_string($id)."';");
+		return $db->fetch();
 	}
 
 	public function setUserById($id) {

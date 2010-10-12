@@ -267,12 +267,19 @@ $(document).ready(function() {
 	
 	// Bind Txn Save to QaTxnEdit
 	$('.txn_save')
-			.live('click', function() {
+				.live('click', function() {
 				txn_id = this.getAttribute('id')
 						.slice(this.getAttribute('id').lastIndexOf('_') + 1);
 				QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document
 						.getElementById('show_acct').value, txn_id);
-			});
+		})		.live('keypress', function(e) {
+				if (e.keyCode == 13) {
+					txn_id = this.getAttribute('id')
+						.slice(this.getAttribute('id').lastIndexOf('_') + 1);
+					QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document
+							.getElementById('show_acct').value, txn_id);
+				}
+	});
 	
 	// Bind TxnH Make Active to QaTxnMakeActive
 	$('.txnh_make_active').live('click', function() {

@@ -172,6 +172,10 @@ td.split_grp_acct_col {
     margin-left: 1em;
 }
 
+.dropdown_group_option {
+	color: #990;
+}
+
 #quick_accts_id {
     position: relative;
     border: lightgray 1px solid;
@@ -212,6 +216,7 @@ table.txnt, #trash_bin {
 }
 
 .txn_actions {
+	margin-top: 0.25em;
     margin-bottom: 1em;
 	width: 1200px;
 }
