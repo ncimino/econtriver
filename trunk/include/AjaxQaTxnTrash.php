@@ -13,7 +13,7 @@ class AjaxQaTxnTrash extends AjaxQaTxns {
 		$this->activeAccounts = AjaxQaSelectAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
 		$this->getTxnTrash();
 		new HTMLHeading($this->container,3,'Trash Bin for: '.AjaxQaSelectAccounts::getAccountNameById($this->showAcct,$this->DB,TRUE));
-		if ($this->DB->num($this->inactiveTxns) != 0) {
+		if (($this->inactiveTxns) and ($this->DB->num($this->inactiveTxns) != 0)) {
 			$rows = $this->DB->num($this->inactiveTxns);
 			$tableTxn = new Table($this->container,$rows+$this->titleRowHeight,$this->numberOfColumns,'txnt_table','txnt');
 			$this->buildTxnTrashTitles($tableTxn,$row = 0);

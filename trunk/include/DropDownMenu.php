@@ -60,15 +60,15 @@ class DropDownMenu {
 		if (!empty($id)) { $option->setId($id.'_'.$this->num_options); }
 	}
 	
-	function disableOption($option = FALSE) {
+	function disableOption($option = NULL) {
 		if ($this->num_options > 0) {
-			if ($option) $option = $this->num_options - 1;
+			if ($option == NULL) $option = $this->num_options - 1;
 			$this->options[$option]->setAttribute('disabled','disabled');
 		}
 	}
 	
 	function setSelected($option) {
-		if (!$this->option_selected) {
+		if ($this->option_selected == FALSE) {
 			$this->options[$option]->setAttribute('selected','selected');
 		}
 	}
