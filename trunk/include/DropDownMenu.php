@@ -68,7 +68,7 @@ class DropDownMenu {
 	}
 	
 	function setSelected($option) {
-		if ($this->option_selected == FALSE) {
+		if (($this->option_selected == FALSE) and count($this->options)) {
 			$this->options[$option]->setAttribute('selected','selected');
 		}
 	}
