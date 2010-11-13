@@ -81,52 +81,31 @@ class AjaxQaTxns extends AjaxQaWidget {
 		new HTMLText($link,$title);
 	}
 
-	function getTxnParentId($current_txn_id) {
-		$sql = "SELECT parent_txn_id FROM q_txn
-					WHERE id = $current_txn_id;";
-		$result = $this->DB->fetch($this->DB->query($sql));
-		return $result['parent_txn_id'];
-	}
-
 	function dropEntries($active_txn_id, $log, $current_txn_id=FALSE) {
-		if ($this->makeTxnInactive($active_txn_id)) {
+		if (AjaxQaModifyTxns::makeTxnInactive($active_txn_id,$this->DB)) {
 			if ($current_txn_id) { // If current_txn_id is defined, then the transaction was made active
 				// This occurs when restoring a previous revision of the same transaction. The current must be made inactive.
 				//$this->infoMsg->addMessage(2,'Transaction was successfully made active.');
 			} else {
 				$this->infoMsg->addMessage(2,'Transaction was successfully moved to the trash bin.');
-				if ($log == 'true') $this->insertTxnNote($this->getTxnParentId($active_txn_id), "Deleted Transaction", FALSE);
+				if ($log == 'true') {
+					$parent_txn_id = AjaxQaSelectTxns::getTxnParentId($active_txn_id,$this->DB);
+					AjaxQaModifyNotes::insertTxnNote($parent_txn_id, "Deleted Transaction", $this->user, $this->DB, FALSE);
+				}
 			}
 		} else {
 			$this->infoMsg->addMessage(-1,'An unexpected error occurred while trying to move the transaction to the trash.');
 		}
 	}
 
-	function makeTxnInactive($current_txn_id) {
-		$sql = "UPDATE q_txn SET active = 0 WHERE q_txn.id = $current_txn_id;";
-		return $this->DB->query($sql);
-	}
-
 	function restoreEntries($current_txn_id) {
-		if ($this->makeTxnActive($current_txn_id)) {
+		if (AjaxQaModifyTxns::makeTxnActive($current_txn_id,$this->DB)) {
 			$this->infoMsg->addMessage(2,'Transaction was successfully restored.');
-			$this->insertTxnNote($this->getTxnParentId($current_txn_id), "Restored Transaction", FALSE);
+			$parent_txn_id = AjaxQaSelectTxns::getTxnParentId($current_txn_id,$this->DB);
+			AjaxQaModifyNotes::insertTxnNote($parent_txn_id, "Restored Transaction", $this->user, $user->DB, FALSE);
 		} else {
 			$this->infoMsg->addMessage(-1,'An unexpected error occurred while trying to restore the transaction.');
 		}
-	}
-
-	function makeTxnActive($current_txn_id) {
-		$sql = "UPDATE q_txn SET active = 1 WHERE q_txn.id = $current_txn_id;";
-		return $this->DB->query($sql);
-	}
-
-	private function insertTxnNote($parent_txn_id, $note, $editable=TRUE) {
-		$edited = ($editable) ? "null" : "1";
-		$clean_note = Normalize::tags($note);
-		$sql = "INSERT INTO q_txn_notes (user_id,txn_id,posted,note,edited)
-				VALUES ({$this->user->getUserId()}, $parent_txn_id, {$this->user->getTime()}, '$clean_note', $edited);";
-		return $this->DB->query($sql);
 	}
 
 	function buildWidget() {
@@ -178,7 +157,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$allAccountsIndex = 0;
 		$selectAcctMenu = new DropDownMenu($parentElement,$name,$id,$class);
 		$selectAcctMenu->addOption('All Accounts',$allAccountsIndex,($allAccountsIndex === $selectedAcct),NULL,'dropdown_group');
-		$accountSelected = $this->buildActionAcctsForDropDown($selectAcctMenu,'My Accounts',$this->user->getUserId(),'u'.$this->user->getUserId(),$selectedAcct);
+		$this->buildActionAcctsForDropDown($selectAcctMenu,'My Accounts',$this->user->getUserId(),'u'.$this->user->getUserId(),$selectedAcct);
 		$activeContacts = AjaxQaSelectGroupMembers::getAssociatedActiveContactsForAllGroups($this->user->getUserId(),$this->DB);
 		while($result = $this->DB->fetch($activeContacts)) {
 			if ($this->user->getUserId() != $result['user_id']) {
@@ -229,67 +208,14 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function buildTxnsTable() {
 		$divNew = new HTMLDiv($this->container,'txn_id','txn');
-		$this->getTxns();
-		$this->getTxnsSum();
-		$this->getTxnsBankSaysSum();
+		$this->activeTxns = AjaxQaSelectTxns::getTxns($this->sqlAcctsToShow,$this->sortField,$this->sortDir,$this->DB);
+		$this->activeTxnsSum = AjaxQaSelectTxns::getTxnsSum($this->sqlAcctsToShow,$this->DB);
+		$this->activeTxnsBankSaysSum = AjaxQaSelectTxns::getTxnsBankSaysSum($this->sqlAcctsToShow,$this->DB);
 		$rows = $this->DB->num($this->activeTxns) * 3 + 2;
 		$tableTxn = new Table($divNew,$rows,12,'txn_table','txn');
 		$this->buildTxnTitles($tableTxn,0);
 		$this->buildNewTxns($tableTxn,1);
 		$this->buildTxns($tableTxn,2);
-	}
-
-	function getTxns() {
-		$sql = "SELECT q_txn.*,user.handle FROM q_txn,user,q_acct
-					WHERE (".$this->sqlAcctsToShow.")
-					  AND q_txn.active = 1
-					  AND q_txn.user_id = user.user_id
-					  AND q_txn.acct_id = q_acct.id
-					GROUP BY q_txn.id
-					ORDER BY {$this->sortField} {$this->sortDir},q_txn.type ASC,q_txn.establishment ASC,q_txn.note ASC,q_txn.entered ASC;"; // Need to add next lvl search for consistent results
-		return $this->activeTxns = $this->DB->query($sql);
-	}
-
-	function getTxnsSum() {
-		return $this->activeTxnsSum = $this->getCreditSum() - $this->getDebitSum();
-	}
-
-	function getTxnsBankSaysSum() {
-		return $this->activeTxnsBankSaysSum = $this->getCreditBankSaysSum() - $this->getDebitBankSaysSum();
-	}
-
-	function getCreditSum() {
-		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
-					WHERE (".$this->sqlAcctsToShow.")
-					  AND q_txn.active = 1;";
-		$result = $this->DB->fetch($this->DB->query($sql));
-		return $result['total'];
-	}
-
-	function getCreditBankSaysSum() {
-		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
-					WHERE (".$this->sqlAcctsToShow.")
-					  AND q_txn.active = 1
-					  AND q_txn.banksays = 1;";
-		$result = $this->DB->fetch($this->DB->query($sql));
-		return $result['total'];
-	}
-
-	function getDebitSum() {
-		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
-					WHERE (".$this->sqlAcctsToShow.")
-					  AND q_txn.active = 1;";
-		$result = $this->DB->fetch($this->DB->query($sql));
-		return $result['total'];
-	}
-
-	function getDebitBankSaysSum() {
-		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
-					WHERE (".$this->sqlAcctsToShow.")
-					  AND q_txn.active = 1
-					  AND q_txn.banksays = 1;";
-		$result = $this->DB->fetch($this->DB->query($sql));
-		return $result['total'];
 	}
 
 	function buildTxnTitles($tableTxn,$row) {
@@ -331,7 +257,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_debit\')');
 		$this->tabIndex->add($txn_current_tag);
 		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_debit',$this->newTxnValues['debit'],'new_txn_debit','txn_input debit');
-		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'txn_add\')');
+		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_submit\')');
 		$this->tabIndex->add($txn_current_tag);
 		new HTMLText($tableTxn->cells[$row][$col++],'-'); // Balance
 		new HTMLText($tableTxn->cells[$row][$col++],'-'); // Bank Says
@@ -339,14 +265,15 @@ class AjaxQaTxns extends AjaxQaWidget {
 		/*ACTIONS*/
 
 		$submitNew = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_add');
-		$submitNew->setAttribute('onkeyup','enterCall(event,function() {QaTxnAdd(\'new_txn_\');})');
+		//$submitNew->setAttribute('onkeyup','enterCall(event,function() {QaTxnAdd(\'new_txn_\');})');
 		$submitNew->setTitle("Add");
 		$submitNewSpan = new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick ui-float-left');
 		$this->tabIndex->add($submitNewSpan);
 
 		$splitNew = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_split');
-		$splitNew->setTitle("Split");
-		new HTMLSpan($splitNew,'','new_txn_split','ui-icon-inactive ui-icon-transferthick-e-w ui-float-left');
+		$splitNew->setTitle("Transfer");
+		$splitNewSpan = new HTMLSpan($splitNew,'','new_txn_split','ui-icon ui-icon-transferthick-e-w ui-float-left');
+		$this->tabIndex->add($splitNewSpan);
 	}
 
 	function buildTxns($tableTxn,$row) {
@@ -457,13 +384,13 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$return=FALSE;
 		if ($this->validateNewTxn($date,$credit,$debit)) {
 			$datestamp = strtotime($date);
-			$this->getTxnActiveStatus($current_txn_id);
+			AjaxQaSelectTxns::getTxnActiveStatus($current_txn_id,$this->DB);
 			$txnActiveStatus = $this->DB->fetch();
 			if (($this->DB->num() >= 1) and ($txnActiveStatus['active'] == 0)) { // If current txn id exists, but is inactive
 				$this->infoMsg->addMessage(0,'This entry was modified before you submitted this change. Please resubmit your changes.');
 			} elseif ($this->insertTxn($acct,$this->user->getUserId(),$datestamp,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays)) {
 				if ($current_txn_id != 'null') {
-					if ($this->makeTxnInactive($current_txn_id)) {
+					if (AjaxQaModifyTxns::makeTxnInactive($current_txn_id,$this->DB)) {
 						$this->infoMsg->addMessage(2,'Transaction was successfully modified.');
 						$return=TRUE; // Transaction was modified, and done so successfully
 					}
@@ -509,11 +436,6 @@ class AjaxQaTxns extends AjaxQaWidget {
 		}
 	}
 
-	function getTxnActiveStatus($current_txn_id) {
-		$sql = "SELECT q_txn.active FROM q_txn WHERE q_txn.id = $current_txn_id;";
-		return $this->DB->query($sql);
-	}
-
 	function insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays) {
 		if (($credit != NULL) and ($debit != NULL)) {
 			$this->infoMsg->addMessage(-1,'Credit and debit have values, this transaction cannot be added.');
@@ -522,20 +444,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 			$this->infoMsg->addMessage(-1,'Credit and debit do not have values, this transaction cannot be added.');
 			return false;
 		} else {
-			$txn_type = ($debit == NULL) ? 'credit' : 'debit';
-			$value = ($debit == NULL) ? $credit : $debit;
-			$value = str_replace('$', '', $value);
-			$banksays = ($banksays == 'on') ? 1 : 0;
-			$entered = $this->user->getTime();
-			$sql = "INSERT INTO q_txn (acct_id,user_id,entered,date,type,establishment,note,$txn_type,parent_txn_id,banksays,active)
-				VALUES ($acct,$user_id,$entered,$date,'$type','$establishment','$note',$value,$parent_id,$banksays,1);";
-			$return = $this->DB->query($sql);
-			if ($parent_id == 'null') {
-				$last_record_id = $this->DB->lastId();
-				$sql = "UPDATE q_txn SET parent_txn_id = $last_record_id WHERE id = $last_record_id;";
-				$this->DB->query($sql);
-			}
-			return $return;
+			return AjaxQaModifyTxns::insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays,$this->user,$this->DB);
 		}
 	}
 }

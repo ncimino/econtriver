@@ -36,7 +36,8 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		$userId = AjaxQaSelectGroupMembers::findContact($contactName,$this->DB);
 		if (!$userId) {
 			$this->infoMsg->addMessage(0,'User was not found.');
-		} elseif (($this->insertContact($this->user->getUserId(),$userId)) and (($this->insertContact($userId,$this->user->getUserId())))) {
+		} elseif ($this->insertContact($this->user->getUserId(),$userId)) {
+			$this->insertContact($userId,$this->user->getUserId());
 			$this->infoMsg->addMessage(2,'Contact was successfully added.');
 		} else {
 			$this->infoMsg->addMessage(0,'You are already affiliated with this contact.');
