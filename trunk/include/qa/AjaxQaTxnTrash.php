@@ -103,7 +103,7 @@ class AjaxQaTxnTrash extends AjaxQaTxns {
 				$parent_id = ($txn['parent_txn_id']) ? $txn['parent_txn_id'] : $txn['id'];
 				new HTMLInputHidden($tableTxn->cells[$row][$col++],'txnt_parent_id_'.$txn['id'],$parent_id,'txnt_parent_id_'.$txn['id']);
 
-				$makeActive = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txnt_make_active_anchor_'.$txn['id'],'txnt_make_active');
+				$makeActive = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txnt_make_active_anchor_'.$txn['id'],'txnt_make_active');
 				$makeActive->setTitle('Make Active');
 				new HTMLSpan($makeActive,'','txnt_make_active_'.$txn['id'],'ui-icon ui-icon-arrowreturnthick-1-n ui-float-left');
 					

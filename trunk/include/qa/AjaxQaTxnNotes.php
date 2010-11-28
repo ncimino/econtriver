@@ -80,7 +80,7 @@ class AjaxQaTxnNotes extends AjaxQaTxns {
 	}
 
 	function buildNotesTab($parentElement,$notesResult,$name,$tabNumber,$parentTxnId,$list) {
-		new HTMLAnchor($list->items[$tabNumber-1],'#tab-'.$parentTxnId.'-'.$tabNumber,$name.' Notes');
+		new HTML_Anchor($list->items[$tabNumber-1],'#tab-'.$parentTxnId.'-'.$tabNumber,$name.' Notes');
 		$notes = new HTMLDiv($parentElement,'tab-'.$parentTxnId.'-'.$tabNumber);
 		if ($this->DB->resetRowPointer($notesResult)) {
 			$txnNoteTable = new Table($notes,$this->DB->num($notesResult)+1,3);

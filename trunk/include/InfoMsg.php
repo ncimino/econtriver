@@ -29,7 +29,7 @@ class InfoMsg {
 				if ($value['level']==-1) {
 					$this->parentElement->setAttribute('class',"ui-state-error ui-corner-all");
 					new HTMLText($this->parentElement,"This should not have occurred. Please report this problem: ");
-					new HTMLAnchor($this->parentElement,'bugs.php','Report Bug');
+					new HTML_Anchor($this->parentElement,'bugs.php','Report Bug');
 					new HTMLBr($this->parentElement);
 					$icon = new HTMLSpan($this->parentElement,'','','ui-icon ui-icon-alert');
 					$icon->setAttribute('style','float: left; margin-right: .3em;');
@@ -51,7 +51,7 @@ class InfoMsg {
 					new HTMLStrong($this->parentElement,' Info: ');
 				}
 				new HTMLText($this->parentElement,$value['message']." ");
-				if(!empty($value['link_text'])) { new HTMLAnchor($this->parentElement,$value['link'],$value['link_text']); }
+				if(!empty($value['link_text'])) { new HTML_Anchor($this->parentElement,$value['link'],$value['link_text']); }
 			}
 			$this->parentElement->setAttribute('style',"display:block;");
 		}

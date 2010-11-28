@@ -72,11 +72,11 @@ class AjaxQaTxns extends AjaxQaWidget {
 	function addSortableTitle($parentElement,$title,$fieldName,$id) {
 		if ($this->sortField == $fieldName) {
 			$nextSortDir = ($this->sortDir == 'DESC') ? 'ASC' : 'DESC';
-			$link = new HTMLAnchor($parentElement,"#",'',$id,'txn_title');
+			$link = new HTML_Anchor($parentElement,"#",'',$id,'txn_title');
 			$curArrow = ($this->sortDir == 'DESC') ? 'ui-icon ui-icon-carat-1-s ui-float-right' : 'ui-icon ui-icon-carat-1-n ui-float-right';
 			new HTMLSpan($link,'',$id.'_'.$this->sortDir,$curArrow);
 		} else {
-			$link = new HTMLAnchor($parentElement,"#",'',$id,'txn_title');
+			$link = new HTML_Anchor($parentElement,"#",'',$id,'txn_title');
 		}
 		new HTMLText($link,$title);
 	}
@@ -138,15 +138,15 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$h3Actions = new HTMLHeading($divActionButtons,5,'Actions: ');
 		$h3Actions->setStyle('float: left;margin: 2px;padding 0px;');
 
-		$trashTxn = new HTMLAnchor($divActionButtons,'#','','txn_show_trash_anchor','txn_show_trash');
+		$trashTxn = new HTML_Anchor($divActionButtons,'#','','txn_show_trash_anchor','txn_show_trash');
 		$trashTxn->setTitle('Trash Bin');
 		new HTMLSpan($trashTxn,'','txn_show_trash','ui-icon ui-icon-trash ui-float-right');
 
-		$printTxn = new HTMLAnchor($divActionButtons,'#','','txn_print_anchor');
+		$printTxn = new HTML_Anchor($divActionButtons,'#','','txn_print_anchor');
 		$printTxn->setTitle('Open Print View');
 		new HTMLSpan($printTxn,'','txn_print','ui-icon-inactive ui-icon-print ui-float-right');
 
-		$overviewTxn = new HTMLAnchor($divActionButtons,'#','','txn_show_overview_anchor','txn_show_overview');
+		$overviewTxn = new HTML_Anchor($divActionButtons,'#','','txn_show_overview_anchor','txn_show_overview');
 		$overviewTxn->setTitle('Show Overview');
 		new HTMLSpan($overviewTxn,'','txn_show_overview','ui-icon-inactive ui-icon-clipboard ui-float-right');
 	}
@@ -264,13 +264,13 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 		/*ACTIONS*/
 
-		$submitNew = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_add');
+		$submitNew = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_add');
 		//$submitNew->setAttribute('onkeyup','enterCall(event,function() {QaTxnAdd(\'new_txn_\');})');
 		$submitNew->setTitle("Add");
 		$submitNewSpan = new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick ui-float-left');
 		$this->tabIndex->add($submitNewSpan);
 
-		$splitNew = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_split');
+		$splitNew = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_split');
 		$splitNew->setTitle("Transfer");
 		$splitNewSpan = new HTMLSpan($splitNew,'','new_txn_split','ui-icon ui-icon-transferthick-e-w ui-float-left');
 		$this->tabIndex->add($splitNewSpan);
@@ -323,28 +323,28 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 				/* ACTIONS */
 
-				$saveTxn = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_save_anchor_'.$txn['id'],'');
+				$saveTxn = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_save_anchor_'.$txn['id'],'');
 				$saveTxn->setTitle('Save');
 				$iconSpan = new HTMLSpan($saveTxn,'','txn_save_'.$txn['id'],'ui-icon-inactive ui-icon-disk ui-float-left');
 				$this->tabIndex->add($iconSpan);
 
 				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' per_txn_actions');
 				if ($txn['id'] != $txn['parent_txn_id']) {
-					$showHistory = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_show_history_anchor_'.$txn['id'],'txn_show_history');
+					$showHistory = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_show_history_anchor_'.$txn['id'],'txn_show_history');
 					$iconSpan = new HTMLSpan($showHistory,'','txn_show_history_'.$txn['id'],'ui-icon ui-icon-clock ui-float-left');
 				} else {
-					$showHistory = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','');
+					$showHistory = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','');
 					$iconSpan = new HTMLSpan($showHistory,'','txn_show_history_'.$txn['id'],'ui-icon-inactive ui-icon-clock ui-float-left');
 				}
 				$showHistory->setTitle('History');
 				$this->tabIndex->add($iconSpan);
 
-				$showNotes = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_show_notes_'.$txn['id'],'txn_show_notes');
+				$showNotes = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_show_notes_'.$txn['id'],'txn_show_notes');
 				$showNotes->setTitle('Notes');
 				$iconSpan = new HTMLSpan($showNotes,'','txn_show_notes_'.$txn['id'],'ui-icon ui-icon-note ui-float-left');
 				$this->tabIndex->add($iconSpan);
 
-				$deleteTxn = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txn_delete_anchor_'.$txn['id'],'txn_delete');
+				$deleteTxn = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_delete_anchor_'.$txn['id'],'txn_delete');
 				$deleteTxn->setTitle('Delete');
 				$iconSpan = new HTMLSpan($deleteTxn,'','txn_delete_'.$txn['id'],'ui-icon ui-icon-trash ui-float-left');
 				$this->tabIndex->add($iconSpan);

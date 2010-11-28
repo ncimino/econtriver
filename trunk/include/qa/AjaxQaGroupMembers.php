@@ -86,7 +86,7 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		$lClose = new HTMLLegend($divQuickAccounts,'Group Memberships');
 		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$lClose->setAttribute('title','Close');
-		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
+		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$tableSplit = new Table($divQuickAccounts,1,2,'',self::getSplitGroupMemberClass());
@@ -146,7 +146,7 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 			$inputClass = $this->getContactClass().' ui-draggable';
 			$inputEditGroup = new HTMLDiv($tableListGroups->cells[$i][0],$inputId,$inputClass);
 			$contactsP = new HTMLParagraph($inputEditGroup,$contact['handle']);
-			$contactsA = new HTMLAnchor($contactsP,'#','','','');
+			$contactsA = new HTML_Anchor($contactsP,'#','','','');
 			$contactsA->setAttribute('onclick',"QaContactDrop('quick_accounts_manage_div','{$contact['contact_id']}');");
 			$contactsSpan = new HTMLSpan($contactsA,'','','ui-icon ui-icon-circle-close');
 			$contactsSpan->setStyle('float: right;');
@@ -159,7 +159,7 @@ class AjaxQaGroupMembers extends AjaxQaWidget {
 		new HTMLHeading($divAddContact,5,'Add Contact:');
 		$inputAddContact = new HTMLInputText($divAddContact,'contact','Email or User name','contact');
 		$inputAddContact->setAttribute('onkeypress',"enterCall(event,function() {QaContactAdd('{$this->parentId}','".self::getContactInputId()."');})");
-		$aAddContact = new HTMLAnchor($divAddContact,'#','Add Contact');
+		$aAddContact = new HTML_Anchor($divAddContact,'#','Add Contact');
 		$aAddContact->setAttribute('onclick',"QaContactAdd('{$this->parentId}','".self::getContactInputId()."');");
 	}
 }

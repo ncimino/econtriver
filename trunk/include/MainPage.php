@@ -22,16 +22,16 @@ class MainPage {
 	}
 	
 	function buildAccountManagementMenu($parentElement) {
-		$aManageAccounts = new HTMLAnchor($parentElement,'#','Manage Accounts','accounts_link');
+		$aManageAccounts = new HTML_Anchor($parentElement,'#','Manage Accounts','accounts_link');
 		$aManageAccounts->setAttribute('onclick',"QaAccountGet('".self::getQaManageId()."');");
 		new HTMLText($parentElement,' | ');
-		$aManageGroups = new HTMLAnchor($parentElement,'#','Manage Groups');
+		$aManageGroups = new HTML_Anchor($parentElement,'#','Manage Groups');
 		$aManageGroups->setAttribute('onclick',"QaGroupGet('".self::getQaManageId()."');");
 		new HTMLText($parentElement,' | ');
-		$aAccountSharing = new HTMLAnchor($parentElement,'#','Account Sharing');
+		$aAccountSharing = new HTML_Anchor($parentElement,'#','Account Sharing');
 		$aAccountSharing->setAttribute('onclick',"QaSharedAccountsGet('".self::getQaManageId()."');");
 		new HTMLText($parentElement,' | ');
-		$aGroupMembership = new HTMLAnchor($parentElement,'#','Group Membership');
+		$aGroupMembership = new HTML_Anchor($parentElement,'#','Group Membership');
 		$aGroupMembership->setAttribute('onclick',"QaGroupMembersGet('".self::getQaManageId()."');");
 	}
 }

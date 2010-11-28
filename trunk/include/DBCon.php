@@ -7,58 +7,43 @@ class DBCon {
 	private $ini_arr = array();
 	public $sql;
 
-	function __construct($connect_bool=true) {
-		if ($connect_bool)
+	function __construct($select_bool=true) {
+		$this->parseDbIniFile();
+		$this->connect();
+		if ($select_bool)
 		{
-			$this->connect();
 			$this->selectDB();
 			return $this->link;
-		}else{
+		} else {
 			return true;
+		}
+	}
+	
+	private function parseDbIniFile() {
+		if (! $this->ini_arr = parse_ini_file($this->ini_file)) {
+			throw new exception("Failed to parse '{$this->ini_file}'");
 		}
 	}
 
 	public function connect() {
-		if (! $ini_arr = parse_ini_file($this->ini_file)) {
-			//throw new Exception("ERROR:DBCon:connect - parse_ini_file - Failed to parse '{$this->ini_file}' <br />\n");
-			echo "ERROR:DBCon:connect - parse_ini_file - Failed to parse '{$this->ini_file}' <br />\n";
-			return false;
-		} elseif (! $this->link = mysql_connect($ini_arr['dbinfo.host'],$ini_arr['dbinfo.user'],$ini_arr['dbinfo.pw'])) {
-			//throw new Exception("ERROR:DBCon:connect - mysql_connect - " . mysql_error() . " <br />\n");
-			echo "ERROR:DBCon:connect - mysql_connect - " . mysql_error() . " <br />\n";
-			return false;
-		} else {
-			return true;
+		if (! $this->link = mysql_connect($this->ini_arr['dbinfo.host'],$this->ini_arr['dbinfo.user'],$this->ini_arr['dbinfo.pw'])) {
+			throw new exception(mysql_error());
 		}
 	}
 
 	public function selectDB() {
-		if (! $ini_arr = parse_ini_file($this->ini_file)) {
-			//throw new Exception("ERROR:DBCon:selectDB - parse_ini_file - Failed to parse '{$this->ini_file}' <br />\n");
-			echo "ERROR:DBCon:selectDB - parse_ini_file - Failed to parse '{$this->ini_file}' <br />\n";
-			return false;
-		} elseif (! mysql_select_db($ini_arr['dbinfo.db'],$this->link)) {
-			//throw new Exception("ERROR:DBCon:selectDB - mysql_select_db - " . mysql_error() . " <br />\n");
-			echo "ERROR:DBCon:selectDB - mysql_select_db - " . mysql_error() . " <br />\n";
-			return false;
-		} else {
-			return true;
+		if (! mysql_select_db($this->ini_arr['dbinfo.db'],$this->link)) {
+			throw new exception(mysql_error());
 		}
 	}
 
 	public function query($sql) {
-		if (!empty($sql)){
-			$this->sql = $sql;
-			$this->result = mysql_query($sql,$this->link);
-			if (! $this->result) {
-				//throw new Exception("ERROR:DBCon:query - mysql_query - " . mysql_error() . " trying to execute " . $sql . " <br />\n");
-				echo "ERROR:DBCon:query - mysql_query - " . mysql_error() . " trying to execute " . $sql . " <br />\n";
-				return false;
-			} else {
-				return $this->result;
-			}
-		} else {
+		$this->sql = $sql;
+		if (! $this->result = mysql_query($sql,$this->link)) {
+			throw new exception(mysql_error()." - Trying to execute " . $sql);
 			return false;
+		} else {
+			return $this->result;
 		}
 	}
 
@@ -67,9 +52,7 @@ class DBCon {
 		return (empty($result)) ? FALSE : mysql_num_rows($result);
 	}
 
-	public function lastId() {
-		return mysql_insert_id($this->link);
-	}
+	public function lastId() { return mysql_insert_id($this->link);	}
 
 	public function fetch($result="") {
 		if (empty($result)){ $result = $this->result; }
@@ -83,25 +66,18 @@ class DBCon {
 		return ($this->num($result) and mysql_data_seek($result,0));
 	}
 
-	public function setDB($database="") {
-		$this->database = $database;
-	}
+	public function setDB($database="") { $this->database = $database; }
+	public function setINIFile($ini_file="") { $this->ini_file = $ini_file; }
 
-	public function setINIFile($ini_file="") {
-		$this->ini_file = $ini_file;
+	public function getDB() { 
+		if ($this->database=="") {
+			return $this->ini_arr['dbinfo.db'];
+		} else {
+			return $this->database; 
+		}
 	}
-
-	public function getDB() {
-		return $this->database;
-	}
-
-	public function getINIFile() {
-		return $this->ini_file;
-	}
-
-
-	function __destruct(){
-		mysql_close($this->link);
-	}
+	
+	public function getINIFile() { return $this->ini_file; }
+	public function __destruct(){ mysql_close($this->link); }
 }
 ?>

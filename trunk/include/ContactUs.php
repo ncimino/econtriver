@@ -103,7 +103,7 @@ class RecoverAccount {
 		$verify2 = $cipher->encrypt($this->user->getTime());
 		$recoveryLink = $this->siteInfo->getSiteHTTP().'/recover.php?recover_id='.$this->user->getUserId().'&verify1='.$verify1.'&verify2='.$verify2;
 		echo "<a href='".$recoveryLink."' >RECOVER NOW</a>\n";
-		new HTMLAnchor($email->content,$recoveryLink,'Recover My Account');
+		new HTML_Anchor($email->content,$recoveryLink,'Recover My Account');
 		new HTMLParagraph($email->content,'Once you follow this link, then enter and verify a new password.  This new password will then be used to login.');
 
 		$sendEmail = new SendEmail();
