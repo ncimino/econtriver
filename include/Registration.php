@@ -73,7 +73,7 @@ class Registration {
 		new HTMLParagraph($email->content,'Thank you for registering with eContriver.');
 		new HTMLParagraph($email->content,'To access the site you can follow this link directly:');
 		$mainLink = $this->siteInfo->getSiteHTTP();
-		new HTMLAnchor($email->content,$mainLink,'eContriver');
+		new HTML_Anchor($email->content,$mainLink,'eContriver');
 
 		$sendEmail = new SendEmail();
 		$sendEmail->addTo($this->user->getEmail());

@@ -74,7 +74,7 @@ class AjaxQaAccounts extends AjaxQaWidget {
 		$lClose = new HTMLLegend($divQuickAccounts,'Account Management',NULL,'manage_title');
 		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$lClose->setAttribute('title','Close');
-		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
+		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$this->buildCreateAccountForm($divQuickAccounts);
@@ -120,14 +120,14 @@ class AjaxQaAccounts extends AjaxQaWidget {
 			if ($editable) {
 				$jsEdit = "QaAccountEdit('{$this->parentId}','{$inputId}','{$account['id']}');";
 				$jsDrop = "if(confirmSubmit('Are you sure you want to delete the \'".$account['name']."\' account?')) { QaAccountDrop('{$this->parentId}','{$account['id']}'); }";
-				$aEditAccount = new HTMLAnchor($tableListAccounts->cells[$i][1],'#','Edit');
+				$aEditAccount = new HTML_Anchor($tableListAccounts->cells[$i][1],'#','Edit');
 				$aEditAccount->setAttribute('onclick',$jsEdit);
-				$aDropAccount = new HTMLAnchor($tableListAccounts->cells[$i][2],'#','Delete');
+				$aDropAccount = new HTML_Anchor($tableListAccounts->cells[$i][2],'#','Delete');
 				$aDropAccount->setAttribute('onclick',$jsDrop);
 			} elseif ($restorable) {
 				$jsRestore = "QaAccountRestore('{$this->parentId}','{$account['id']}');";
 				$inputEditAccount->setAttribute('disabled',"disabled");
-				$aRestoreAccount = new HTMLAnchor($tableListAccounts->cells[$i][1],'#','Restore');
+				$aRestoreAccount = new HTML_Anchor($tableListAccounts->cells[$i][1],'#','Restore');
 				$aRestoreAccount->setAttribute('onclick',$jsRestore);
 			} else {
 				$inputEditAccount->setAttribute('disabled',"disabled");
@@ -141,7 +141,7 @@ class AjaxQaAccounts extends AjaxQaWidget {
 		new HTMLHeading($divAddAccount,5,'Add Account:');
 		$inputAddAccount = new HTMLInputText($divAddAccount,$this->getCreateAcctInName(),$this->acctName,$this->getCreateAcctInId(),$this->getCreateAcctClass());
 		$inputAddAccount->setAttribute('onkeypress',"enterCall(event,function() {QaAccountAdd('{$this->parentId}','{$this->getCreateAcctInId()}');})");
-		$aAddAccount = new HTMLAnchor($divAddAccount,'#','Add Account');
+		$aAddAccount = new HTML_Anchor($divAddAccount,'#','Add Account');
 		$aAddAccount->setAttribute('onclick',"QaAccountAdd('{$this->parentId}','{$this->getCreateAcctInId()}');");
 	}
 }

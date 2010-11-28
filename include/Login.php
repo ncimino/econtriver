@@ -10,9 +10,9 @@ class Login {
 		if ($user->verifyUser()) {
 			$this->email = new HTMLText($DivLogin,$user->getEmail());
 			new HTMLText($DivLogin,' - ');
-			new HTMLAnchor($DivLogin,'profile.php','Profile');
+			new HTML_Anchor($DivLogin,'profile.php','Profile');
 			new HTMLText($DivLogin,' - ');
-			new HTMLAnchor($DivLogin,'index.php?logout=1','Logout');
+			new HTML_Anchor($DivLogin,'index.php?logout=1','Logout');
 		} else {
 			$FormLogin = new HTMLForm($DivLogin,'index.php','login_form','login');
 			$PLogin = new HTMLParagraph($FormLogin);
@@ -24,7 +24,7 @@ class Login {
 			new HTMLText($PLogin,' ');
 			new HTMLInputSubmit($PLogin,'Login','Login','login_form_submit','submit_as_text');
 			new HTMLText($PLogin,' - ');
-			new HTMLAnchor($PLogin,'register.php','Register');
+			new HTML_Anchor($PLogin,'register.php','Register');
 			if(empty($_POST['email'])) {
 				new HTMLScript($PLogin,"document.getElementById(\"email_input\").focus();");
 			} else {

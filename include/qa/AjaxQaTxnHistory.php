@@ -84,7 +84,7 @@ class AjaxQaTxnHistory extends AjaxQaTxns {
 						$tableTxn->cells[$row][$i]->setClass($tableTxn->cells[$row][$i]->getClass().$current_txn);
 					}
 				} else {
-					$makeActive = new HTMLAnchor($tableTxn->cells[$row][$col],'#','','txnh_make_active_anchor_'.$txn['id'],'txnh_make_active');
+					$makeActive = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txnh_make_active_anchor_'.$txn['id'],'txnh_make_active');
 					$makeActive->setTitle('Make Active');
 					new HTMLSpan($makeActive,'','txnh_make_active_'.$txn['id'],'ui-icon ui-icon-arrowreturnthick-1-n ui-float-left');
 					new HTMLInputHidden($tableTxn->cells[$row][$col],'txnh_make_inactive_'.$txn['id'],$active_txn_id,'txnh_make_inactive_'.$txn['id']);

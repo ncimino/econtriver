@@ -25,7 +25,7 @@ class EmailDocument {
 		$divLogo->setAttribute('style','text-align:right;');
 		$h1Logo = new HTMLHeading($divLogo,1);
 		$h1Logo->setAttribute('style','margin:0px;');
-		$anchorLogo = new HTMLAnchor($h1Logo,$siteInfo->getSiteHTTP(),'e','','logo_anchor');
+		$anchorLogo = new HTML_Anchor($h1Logo,$siteInfo->getSiteHTTP(),'e','','logo_anchor');
 		$anchorLogo->setAttribute('style','text-decoration:none;color:gray;');
 		$logo = new HTMLSpan($anchorLogo,'Contriver');
 		$logo->setAttribute('style','color: #EE9;');
@@ -47,7 +47,7 @@ class EmailDocument {
 		new HTMLBr($divFooter);
 		new HTMLHr($divFooter);
 		new HTMLText($divFooter,'Email sent from ');
-		new HTMLAnchor($divFooter,$siteInfo->getSiteHTTP(),$siteInfo->getName());
+		new HTML_Anchor($divFooter,$siteInfo->getSiteHTTP(),$siteInfo->getName());
 	}
 
 	function printPage () {

@@ -118,7 +118,7 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 		$lClose = new HTMLLegend($divQuickAccounts,'Account Sharing');
 		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$lClose->setAttribute('title','Close');
-		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
+		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$tableSplit = new Table($divQuickAccounts,1,3,'',self::getSplitGroupAcctClass());
@@ -159,7 +159,7 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 				$sharesDiv = new HTMLDiv($tableListAccounts->cells[$i][0],$groupId,$groupClass);
 				$sharesP = new HTMLParagraph($sharesDiv,$group['name']);
 				if ($allowEditing) {
-					$sharesA = new HTMLAnchor($sharesP,'#','','','');
+					$sharesA = new HTML_Anchor($sharesP,'#','','','');
 					$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('quick_accounts_manage_div','{$group['group_id']}','{$account['id']}');");
 					$sharesSpan = new HTMLSpan($sharesA,'','','ui-icon ui-icon-circle-close');
 					$sharesSpan->setStyle('float: right;');

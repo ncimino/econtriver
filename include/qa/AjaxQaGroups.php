@@ -171,7 +171,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 		$lClose = new HTMLLegend($divQuickAccounts,'Group Management');
 		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$lClose->setAttribute('title','Close');
-		$aClose = new HTMLAnchor($divQuickAccounts,'#','','','');
+		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$this->buildCreateGroupForm($divQuickAccounts);
@@ -206,15 +206,15 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 
 			$inputEditGroup = new HTMLInputText($tableListGroups->cells[$i][0],$inputName,$groupName,$inputId,$this->getEditGrpNameClass());
 			if ($editable) {
-				$aEditGroup = new HTMLAnchor($tableListGroups->cells[$i][1],'#','Edit');
+				$aEditGroup = new HTML_Anchor($tableListGroups->cells[$i][1],'#','Edit');
 				$aEditGroup->setAttribute('onclick',"QaGroupEdit('{$this->parentId}','{$inputId}','{$group['group_id']}');");
-				$aDropGroup = new HTMLAnchor($tableListGroups->cells[$i][2],'#','Disable');
+				$aDropGroup = new HTML_Anchor($tableListGroups->cells[$i][2],'#','Disable');
 				$aDropGroup->setAttribute('onclick',"QaGroupDrop('{$this->parentId}','{$group['group_id']}')");
 			} else {
 				$inputEditGroup->setAttribute('disabled',"disabled");
-				$aRejoinGroup = new HTMLAnchor($tableListGroups->cells[$i][1],'#','Join');
+				$aRejoinGroup = new HTML_Anchor($tableListGroups->cells[$i][1],'#','Join');
 				$aRejoinGroup->setAttribute('onclick',"QaGroupRejoin('{$this->parentId}','{$group['group_id']}');");
-				$aPermDropGroup = new HTMLAnchor($tableListGroups->cells[$i][2],'#','Leave');
+				$aPermDropGroup = new HTML_Anchor($tableListGroups->cells[$i][2],'#','Leave');
 				$aPermDropGroup->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to leave the \'".$group['name']."\' group?')) { QaGroupPermDrop('{$this->parentId}','{$group['group_id']}'); }");
 			}
 			$i++;
@@ -226,7 +226,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 		new HTMLHeading($divAddGroup,5,'Add Group:');
 		$inputAddGroup = new HTMLInputText($divAddGroup,$this->getCreateGrpInName(),$this->grpName,$this->getCreateGrpInId(),$this->getCreateGrpClass());
 		$inputAddGroup->setAttribute('onkeypress',"enterCall(event,function() {QaGroupAdd('{$this->parentId}','{$this->getCreateGrpInId()}');})");
-		$aAddGroup = new HTMLAnchor($divAddGroup,'#','Add Group');
+		$aAddGroup = new HTML_Anchor($divAddGroup,'#','Add Group');
 		$aAddGroup->setAttribute('onclick',"QaGroupAdd('{$this->parentId}','{$this->getCreateGrpInId()}');");
 	}
 }
