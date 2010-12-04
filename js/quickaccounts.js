@@ -3,7 +3,7 @@
  */
 
 function QaHideMsgs() {
-	msg_id = AjaxGetIt('GetVar.php?var=getQaMsgsId');
+	msg_id = AjaxGetIt('QA/GetVar.php?var=getQaMsgsId');
 	timedHide("'" + msg_id + "'", 8000);
 }
 
@@ -16,29 +16,29 @@ function bindQaAccts() {
 	return QaTxnGet();
 }
 
-function QaAccountGet(content_id) {
-	// AjaxIt('QaAccountGet', content_id, '', '', bindQaAccts());
-	AjaxIt('QaAccountGet', content_id);
+function QA_Account_AJAX_Get(content_id) {
+	// AjaxIt('QA_Account_AJAX_Get', content_id, '', '', bindQaAccts());
+	AjaxIt('QA_Account_AJAX_Get', content_id);
 }
 
-function QaAccountAdd(content_id, name_id) {
+function QA_Account_AJAX_Add(content_id, name_id) {
 	var post_data = "name=" + escape(document.getElementById(name_id).value);
-	AjaxIt('QaAccountAdd', content_id, post_data, name_id, bindQaAccts());
+	AjaxIt('QA_Account_AJAX_Add', content_id, post_data, name_id, bindQaAccts());
 }
 
-function QaAccountEdit(content_id, name_id, acct_id) {
+function QA_Account_AJAX_Edit(content_id, name_id, acct_id) {
 	var post_data = "name=" + escape(document.getElementById(name_id).value) + "&acct_id=" + acct_id;
-	AjaxIt('QaAccountEdit', content_id, post_data, name_id, bindQaAccts());
+	AjaxIt('QA_Account_AJAX_Edit', content_id, post_data, name_id, bindQaAccts());
 }
 
-function QaAccountDrop(content_id, acct_id) {
+function QA_Account_AJAX_Drop(content_id, acct_id) {
 	var post_data = "acct_id=" + acct_id;
-	AjaxIt('QaAccountDrop', content_id, post_data, '', bindQaAccts());
+	AjaxIt('QA_Account_AJAX_Drop', content_id, post_data, '', bindQaAccts());
 }
 
-function QaAccountRestore(content_id, acct_id) {
+function QA_Account_AJAX_Restore(content_id, acct_id) {
 	var post_data = "acct_id=" + acct_id;
-	AjaxIt('QaAccountRestore', content_id, post_data, '', bindQaAccts());
+	AjaxIt('QA_Account_AJAX_Restore', content_id, post_data, '', bindQaAccts());
 }
 
 /*

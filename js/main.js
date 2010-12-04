@@ -76,20 +76,24 @@ function confirmSubmit(msg) {
 		return false;
 }
 
-// AjaxIt('myfile.php','main_div','test=1&foo=3','acct_name',function(){});
+// AjaxIt('myfile','main_div','test=1&foo=3','acct_name',function(){});
 function AjaxIt(file, content_id, post_data, focus_id, after_load) {
 	if (post_data) {
 		post_data = "content_id=" + content_id + "&" + post_data;
 	} else {
 		post_data = "content_id=" + content_id;
 	}
-	url = "include/ajax/" + file + ".php";
+	url = "include/" + file.replace("/_/i","/\//" ) + ".php";
+	alert(url);
 	sendPostRequest(url, content_id, post_data, focus_id, after_load);
 }
 
 // AjaxGetIt('myfile.php?test=2');
 function AjaxGetIt(file, focus_id) {
-	url = "include/ajax/" + file;
+	split_file = file.split("?");
+	pop(split_file);
+	alert(pop(split_file));
+	url = "include/" + file;
 	return sendGetRequest(url, focus_id);
 }
 

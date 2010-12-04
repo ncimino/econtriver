@@ -79,7 +79,7 @@ class QA_GroupMembers extends QA_Widget {
 		return $this->DB->query($sql);
 	}
 
-	function buildWidget() {
+	function createWidget() {
 		$this->activeGroups = QA_SelectGroupMembers::getActiveGroups($this->user->getUserId(),$this->DB);
 		$this->contacts = QA_SelectGroupMembers::getContacts($this->user->getUserId(),$this->DB);
 		$divQuickAccounts = new HTML_Fieldset($this->container,self::getFsId(),'manage_title');

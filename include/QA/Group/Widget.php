@@ -1,5 +1,5 @@
 <?php
-class QA_Groups extends QA_Widget {
+class QA_Group_Widget extends QA_Widget {
 	private $activeGroups; // MySQL result
 	private $inactiveGroups; // MySQL result
 	private $parentId;
@@ -164,7 +164,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 		$this->inactiveGroups = $this->DB->query($sql);
 	}
 
-	function buildWidget() {
+	function createWidget() {
 		$this->getActiveGroups();
 		$this->getInactiveGroups();
 		$divQuickAccounts = new HTML_Fieldset($this->container,self::getFsId(),'manage_title');
