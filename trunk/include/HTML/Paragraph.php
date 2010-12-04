@@ -1,7 +1,7 @@
 <?php
-class HTMLParagraph extends HTMLElement {
+class HTML_Paragraph extends HTML_Element {
 	function __construct($parentElement,$data='',$id=NULL,$class=NULL) {
-		parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'p',$data,$id,$class);
+		parent::__construct($parentElement->HTML_Element->ownerDocument,$parentElement->HTML_Element,'p',$data,$id,$class);
 	}
 }
 ?>

@@ -39,8 +39,8 @@ class Normalize {
 			return $value;
 		}
 	}
-	static function innerFragment($HTMLDocument) {
-		$htmlString = $HTMLDocument->saveXML();
+	static function innerFragment($HTML_Document) {
+		$htmlString = $HTML_Document->saveXML();
 		$htmlString = explode('<fragment>',$htmlString);
 		$htmlString = explode('</fragment>',$htmlString[1]);
 		return $htmlString[0];

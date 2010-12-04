@@ -15,22 +15,22 @@ class MainPage {
 
 	function __construct($parentElement,$DB,$siteInfo,$infoMsg,$user) {
 
-		$divMenu = new HTMLDiv($parentElement,self::getQaMenuId(),self::getQaMenuClass());
+		$divMenu = new HTML_Div($parentElement,self::getQaMenuId(),self::getQaMenuClass());
 		self::buildAccountManagementMenu($divMenu);
-		new HTMLDiv($parentElement,self::getQaManageId(),self::getQaManageClass());		
-		new HTMLDiv($parentElement,self::getQaTxnId(),self::getQaTxnClass());
+		new HTML_Div($parentElement,self::getQaManageId(),self::getQaManageClass());		
+		new HTML_Div($parentElement,self::getQaTxnId(),self::getQaTxnClass());
 	}
 	
 	function buildAccountManagementMenu($parentElement) {
 		$aManageAccounts = new HTML_Anchor($parentElement,'#','Manage Accounts','accounts_link');
 		$aManageAccounts->setAttribute('onclick',"QaAccountGet('".self::getQaManageId()."');");
-		new HTMLText($parentElement,' | ');
+		new HTML_Text($parentElement,' | ');
 		$aManageGroups = new HTML_Anchor($parentElement,'#','Manage Groups');
 		$aManageGroups->setAttribute('onclick',"QaGroupGet('".self::getQaManageId()."');");
-		new HTMLText($parentElement,' | ');
+		new HTML_Text($parentElement,' | ');
 		$aAccountSharing = new HTML_Anchor($parentElement,'#','Account Sharing');
 		$aAccountSharing->setAttribute('onclick',"QaSharedAccountsGet('".self::getQaManageId()."');");
-		new HTMLText($parentElement,' | ');
+		new HTML_Text($parentElement,' | ');
 		$aGroupMembership = new HTML_Anchor($parentElement,'#','Group Membership');
 		$aGroupMembership->setAttribute('onclick',"QaGroupMembersGet('".self::getQaManageId()."');");
 	}

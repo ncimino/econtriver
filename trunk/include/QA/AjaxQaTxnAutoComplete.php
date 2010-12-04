@@ -1,12 +1,12 @@
 <?php
-class AjaxQaTxnAutoComplete extends AjaxQaTxns {
+class QA_TxnAutoComplete extends QA_Txns {
 	private $txnAutoCompleteValues;
 	private $txnAutoCompleteValuesSerialized;
 	private $txnAutoCompleteFieldId;
 	
 	function __construct() {
 		parent::__construct($parentId=NULL,$sortId=NULL,$sortDir=NULL,$showAcct=NULL,$showMsgDiv=FALSE);
-		$this->activeAccounts = AjaxQaSelectAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
+		$this->activeAccounts = QA_SelectAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
 	}
 	
 	function setFieldId($id) {
@@ -15,7 +15,7 @@ class AjaxQaTxnAutoComplete extends AjaxQaTxns {
 
 	function pullAutoCompleteValues() {
 		$sql = "SELECT DISTINCT q_txn.{$this->txnAutoCompleteFieldId} FROM q_txn,user,q_acct
-					WHERE (".AjaxQaSelectAccounts::getSqlActiveAccounts($this->activeAccounts,$this->DB).")
+					WHERE (".QA_SelectAccounts::getSqlActiveAccounts($this->activeAccounts,$this->DB).")
 					  AND q_txn.active = 1
 					  AND q_txn.user_id = user.user_id
 					  AND q_txn.acct_id = q_acct.id

@@ -25,32 +25,32 @@ class InfoMsg {
 	public function commitMessages() {
 		if (count($this->messages) > 0 ) {
 			foreach ($this->messages as $index=>$value) {
-				if ($index != 0) { new HTMLBr($this->parentElement); }
+				if ($index != 0) { new HTML_Br($this->parentElement); }
 				if ($value['level']==-1) {
 					$this->parentElement->setAttribute('class',"ui-state-error ui-corner-all");
-					new HTMLText($this->parentElement,"This should not have occurred. Please report this problem: ");
+					new HTML_Text($this->parentElement,"This should not have occurred. Please report this problem: ");
 					new HTML_Anchor($this->parentElement,'bugs.php','Report Bug');
-					new HTMLBr($this->parentElement);
-					$icon = new HTMLSpan($this->parentElement,'','','ui-icon ui-icon-alert');
+					new HTML_Br($this->parentElement);
+					$icon = new HTML_Span($this->parentElement,'','','ui-icon ui-icon-alert');
 					$icon->setAttribute('style','float: left; margin-right: .3em;');
-					new HTMLStrong($this->parentElement,' Fatal Error: ');
+					new HTML_Strong($this->parentElement,' Fatal Error: ');
 				} elseif ($value['level']==0) {
 					$this->parentElement->setAttribute('class',"ui-state-error ui-corner-all");
-					$icon = new HTMLSpan($this->parentElement,'','','ui-icon ui-icon-alert');
+					$icon = new HTML_Span($this->parentElement,'','','ui-icon ui-icon-alert');
 					$icon->setAttribute('style','float: left; margin-right: .3em;');
-					new HTMLStrong($this->parentElement,' Error: ');
+					new HTML_Strong($this->parentElement,' Error: ');
 				} elseif ($value['level']==1) {
 					$this->parentElement->setAttribute('class',"ui-state-highlight ui-corner-all");
-					$icon = new HTMLSpan($this->parentElement,'','','ui-icon ui-icon-info');
+					$icon = new HTML_Span($this->parentElement,'','','ui-icon ui-icon-info');
 					$icon->setAttribute('style','float: left; margin-right: .3em;');
-					new HTMLStrong($this->parentElement,' Warning: ');
+					new HTML_Strong($this->parentElement,' Warning: ');
 				} elseif ($value['level']==2) {
 					$this->parentElement->setAttribute('class',"ui-state-highlight ui-corner-all");
-					$icon = new HTMLSpan($this->parentElement,'','','ui-icon ui-icon-info');
+					$icon = new HTML_Span($this->parentElement,'','','ui-icon ui-icon-info');
 					$icon->setAttribute('style','float: left; margin-right: .3em;');
-					new HTMLStrong($this->parentElement,' Info: ');
+					new HTML_Strong($this->parentElement,' Info: ');
 				}
-				new HTMLText($this->parentElement,$value['message']." ");
+				new HTML_Text($this->parentElement,$value['message']." ");
 				if(!empty($value['link_text'])) { new HTML_Anchor($this->parentElement,$value['link'],$value['link_text']); }
 			}
 			$this->parentElement->setAttribute('style',"display:block;");

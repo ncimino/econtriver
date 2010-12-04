@@ -1,5 +1,5 @@
 <?php
-class AjaxQaTxnNotes extends AjaxQaTxns {
+class QA_TxnNotes extends QA_Txns {
 	private $txnNotes; // MySQL result
 	private $userGroups; // MySQL result
 	private $txnGroupNotes; // MySQL result
@@ -68,7 +68,7 @@ class AjaxQaTxnNotes extends AjaxQaTxns {
 	}
 
 	function buildTxnNotes($parentElement,$parent_txn_id) {
-		$notesDiv = new HTMLDiv($parentElement,'txnn_'.$parent_txn_id,'txnn');
+		$notesDiv = new HTML_Div($parentElement,'txnn_'.$parent_txn_id,'txnn');
 		$list = new UnorderedList($notesDiv,1);
 		$this->buildNotesTab($notesDiv,$this->txnNotes,"Transaction",$tab=1,$parent_txn_id,$list);
 		if ($this->DB->resetRowPointer($this->userGroups)) {
@@ -81,24 +81,24 @@ class AjaxQaTxnNotes extends AjaxQaTxns {
 
 	function buildNotesTab($parentElement,$notesResult,$name,$tabNumber,$parentTxnId,$list) {
 		new HTML_Anchor($list->items[$tabNumber-1],'#tab-'.$parentTxnId.'-'.$tabNumber,$name.' Notes');
-		$notes = new HTMLDiv($parentElement,'tab-'.$parentTxnId.'-'.$tabNumber);
+		$notes = new HTML_Div($parentElement,'tab-'.$parentTxnId.'-'.$tabNumber);
 		if ($this->DB->resetRowPointer($notesResult)) {
 			$txnNoteTable = new Table($notes,$this->DB->num($notesResult)+1,3);
 			$this->buildNotesTitles($txnNoteTable,$row=0);
 			while ($current_note = $this->DB->fetch($notesResult)) {
-				new HTMLText($txnNoteTable->cells[++$row][$col=0],date($this->user->getDateFormat().' g:i:s a',$current_note['posted']));
-				new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['handle']);
-				new HTMLText($txnNoteTable->cells[$row][++$col],$current_note['note']);
+				new HTML_Text($txnNoteTable->cells[++$row][$col=0],date($this->user->getDateFormat().' g:i:s a',$current_note['posted']));
+				new HTML_Text($txnNoteTable->cells[$row][++$col],$current_note['handle']);
+				new HTML_Text($txnNoteTable->cells[$row][++$col],$current_note['note']);
 			}
 		} else {
-			new HTMLText($notes,"There weren't any notes found for {$name}.");
+			new HTML_Text($notes,"There weren't any notes found for {$name}.");
 		}
 	}
 
 	function buildNotesTitles($table,$row) {
-		new HTMLText($table->cells[$row][0],'Date');
-		new HTMLText($table->cells[$row][1],'User');
-		new HTMLText($table->cells[$row][2],'Note');
+		new HTML_Text($table->cells[$row][0],'Date');
+		new HTML_Text($table->cells[$row][1],'User');
+		new HTML_Text($table->cells[$row][2],'Note');
 	}
 }
 ?>

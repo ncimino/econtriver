@@ -1,5 +1,5 @@
 <?php
-class HTMLStylesheet extends HTMLLink {
+class HTML_Stylesheet extends HTML_Link {
 	function __construct($parentElement,$iconLocation) {
 		parent::__construct($parentElement);
 		$this->setAttribute( 'rel', 'stylesheet' );

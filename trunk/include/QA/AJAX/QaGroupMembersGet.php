@@ -1,5 +1,5 @@
 <?php
 require_once '../autoload.php';
-$widget = new AjaxQaGroupMembers($_POST['content_id']);
+$widget = new QA_GroupMembers($_POST['content_id']);
 $widget->buildWidget();
 ?>

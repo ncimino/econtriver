@@ -1,7 +1,7 @@
 <?php
-class HTMLLegend extends HTMLElement {
+class HTML_Legend extends HTML_Element {
 	function __construct($parentElement,$value,$id=NULL,$class=NULL) {
-		parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'legend',$value,$id,$class);
+		parent::__construct($parentElement->HTML_Element->ownerDocument,$parentElement->HTML_Element,'legend',$value,$id,$class);
 	}
 }
 ?>

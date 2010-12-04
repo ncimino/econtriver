@@ -4,7 +4,7 @@ try {
 	$site = new Site('Account Recovery');
 
 	if ($site->user->verifyUser()) {
-		new HTMLText($site->content,'You are logged in.');
+		new HTML_Text($site->content,'You are logged in.');
 	} else {
 		new RecoverAccount($site->content,$site->infoMsg,$site->siteInfo,$site->user);
 	}

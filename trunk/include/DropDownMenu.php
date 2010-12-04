@@ -8,7 +8,7 @@ class DropDownMenu {
 	private $option_selected = FALSE;
 	
 	function __construct($parentElement,$name=NULL,$id=NULL,$class=NULL) {
-		$this->menu = new HTMLSelect($parentElement,$name,$id,$class);
+		$this->menu = new HTML_Select($parentElement,$name,$id,$class);
 	}
 
 	function removeOptionClass($option) {
@@ -38,7 +38,7 @@ class DropDownMenu {
 	}
 	
 	function addOption($innerHTML,$value=NULL,$selected=FALSE,$id=NULL,$class=NULL) {
-		$option = new HTMLOption($this->menu,$innerHTML,$value,$selected,$id,$class);
+		$option = new HTML_Option($this->menu,$innerHTML,$value,$selected,$id,$class);
 		$this->option_selected = ($this->option_selected) ? TRUE : $selected;
 		$this->options[$this->num_options++] = $option;
 		if (!empty($class)) { $option->setClass($class.'_option'); }
@@ -46,14 +46,14 @@ class DropDownMenu {
 	}
 	
 	function addOptGroup($innerHTML,$id=NULL,$class=NULL) {
-		$group = new HTMLOptGroup($this->menu,$innerHTML,$selected,$id,$class);
+		$group = new HTML_OptGroup($this->menu,$innerHTML,$selected,$id,$class);
 		$this->optgroups[$this->num_groups++] = $group;
 		if (!empty($class)) { $group->setClass($class.'_group'); }
 		if (!empty($id)) { $group->setId($id.'_'.$this->num_groups); }
 	}
 	
 	function addOptGroupOption($groupElement,$innerHTML,$value=NULL,$selected=FALSE,$id=NULL,$class=NULL) {
-		$option = new HTMLOption($groupElement,$innerHTML,$value,$selected,$id,$class);
+		$option = new HTML_Option($groupElement,$innerHTML,$value,$selected,$id,$class);
 		$this->option_selected = ($this->option_selected) ? TRUE : $selected;
 		$this->options[$this->num_options++] = $option;
 		if (!empty($class)) { $option->setClass($class.'_option'); }

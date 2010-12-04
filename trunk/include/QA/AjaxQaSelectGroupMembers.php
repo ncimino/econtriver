@@ -1,5 +1,5 @@
 <?php
-class AjaxQaSelectGroupMembers {
+class QA_SelectGroupMembers {
 	
 	function getContact($ownerId,$userId,$db) {
 		$sql = "SELECT id FROM contacts WHERE owner_id='{$ownerId}' AND contact_id='{$userId}';";
@@ -46,7 +46,7 @@ class AjaxQaSelectGroupMembers {
 	}
 	
 	function getAssociatedActiveContactsForAllGroups($userId,$db) {
-		$activeGroupsSql = AjaxQaSelectGroupMembers::getSqlActiveGroups(AjaxQaSelectGroupMembers::getActiveGroups($userId,$db),$db);
+		$activeGroupsSql = QA_SelectGroupMembers::getSqlActiveGroups(QA_SelectGroupMembers::getActiveGroups($userId,$db),$db);
 		$sql = "SELECT q_user_groups.*,user.handle FROM q_user_groups,user
         WHERE ({$activeGroupsSql})
           AND q_user_groups.user_id = user.user_id

@@ -1,5 +1,5 @@
 <?php
-class AjaxQaModifyNotes {
+class QA_ModifyNotes {
 	static function insertTxnNote($parent_txn_id, $note, $user, $db, $editable=TRUE) {
 		$edited = ($editable) ? "null" : "1";
 		$clean_note = Normalize::tags($note);

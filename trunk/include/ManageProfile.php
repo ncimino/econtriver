@@ -47,13 +47,13 @@ class ManageProfile {
 		}
 
 		if (!empty($this->focusId)) {
-			new HTMLScript($parentElement,"document.getElementById(\"" . $this->focusId . "\").focus();");
+			new HTML_Script($parentElement,"document.getElementById(\"" . $this->focusId . "\").focus();");
 		}
 	}
 
 	function buildManagementForm($parentElement) {
-		$formManage = new HTMLForm($parentElement,'profile.php','profile');
-		new HTMLInputHidden($formManage,'profile','1');
+		$formManage = new HTML_Form($parentElement,'profile.php','profile');
+		new HTML_InputHidden($formManage,'profile','1');
 		$TableReg = new Table($formManage,4,2,'profile');
 		$TableReg->table->setAttribute( 'width', '500px' );
 
@@ -63,14 +63,14 @@ class ManageProfile {
 		$userInputs->selectFormat($TableReg->cells[2][1],$TableReg->cells[2][0]);
 		$userInputs->selectTimezone($TableReg->cells[3][1],$TableReg->cells[3][0]);
 
-		new HTMLInputSubmit($formManage,'profile_submit','Update');
-		new HTMLBr($formManage);
-		new HTMLBr($formManage);
+		new HTML_InputSubmit($formManage,'profile_submit','Update');
+		new HTML_Br($formManage);
+		new HTML_Br($formManage);
 	}
 
 	function buildPasswordForm($parentElement) {
-		$formPassword = new HTMLForm($parentElement,'profile.php','profile');
-		new HTMLInputHidden($formPassword,'passwords','1');
+		$formPassword = new HTML_Form($parentElement,'profile.php','profile');
+		new HTML_InputHidden($formPassword,'passwords','1');
 		$TablePas = new Table($formPassword,2,2,'passwords');
 		$TablePas->table->setAttribute( 'width', '500px' );
 
@@ -78,8 +78,8 @@ class ManageProfile {
 		$userInputs->inputPassword($TablePas->cells[0][1],$TablePas->cells[0][0]);
 		$userInputs->inputVerPassword($TablePas->cells[1][1],$TablePas->cells[1][0]);
 
-		new HTMLInputSubmit($formPassword,'passwords_submit','Change Password');
-		new HTMLBr($formPassword);
-		new HTMLBr($formPassword);
+		new HTML_InputSubmit($formPassword,'passwords_submit','Change Password');
+		new HTML_Br($formPassword);
+		new HTML_Br($formPassword);
 	}
 }

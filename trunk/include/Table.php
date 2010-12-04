@@ -8,14 +8,14 @@ class Table {
 	function __construct($parentElement,$num_rows,$num_cols,$id=NULL,$class=NULL) {
 		$this->num_cols = $num_cols;
 		$this->num_rows = $num_rows;
-		$this->table = new HTMLTable($parentElement,$id,$class);
+		$this->table = new HTML_Table($parentElement,$id,$class);
 		for ($i=0;$i<$num_rows;$i++) {
-			$row = new HTMLTr($this->table);
+			$row = new HTML_Tr($this->table);
 			$this->rows[$i] = $row;
 			if (!empty($class)) { $row->setClass($class.'_row'); }
 			if (!empty($id)) { $row->setId($id.'_'.$i); }
 			for ($j=0;$j<$num_cols;$j++) {
-				$this->cells[$i][$j] = new HTMLTd($row);
+				$this->cells[$i][$j] = new HTML_Td($row);
 				if (!empty($class)) { $this->cells[$i][$j]->setClass($class.'_col'); }
 				if (!empty($id)) { $this->cells[$i][$j]->setId($id.'_'.$i.'_'.$j); }
 			}

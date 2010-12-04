@@ -1,5 +1,5 @@
 <?php
-class AjaxQaSharedAccounts extends AjaxQaWidget {
+class QA_SharedAccounts extends QA_Widget {
 	private $ownedAccounts; // MySQL result
 	private $sharedAccounts; // MySQL result
 	private $activeShares; // MySQL result
@@ -114,13 +114,13 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 		$this->getActiveGroups();
 		$this->getSharedAccounts();
 		$this->getOwnedAccounts();
-		$divQuickAccounts = new HTMLFieldset($this->container,self::getFsId(),'manage_title');		
-		$lClose = new HTMLLegend($divQuickAccounts,'Account Sharing');
+		$divQuickAccounts = new HTML_Fieldset($this->container,self::getFsId(),'manage_title');		
+		$lClose = new HTML_Legend($divQuickAccounts,'Account Sharing');
 		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$lClose->setAttribute('title','Close');
 		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
-		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
+		$divClose = new HTML_Span($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$tableSplit = new Table($divQuickAccounts,1,3,'',self::getSplitGroupAcctClass());
 		$this->buildOwnedAccountsTable($tableSplit->cells[0][0]);
 		$this->buildSharedAccountsTable($tableSplit->cells[0][0]);
@@ -131,37 +131,37 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 
 	function buildOwnedAccountsTable($parentElement) {
 		if ($this->DB->num($this->ownedAccounts)>0) {
-			$divOwnedAccounts = new HTMLDiv($parentElement);
+			$divOwnedAccounts = new HTML_Div($parentElement);
 			$this->buildAccountsTable($divOwnedAccounts,'Owned Accounts:',$this->ownedAccounts,true);
 		}
 	}
 
 	function buildSharedAccountsTable($parentElement) {
 		if ($this->DB->num($this->sharedAccounts)>0) {
-			$divSharedAccounts = new HTMLDiv($parentElement);
+			$divSharedAccounts = new HTML_Div($parentElement);
 			$this->buildAccountsTable($divSharedAccounts,'Shared Accounts:',$this->sharedAccounts,false);
 		}
 	}
 
 	function buildAccountsTable($parentElement,$title,$queryResult,$allowEditing) {
-		new HTMLHeading($parentElement,5,$title);
+		new HTML_Heading($parentElement,5,$title);
 		$tableListAccounts = new Table($parentElement,$this->DB->num($queryResult),1);
 		$i = 0;
 		while ($account = $this->DB->fetch($queryResult)) {
 			$inputId = $this->getSharedAcctId().'_'.$account['id'];
 			$inputClass = ($allowEditing) ? $this->getAcctClass().' ui-droppable' : $this->getAcctClass();
-			$inputAccount = new HTMLDiv($tableListAccounts->cells[$i][0],$inputId,$inputClass);
-			new HTMLParagraph($inputAccount,$account['name']);
+			$inputAccount = new HTML_Div($tableListAccounts->cells[$i][0],$inputId,$inputClass);
+			new HTML_Paragraph($inputAccount,$account['name']);
 			$this->getActiveShares($account['id']);
 			while ($group = $this->DB->fetch()) {
 				$groupId = $this->getActiveGrpId().'_'.$group['group_id'];
 				$groupClass = $this->getGrpClass().' ui-draggable sub-item';
-				$sharesDiv = new HTMLDiv($tableListAccounts->cells[$i][0],$groupId,$groupClass);
-				$sharesP = new HTMLParagraph($sharesDiv,$group['name']);
+				$sharesDiv = new HTML_Div($tableListAccounts->cells[$i][0],$groupId,$groupClass);
+				$sharesP = new HTML_Paragraph($sharesDiv,$group['name']);
 				if ($allowEditing) {
 					$sharesA = new HTML_Anchor($sharesP,'#','','','');
 					$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('quick_accounts_manage_div','{$group['group_id']}','{$account['id']}');");
-					$sharesSpan = new HTMLSpan($sharesA,'','','ui-icon ui-icon-circle-close');
+					$sharesSpan = new HTML_Span($sharesA,'','','ui-icon ui-icon-circle-close');
 					$sharesSpan->setStyle('float: right;');
 				}
 			}
@@ -171,27 +171,27 @@ class AjaxQaSharedAccounts extends AjaxQaWidget {
 
 	function buildActiveGroupsTable($parentElement) {
 		if ($this->DB->num($this->activeGroups)>0) {
-			$divGroups = new HTMLDiv($parentElement);
+			$divGroups = new HTML_Div($parentElement);
 			$this->buildGroupsTable($divGroups,'Active Groups:',$this->activeGroups);
 		}
 	}
 
 	function buildContactGroupsTable($parentElement) {
 		if ($this->DB->num($this->contactGroups)>0) {
-			$divGroups = new HTMLDiv($parentElement);
+			$divGroups = new HTML_Div($parentElement);
 			$this->buildGroupsTable($divGroups,'Contacts belong to:',$this->contactGroups);
 		}
 	}
 
 	function buildGroupsTable($parentElement,$title,$queryResult) {
-		new HTMLHeading($parentElement,5,$title);
+		new HTML_Heading($parentElement,5,$title);
 		$tableListGroups = new Table($parentElement,$this->DB->num($queryResult),1);
 		$i = 0;
 		while ($group = $this->DB->fetch($queryResult)) {
 			$inputId = $this->getActiveGrpId().'_'.$group['group_id'];
 			$inputClass = $this->getGrpClass().' ui-draggable';
-			$inputEditGroup = new HTMLDiv($tableListGroups->cells[$i][0],$inputId,$inputClass);
-			new HTMLParagraph($inputEditGroup,$group['name']);
+			$inputEditGroup = new HTML_Div($tableListGroups->cells[$i][0],$inputId,$inputClass);
+			new HTML_Paragraph($inputEditGroup,$group['name']);
 			$i++;
 		}
 	}

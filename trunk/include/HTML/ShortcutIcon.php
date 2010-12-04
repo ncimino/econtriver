@@ -1,5 +1,5 @@
 <?php
-class HTMLShortcutIcon extends HTMLLink {
+class HTML_ShortcutIcon extends HTML_Link {
 	function __construct($parentElement,$iconLocation,$type) {
 		parent::__construct($parentElement);
 		$this->setAttribute( 'rel', 'shortcut icon' );

@@ -1,7 +1,7 @@
 <?php
-class HTMLBr extends HTMLElement {
+class HTML_Br extends HTML_Element {
 	function __construct($parentElement) {
-		parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement,'br');
+		parent::__construct($parentElement->HTML_Element->ownerDocument,$parentElement->HTML_Element,'br');
 	}
 }
 ?>
