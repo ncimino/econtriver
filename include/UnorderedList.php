@@ -4,9 +4,9 @@ class UnorderedList {
 	public $items = array();
 	private $num_items;
 	function __construct($parentElement,$num_items,$id=NULL,$class=NULL) {
-		$this->list = new HTMLUnorderedList($parentElement,$id,$class);
+		$this->list = new HTML_UnorderedList($parentElement,$id,$class);
 		for ($this->num_items=0;$this->num_items<$num_items;$this->num_items++) {
-			$item = new HTMLListItem($this->list);
+			$item = new HTML_ListItem($this->list);
 			$this->items[$this->num_items] = $item;
 			if (!empty($class)) { $item->setClass($class.'_item'); }
 			if (!empty($id)) { $item->setId($id.'_'.$this->num_items); }
@@ -27,7 +27,7 @@ class UnorderedList {
 	}
 
 	function addItem($value='') {
-		$item = new HTMLListItem($this->list,$value);
+		$item = new HTML_ListItem($this->list,$value);
 		$this->items[$this->num_items++] = $item;
 		if (!empty($class)) { $item->setClass($class.'_item'); }
 		if (!empty($id)) { $item->setId($id.'_'.$this->num_items); }

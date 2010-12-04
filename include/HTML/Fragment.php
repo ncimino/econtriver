@@ -1,7 +1,7 @@
 <?php
-class HTMLFragment extends HTMLElement {
-	function __construct($HTMLDocument) {
-		parent::__construct($HTMLDocument,$HTMLDocument->documentElement,'fragment','');
+class HTML_Fragment extends HTML_Element {
+	function __construct($HTML_Document) {
+		parent::__construct($HTML_Document,$HTML_Document->documentElement,'fragment','');
 	}
 }
 ?>

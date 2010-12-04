@@ -8,5 +8,5 @@ CONSTRAINT tag_id PRIMARY KEY(tag_id),
 tag_name varchar(255)
 )";
 
-new db_handler($sql);
+new DB_Handler($sql);
 ?>

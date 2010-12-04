@@ -1,5 +1,5 @@
 <?php
-class AjaxQaGroups extends AjaxQaWidget {
+class QA_Groups extends QA_Widget {
 	private $activeGroups; // MySQL result
 	private $inactiveGroups; // MySQL result
 	private $parentId;
@@ -167,13 +167,13 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 	function buildWidget() {
 		$this->getActiveGroups();
 		$this->getInactiveGroups();
-		$divQuickAccounts = new HTMLFieldset($this->container,self::getFsId(),'manage_title');
-		$lClose = new HTMLLegend($divQuickAccounts,'Group Management');
+		$divQuickAccounts = new HTML_Fieldset($this->container,self::getFsId(),'manage_title');
+		$lClose = new HTML_Legend($divQuickAccounts,'Group Management');
 		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$lClose->setAttribute('title','Close');
 		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
-		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
+		$divClose = new HTML_Span($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$this->buildCreateGroupForm($divQuickAccounts);
 		$this->buildActiveGroupsTable($divQuickAccounts);
 		$this->buildInactiveGroupsTable($divQuickAccounts);
@@ -182,20 +182,20 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 
 	function buildActiveGroupsTable($parentElement) {
 		if ($this->DB->num($this->activeGroups)>0) {
-			$divGroups = new HTMLDiv($parentElement,self::getActiveGrpClass());
+			$divGroups = new HTML_Div($parentElement,self::getActiveGrpClass());
 			$this->buildGroupsTable($divGroups,'Active Groups:',$this->activeGroups,self::getActiveGrpClass());
 		}
 	}
 
 	function buildInactiveGroupsTable($parentElement) {
 		if ($this->DB->num($this->inactiveGroups)>0) {
-			$divGroups = new HTMLDiv($parentElement,self::getInactiveGrpClass());
+			$divGroups = new HTML_Div($parentElement,self::getInactiveGrpClass());
 			$this->buildGroupsTable($divGroups,'Inactive Groups:',$this->inactiveGroups,self::getInactiveGrpClass(),false);
 		}
 	}
 
 	function buildGroupsTable($parentElement,$title,$queryResult,$tableName,$editable=true) {
-		new HTMLHeading($parentElement,5,$title);
+		new HTML_Heading($parentElement,5,$title);
 		$cols = ($editable) ? 3 : 3;
 		$tableListGroups = new Table($parentElement,$this->DB->num($queryResult),$cols,$tableName);
 		$i = 0;
@@ -204,7 +204,7 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 			$inputId = $this->getEditGrpNameInId().'_'.$group['group_id'];
 			$inputName = $this->getEditGrpNameInName().'_'.$group['group_id'];
 
-			$inputEditGroup = new HTMLInputText($tableListGroups->cells[$i][0],$inputName,$groupName,$inputId,$this->getEditGrpNameClass());
+			$inputEditGroup = new HTML_InputText($tableListGroups->cells[$i][0],$inputName,$groupName,$inputId,$this->getEditGrpNameClass());
 			if ($editable) {
 				$aEditGroup = new HTML_Anchor($tableListGroups->cells[$i][1],'#','Edit');
 				$aEditGroup->setAttribute('onclick',"QaGroupEdit('{$this->parentId}','{$inputId}','{$group['group_id']}');");
@@ -222,9 +222,9 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 	}
 
 	function buildCreateGroupForm($parentElement) {
-		$divAddGroup = new HTMLDiv($parentElement,'',$this->getCreateGrpClass());
-		new HTMLHeading($divAddGroup,5,'Add Group:');
-		$inputAddGroup = new HTMLInputText($divAddGroup,$this->getCreateGrpInName(),$this->grpName,$this->getCreateGrpInId(),$this->getCreateGrpClass());
+		$divAddGroup = new HTML_Div($parentElement,'',$this->getCreateGrpClass());
+		new HTML_Heading($divAddGroup,5,'Add Group:');
+		$inputAddGroup = new HTML_InputText($divAddGroup,$this->getCreateGrpInName(),$this->grpName,$this->getCreateGrpInId(),$this->getCreateGrpClass());
 		$inputAddGroup->setAttribute('onkeypress',"enterCall(event,function() {QaGroupAdd('{$this->parentId}','{$this->getCreateGrpInId()}');})");
 		$aAddGroup = new HTML_Anchor($divAddGroup,'#','Add Group');
 		$aAddGroup->setAttribute('onclick',"QaGroupAdd('{$this->parentId}','{$this->getCreateGrpInId()}');");

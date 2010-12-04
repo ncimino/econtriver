@@ -14,7 +14,7 @@ class Site {
     $this->siteInfo = new SiteInfo();
     $this->infoMsg = new InfoMsg();
     $this->user = new User($this->DB,$this->siteInfo,$this->infoMsg);
-    $this->document = HTMLDocument::createHTMLDocument();
+    $this->document = HTML_Document::createHTML_Document();
     $this->head = new Head($this->document,$this->siteInfo);
     $this->body = new Body($this->document,$this->infoMsg,$this->siteInfo,$this->user,$title);
     $this->content = $this->body->divMid;
@@ -24,12 +24,12 @@ class Site {
   }
 
   function replaceTitle($title) {
-    $this->body->title->HTMLElement->nodeValue = $title;
+    $this->body->title->HTML_Element->nodeValue = $title;
   }
 
   function landingPage() {
     $this->replaceTitle('Free Multi-User Account and Investment Management');
-    new HTMLHeading($this->content,4,'Welcome to '.$this->siteInfo->getName().'!');
+    new HTML_Heading($this->content,4,'Welcome to '.$this->siteInfo->getName().'!');
     $content[] = "This site was created to help manage investment and account transactions.
     These account tracking pages allow you to share accounts and grant privileges to other 
     users so that they can add, remove, and change transactions.";
@@ -69,8 +69,8 @@ class Site {
     $content[] = "Please check back often, I will be working on getting the checkbook registry up for the next few weeks.";
     
     foreach($content as $text) { 
-      new HTMLParagraph($this->content,$text);
-      new HTMLBr($this->content);     
+      new HTML_Paragraph($this->content,$text);
+      new HTML_Br($this->content);     
     }
   }
 

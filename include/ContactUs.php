@@ -31,7 +31,7 @@ class RecoverAccount {
 				$resetForm = $this->buildResetForm($parentElement); // Must be set before user methods for errorIds to work
 				if ($this->user->updateUser(false,false)) { // Check if password was valid and updates the user if it was
 					$resetForm->remove();
-					new HTMLText($parentElement,'Password reset successful.');
+					new HTML_Text($parentElement,'Password reset successful.');
 					$this->focusId = NULL;
 				} else {
 					$this->focusId = $this->user->getErrorId();
@@ -58,7 +58,7 @@ class RecoverAccount {
 		}
 
 		if (!empty($this->focusId)) {
-			new HTMLScript($parentElement,"document.getElementById(\"" . $this->focusId . "\").focus();");
+			new HTML_Script($parentElement,"document.getElementById(\"" . $this->focusId . "\").focus();");
 		}
 	}
 
@@ -66,13 +66,13 @@ class RecoverAccount {
 		$this->user->setInputNames('','','reset_password','reset_ver_password');
 		$this->user->setFromPost();
 		$userInputs = new UserInputs($this->user);
-		$formRecover = new HTMLForm($parentElement,'recover.php','reset_password');
-		new HTMLInputHidden($formRecover,'reset',$this->user->getUserId());
-		new HTMLText($formRecover,'Enter the new password here.');
+		$formRecover = new HTML_Form($parentElement,'recover.php','reset_password');
+		new HTML_InputHidden($formRecover,'reset',$this->user->getUserId());
+		new HTML_Text($formRecover,'Enter the new password here.');
 		$tableRecover = new Table($formRecover,2,2,'recover_email');
 		$userInputs->inputPassword($tableRecover->cells[0][1],$tableRecover->cells[0][0]);
 		$userInputs->inputVerPassword($tableRecover->cells[1][1],$tableRecover->cells[1][0]);
-		new HTMLInputSubmit($formRecover,'reset_password_submit','Reset');
+		new HTML_InputSubmit($formRecover,'reset_password_submit','Reset');
 		return $formRecover;
 	}
 
@@ -80,23 +80,23 @@ class RecoverAccount {
 		$this->user->setInputNames('recover_email','recover_email');
 		$this->user->setFromPost();
 		$userInputs = new UserInputs($this->user);
-		$FormRecover = new HTMLForm($parentElement,'recover.php','recover_email');
-		new HTMLInputHidden($FormRecover,'recover','1');
-		new HTMLText($FormRecover,'If you know the email or user name that was last set then enter it here.');
+		$FormRecover = new HTML_Form($parentElement,'recover.php','recover_email');
+		new HTML_InputHidden($FormRecover,'recover','1');
+		new HTML_Text($FormRecover,'If you know the email or user name that was last set then enter it here.');
 		$TableRecover = new Table($FormRecover,1,2,'recover_email');
 		$userInputs->inputEmail($TableRecover->cells[0][1],$TableRecover->cells[0][0],'Email/User Name:');
-		new HTMLInputSubmit($FormRecover,'recover_email_submit','Recover');
+		new HTML_InputSubmit($FormRecover,'recover_email_submit','Recover');
 	}
 
 	function sendRecoveryEmail() {
 		$email = new EmailDocument($this->siteInfo,$this->user,"eContriver - Account Restoration");
 
-		$h4SubTitle = new HTMLHeading($email->content,4,"To recover your account follow the instructions below.");
+		$h4SubTitle = new HTML_Heading($email->content,4,"To recover your account follow the instructions below.");
 		$h4SubTitle->setAttribute('style','color:gray;');
-		new HTMLParagraph($email->content,'Someone has requested that your account password be reset.
+		new HTML_Paragraph($email->content,'Someone has requested that your account password be reset.
     If you did not request this, then discard this email. If you think someone is trying to obtain
     unauthorized access to your account then please send an email to: webmaster@econtriver.com');
-		new HTMLParagraph($email->content,'This link will take you to the account recovery page:');
+		new HTML_Paragraph($email->content,'This link will take you to the account recovery page:');
 
 		$cipher = new Cipher($this->siteInfo->getSalt());
 		$verify1 = $cipher->encrypt($this->user->getPassword());
@@ -104,7 +104,7 @@ class RecoverAccount {
 		$recoveryLink = $this->siteInfo->getSiteHTTP().'/recover.php?recover_id='.$this->user->getUserId().'&verify1='.$verify1.'&verify2='.$verify2;
 		echo "<a href='".$recoveryLink."' >RECOVER NOW</a>\n";
 		new HTML_Anchor($email->content,$recoveryLink,'Recover My Account');
-		new HTMLParagraph($email->content,'Once you follow this link, then enter and verify a new password.  This new password will then be used to login.');
+		new HTML_Paragraph($email->content,'Once you follow this link, then enter and verify a new password.  This new password will then be used to login.');
 
 		$sendEmail = new SendEmail();
 		$sendEmail->addTo($this->user->getEmail());

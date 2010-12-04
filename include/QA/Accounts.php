@@ -1,5 +1,5 @@
 <?php
-class AjaxQaAccounts extends AjaxQaWidget {
+class QA_Accounts extends QA_Widget {
 	private $ownedAccounts; // MySQL result
 	private $sharedAccounts; // MySQL result
 	private $deletedAccounts; // MySQL result
@@ -28,7 +28,7 @@ class AjaxQaAccounts extends AjaxQaWidget {
 
 	function addEntries($name) {
 		if ($escapedName = $this->checkAccountName($name)) {
-			if (AjaxQaModifyAccounts::insertAccount($escapedName,$this->DB) and AjaxQaModifyAccounts::insertOwner($this->DB->lastID(),$this->user->getUserId(),$this->DB)) {
+			if (QA_ModifyAccounts::insertAccount($escapedName,$this->DB) and QA_ModifyAccounts::insertOwner($this->DB->lastID(),$this->user->getUserId(),$this->DB)) {
 				$this->infoMsg->addMessage(2,'Account was successfully created.');
 			}
 		} else {
@@ -38,20 +38,20 @@ class AjaxQaAccounts extends AjaxQaWidget {
 
 	function updateEntries($name,$acctId) {
 		if (!empty($acctId) and $sanitizedName = $this->checkAccountName($name)) {
-			if (AjaxQaModifyAccounts::updateAccount($sanitizedName,$acctId,$this->user->getUserId(),$this->DB)) {
+			if (QA_ModifyAccounts::updateAccount($sanitizedName,$acctId,$this->user->getUserId(),$this->DB)) {
 				$this->infoMsg->addMessage(2,'Account was successfully updated.');
 			}
 		}
 	}
 
 	function dropEntries($acctId) {
-		if (!empty($acctId) and AjaxQaModifyAccounts::dropAccount($acctId,$this->user->getUserId(),$this->DB)) {
+		if (!empty($acctId) and QA_ModifyAccounts::dropAccount($acctId,$this->user->getUserId(),$this->DB)) {
 			$this->infoMsg->addMessage(2,'Account was successfully deleted.');
 		}
 	}
 
 	function restoreEntries($acctId) {
-		if (!empty($acctId) and AjaxQaModifyAccounts::restoreAccount($acctId,$this->user->getUserId(),$this->DB)) {
+		if (!empty($acctId) and QA_ModifyAccounts::restoreAccount($acctId,$this->user->getUserId(),$this->DB)) {
 			$this->infoMsg->addMessage(2,'Account was successfully restored.');
 		}
 	}
@@ -67,16 +67,16 @@ class AjaxQaAccounts extends AjaxQaWidget {
 	}
 
 	function buildWidget() {
-		$this->ownedAccounts = AjaxQaSelectAccounts::getOwnedAccounts($this->user->getUserId(),$this->DB);
-		$this->sharedAccounts = AjaxQaSelectAccounts::getSharedAccounts($this->user->getUserId(),$this->DB);
-		$this->deletedAccounts  = AjaxQaSelectAccounts::getDeletedAccounts($this->user->getUserId(),$this->DB);
-		$divQuickAccounts = new HTMLFieldset($this->container,self::getFsId());
-		$lClose = new HTMLLegend($divQuickAccounts,'Account Management',NULL,'manage_title');
+		$this->ownedAccounts = QA_SelectAccounts::getOwnedAccounts($this->user->getUserId(),$this->DB);
+		$this->sharedAccounts = QA_SelectAccounts::getSharedAccounts($this->user->getUserId(),$this->DB);
+		$this->deletedAccounts  = QA_SelectAccounts::getDeletedAccounts($this->user->getUserId(),$this->DB);
+		$divQuickAccounts = new HTML_Fieldset($this->container,self::getFsId());
+		$lClose = new HTML_Legend($divQuickAccounts,'Account Management',NULL,'manage_title');
 		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$lClose->setAttribute('title','Close');
 		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
-		$divClose = new HTMLSpan($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
+		$divClose = new HTML_Span($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		$this->buildCreateAccountForm($divQuickAccounts);
 		$this->buildOwnedAccountsTable($divQuickAccounts);
 		$this->buildSharedAccountsTable($divQuickAccounts);
@@ -86,37 +86,37 @@ class AjaxQaAccounts extends AjaxQaWidget {
 
 	function buildOwnedAccountsTable($parentElement) {
 		if ($this->DB->num($this->ownedAccounts)>0) {
-			$divOwnedAccounts = new HTMLDiv($parentElement,'',self::getOwnedAcctClass());
+			$divOwnedAccounts = new HTML_Div($parentElement,'',self::getOwnedAcctClass());
 			$this->buildAccountsTable($divOwnedAccounts,'Owned Accounts:',$this->ownedAccounts,self::getOwnedAcctClass());
 		}
 	}
 
 	function buildSharedAccountsTable($parentElement) {
 		if ($this->DB->num($this->sharedAccounts)>0) {
-			$divSharedAccounts = new HTMLDiv($parentElement,'',self::getSharedAcctClass());
+			$divSharedAccounts = new HTML_Div($parentElement,'',self::getSharedAcctClass());
 			$this->buildAccountsTable($divSharedAccounts,'Shared Accounts:',$this->sharedAccounts,self::getSharedAcctClass(),false);
 		}
 	}
 
 	function buildDeletedAccountsTable($parentElement) {
 		if ($this->DB->num($this->deletedAccounts)>0) {
-			$divOwnedAccounts = new HTMLDiv($parentElement,'',self::getDeletedAcctClass());
+			$divOwnedAccounts = new HTML_Div($parentElement,'',self::getDeletedAcctClass());
 			$this->buildAccountsTable($divOwnedAccounts,'Deleted Accounts:',$this->deletedAccounts,self::getDeletedAcctClass(),false,true);
 		}
 	}
 
 	function buildAccountsTable($parentElement,$title,$queryResult,$tableName,$editable=true,$restorable=false) {
-		new HTMLHeading($parentElement,5,$title);
+		new HTML_Heading($parentElement,5,$title);
 		$cols = ($restorable) ? 2 : 1;
 		$cols = ($editable) ? 3 : $cols;
 		$tableListAccounts = new Table($parentElement,$this->DB->num($queryResult),$cols,$tableName);
 		$i = 0;
 		while ($account = $this->DB->fetch($queryResult)) {
-			$accountName = (empty($account['name'])) ? AjaxQaSelectAccounts::getAccountNameById($this->getEditAcctId(),$this) : $account['name'];
+			$accountName = (empty($account['name'])) ? QA_SelectAccounts::getAccountNameById($this->getEditAcctId(),$this) : $account['name'];
 			$inputId = $this->getEditAcctNameInId().'_'.$account['id'];
 			$inputName = $this->getEditAcctNameInName().'_'.$account['id'];
 
-			$inputEditAccount = new HTMLInputText($tableListAccounts->cells[$i][0],$inputName,$accountName,$inputId,$this->getEditAcctNameClass());
+			$inputEditAccount = new HTML_InputText($tableListAccounts->cells[$i][0],$inputName,$accountName,$inputId,$this->getEditAcctNameClass());
 			if ($editable) {
 				$jsEdit = "QaAccountEdit('{$this->parentId}','{$inputId}','{$account['id']}');";
 				$jsDrop = "if(confirmSubmit('Are you sure you want to delete the \'".$account['name']."\' account?')) { QaAccountDrop('{$this->parentId}','{$account['id']}'); }";
@@ -137,9 +137,9 @@ class AjaxQaAccounts extends AjaxQaWidget {
 	}
 
 	function buildCreateAccountForm($parentElement) {
-		$divAddAccount = new HTMLDiv($parentElement,'',$this->getCreateAcctClass());
-		new HTMLHeading($divAddAccount,5,'Add Account:');
-		$inputAddAccount = new HTMLInputText($divAddAccount,$this->getCreateAcctInName(),$this->acctName,$this->getCreateAcctInId(),$this->getCreateAcctClass());
+		$divAddAccount = new HTML_Div($parentElement,'',$this->getCreateAcctClass());
+		new HTML_Heading($divAddAccount,5,'Add Account:');
+		$inputAddAccount = new HTML_InputText($divAddAccount,$this->getCreateAcctInName(),$this->acctName,$this->getCreateAcctInId(),$this->getCreateAcctClass());
 		$inputAddAccount->setAttribute('onkeypress',"enterCall(event,function() {QaAccountAdd('{$this->parentId}','{$this->getCreateAcctInId()}');})");
 		$aAddAccount = new HTML_Anchor($divAddAccount,'#','Add Account');
 		$aAddAccount->setAttribute('onclick',"QaAccountAdd('{$this->parentId}','{$this->getCreateAcctInId()}');");

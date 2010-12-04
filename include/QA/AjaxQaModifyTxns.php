@@ -1,5 +1,5 @@
 <?php
-class AjaxQaModifyTxns {
+class QA_ModifyTxns {
 	static function makeTxnInactive($current_txn_id,$db) {
 		$sql = "UPDATE q_txn SET active = 0 WHERE q_txn.id = $current_txn_id;";
 		return $db->query($sql);

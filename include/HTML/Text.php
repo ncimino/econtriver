@@ -1,9 +1,9 @@
 <?php
-class HTMLText extends HTMLElement {
+class HTML_Text extends HTML_Element {
 	function __construct($parentElement,$data) {
-		parent::__construct($parentElement->HTMLElement->ownerDocument,$parentElement->HTMLElement);
-		$textNode = $this->createTextNode($parentElement->HTMLElement->ownerDocument,$data);
-		$parentElement->HTMLElement->appendChild($textNode);
+		parent::__construct($parentElement->HTML_Element->ownerDocument,$parentElement->HTML_Element);
+		$textNode = $this->createTextNode($parentElement->HTML_Element->ownerDocument,$data);
+		$parentElement->HTML_Element->appendChild($textNode);
 	}
 }
 ?>

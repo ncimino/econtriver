@@ -1,5 +1,5 @@
 <?php
-class AjaxQaModifyAccounts {
+class QA_ModifyAccounts {
 	static function insertAccount($acctName,$db) {
 		$accountNameEscaped = Normalize::mysql($acctName);
 		$sql = "INSERT INTO q_acct (name,active)

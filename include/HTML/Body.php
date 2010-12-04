@@ -1,7 +1,7 @@
 <?php
-class HTMLBody extends HTMLElement {
-	function __construct($HTMLDocument) {
-		parent::__construct($HTMLDocument,$HTMLDocument->documentElement,'body','');
+class HTML_Body extends HTML_Element {
+	function __construct($HTML_Document) {
+		parent::__construct($HTML_Document,$HTML_Document->documentElement,'body','');
 	}
 }
 ?>

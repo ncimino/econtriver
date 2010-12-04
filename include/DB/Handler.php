@@ -1,5 +1,5 @@
 <?php
-class db_handler {
+class DB_Handler {
 	private $sql;
 	private $db;
 	

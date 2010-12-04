@@ -1,5 +1,5 @@
 <?php
-class AjaxQaSelectTxns {
+class QA_SelectTxns {
 
 	function getTxnParentId($current_txn_id,$db) {
 		$sql = "SELECT parent_txn_id FROM q_txn

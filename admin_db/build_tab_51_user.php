@@ -15,6 +15,6 @@ date_format varchar(255) NOT NULL,
 active int(1) NOT NULL
 )";
 
-new db_handler($sql);
+new DB_Handler($sql);
 
 ?>

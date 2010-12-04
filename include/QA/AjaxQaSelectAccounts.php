@@ -1,5 +1,5 @@
 <?php
-class AjaxQaSelectAccounts {
+class QA_SelectAccounts {
 
 	function getAccountNameById($id,$db,$allowAllAccounts=FALSE) {
 		if (self::isAcctUserGroup($id)) { //:KLUDGE: Checks to see if user was selected
@@ -103,11 +103,11 @@ class AjaxQaSelectAccounts {
 
 	function getSqlAcctsToShow($showAcct=FALSE,$activeAccountsResult,$userId,$db) {
 		if (self::isAcctUserGroup($showAcct)) { //:KLUDGE: Checks to see if user was selected
-			$acctsToShow = AjaxQaSelectAccounts::getSqlActiveSharedAccountsByOwner(self::extractUserId($showAcct),$activeAccountsResult,$db);
+			$acctsToShow = QA_SelectAccounts::getSqlActiveSharedAccountsByOwner(self::extractUserId($showAcct),$activeAccountsResult,$db);
 		} elseif ($showAcct) {
 			$acctsToShow = "q_txn.acct_id = ".$showAcct;
 		} else {
-			$acctsToShow = AjaxQaSelectAccounts::getSqlActiveAccounts($activeAccountsResult,$db);
+			$acctsToShow = QA_SelectAccounts::getSqlActiveAccounts($activeAccountsResult,$db);
 		}
 		return $acctsToShow;
 	}

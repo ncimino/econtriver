@@ -1,5 +1,5 @@
 <?php
-abstract class AjaxQaWidget {
+abstract class QA_Widget {
 	protected $tabIndex;
 	protected $DB;
 	protected $siteInfo;
@@ -20,10 +20,10 @@ abstract class AjaxQaWidget {
 		$this->siteInfo = new SiteInfo();
 		$this->infoMsg = new InfoMsg();
 		$this->user = new User($this->DB,$this->siteInfo,$this->infoMsg);
-		$this->document = HTMLDocument::createHTMLDocument();
-		$this->container = new HTMLFragment($this->document);
+		$this->document = HTML_Document::createHTML_Document();
+		$this->container = new HTML_Fragment($this->document);
 		if ($this->show_msg_div) {
-			$divInfoMsg = new HTMLDiv($this->container,self::getQaMsgsId(),self::getQaMsgsClass());
+			$divInfoMsg = new HTML_Div($this->container,self::getQaMsgsId(),self::getQaMsgsClass());
 			$this->infoMsg->commitDiv($divInfoMsg);
 		}
 	}

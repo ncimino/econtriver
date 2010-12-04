@@ -1,5 +1,5 @@
 <?php
-class AjaxQaTxns extends AjaxQaWidget {
+class QA_Txns extends QA_Widget {
 	protected $activeAccounts; // MySQL result
 	protected $ownedAccounts; // MySQL result
 	protected $sqlAcctsToShow; // SQL syntax
@@ -74,23 +74,23 @@ class AjaxQaTxns extends AjaxQaWidget {
 			$nextSortDir = ($this->sortDir == 'DESC') ? 'ASC' : 'DESC';
 			$link = new HTML_Anchor($parentElement,"#",'',$id,'txn_title');
 			$curArrow = ($this->sortDir == 'DESC') ? 'ui-icon ui-icon-carat-1-s ui-float-right' : 'ui-icon ui-icon-carat-1-n ui-float-right';
-			new HTMLSpan($link,'',$id.'_'.$this->sortDir,$curArrow);
+			new HTML_Span($link,'',$id.'_'.$this->sortDir,$curArrow);
 		} else {
 			$link = new HTML_Anchor($parentElement,"#",'',$id,'txn_title');
 		}
-		new HTMLText($link,$title);
+		new HTML_Text($link,$title);
 	}
 
 	function dropEntries($active_txn_id, $log, $current_txn_id=FALSE) {
-		if (AjaxQaModifyTxns::makeTxnInactive($active_txn_id,$this->DB)) {
+		if (QA_ModifyTxns::makeTxnInactive($active_txn_id,$this->DB)) {
 			if ($current_txn_id) { // If current_txn_id is defined, then the transaction was made active
 				// This occurs when restoring a previous revision of the same transaction. The current must be made inactive.
 				//$this->infoMsg->addMessage(2,'Transaction was successfully made active.');
 			} else {
 				$this->infoMsg->addMessage(2,'Transaction was successfully moved to the trash bin.');
 				if ($log == 'true') {
-					$parent_txn_id = AjaxQaSelectTxns::getTxnParentId($active_txn_id,$this->DB);
-					AjaxQaModifyNotes::insertTxnNote($parent_txn_id, "Deleted Transaction", $this->user, $this->DB, FALSE);
+					$parent_txn_id = QA_SelectTxns::getTxnParentId($active_txn_id,$this->DB);
+					QA_ModifyNotes::insertTxnNote($parent_txn_id, "Deleted Transaction", $this->user, $this->DB, FALSE);
 				}
 			}
 		} else {
@@ -99,66 +99,66 @@ class AjaxQaTxns extends AjaxQaWidget {
 	}
 
 	function restoreEntries($current_txn_id) {
-		if (AjaxQaModifyTxns::makeTxnActive($current_txn_id,$this->DB)) {
+		if (QA_ModifyTxns::makeTxnActive($current_txn_id,$this->DB)) {
 			$this->infoMsg->addMessage(2,'Transaction was successfully restored.');
-			$parent_txn_id = AjaxQaSelectTxns::getTxnParentId($current_txn_id,$this->DB);
-			AjaxQaModifyNotes::insertTxnNote($parent_txn_id, "Restored Transaction", $this->user, $user->DB, FALSE);
+			$parent_txn_id = QA_SelectTxns::getTxnParentId($current_txn_id,$this->DB);
+			QA_ModifyNotes::insertTxnNote($parent_txn_id, "Restored Transaction", $this->user, $user->DB, FALSE);
 		} else {
 			$this->infoMsg->addMessage(-1,'An unexpected error occurred while trying to restore the transaction.');
 		}
 	}
 
 	function buildWidget() {
-		$this->activeAccounts = AjaxQaSelectAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
-		$this->ownedAccounts = AjaxQaSelectAccounts::getOwnedAccounts($this->user->getUserId(),$this->DB);
-		$this->sqlAcctsToShow = AjaxQaSelectAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);
+		$this->activeAccounts = QA_SelectAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
+		$this->ownedAccounts = QA_SelectAccounts::getOwnedAccounts($this->user->getUserId(),$this->DB);
+		$this->sqlAcctsToShow = QA_SelectAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);
 		if ($this->DB->num($this->activeAccounts)) {
 			$this->buildActions();
 			$this->buildTxnsTable();
 		} else {
-			new HTMLText($this->container,'There are no active accounts. You must have an active account before you can add transactions.');
+			new HTML_Text($this->container,'There are no active accounts. You must have an active account before you can add transactions.');
 		}
 		$this->printHTML();
 	}
 
 	function buildActions() {
-		$divActions = new HTMLDiv($this->container,'txn_actions_id','txn_actions');
+		$divActions = new HTML_Div($this->container,'txn_actions_id','txn_actions');
 		$jsDateFormat = ($this->user->getDateFormat() == "Y-m-d") ? "yy-mm-dd" : "mm/dd/yy"; // else "m/d/Y"
-		new HTMLInputHidden($divActions,'date_format',$jsDateFormat,'date_format');
+		new HTML_InputHidden($divActions,'date_format',$jsDateFormat,'date_format');
 		$this->buildActionsAcctsDropDown($divActions,'show_acct','show_acct',NULL,$this->showAcct);
 		$this->buildActionsTray($divActions);
-		$divActionContent = new HTMLDiv($divActions,'txn_actions_content');
+		$divActionContent = new HTML_Div($divActions,'txn_actions_content');
 		$divActionContent->setAttribute('style','display:none;');
 	}
 
 	function buildActionsTray($parentElement) {
-		$divActionButtons = new HTMLDiv($parentElement,'txn_actions_buttons');
+		$divActionButtons = new HTML_Div($parentElement,'txn_actions_buttons');
 		$divActionButtons->setStyle('float: right;');
 
-		$h3Actions = new HTMLHeading($divActionButtons,5,'Actions: ');
+		$h3Actions = new HTML_Heading($divActionButtons,5,'Actions: ');
 		$h3Actions->setStyle('float: left;margin: 2px;padding 0px;');
 
 		$trashTxn = new HTML_Anchor($divActionButtons,'#','','txn_show_trash_anchor','txn_show_trash');
 		$trashTxn->setTitle('Trash Bin');
-		new HTMLSpan($trashTxn,'','txn_show_trash','ui-icon ui-icon-trash ui-float-right');
+		new HTML_Span($trashTxn,'','txn_show_trash','ui-icon ui-icon-trash ui-float-right');
 
 		$printTxn = new HTML_Anchor($divActionButtons,'#','','txn_print_anchor');
 		$printTxn->setTitle('Open Print View');
-		new HTMLSpan($printTxn,'','txn_print','ui-icon-inactive ui-icon-print ui-float-right');
+		new HTML_Span($printTxn,'','txn_print','ui-icon-inactive ui-icon-print ui-float-right');
 
 		$overviewTxn = new HTML_Anchor($divActionButtons,'#','','txn_show_overview_anchor','txn_show_overview');
 		$overviewTxn->setTitle('Show Overview');
-		new HTMLSpan($overviewTxn,'','txn_show_overview','ui-icon-inactive ui-icon-clipboard ui-float-right');
+		new HTML_Span($overviewTxn,'','txn_show_overview','ui-icon-inactive ui-icon-clipboard ui-float-right');
 	}
 
 	function buildActionsAcctsDropDown($parentElement,$name=NULL,$id=NULL,$class=NULL,$selectedAcct=NULL) {
-		$h3View = new HTMLHeading($parentElement,5,'View Account: ');
+		$h3View = new HTML_Heading($parentElement,5,'View Account: ');
 		$h3View->setStyle('float: left;margin: 4px;padding 0px;');
 		$allAccountsIndex = 0;
 		$selectAcctMenu = new DropDownMenu($parentElement,$name,$id,$class);
 		$selectAcctMenu->addOption('All Accounts',$allAccountsIndex,($allAccountsIndex === $selectedAcct),NULL,'dropdown_group');
 		$this->buildActionAcctsForDropDown($selectAcctMenu,'My Accounts',$this->user->getUserId(),'u'.$this->user->getUserId(),$selectedAcct);
-		$activeContacts = AjaxQaSelectGroupMembers::getAssociatedActiveContactsForAllGroups($this->user->getUserId(),$this->DB);
+		$activeContacts = QA_SelectGroupMembers::getAssociatedActiveContactsForAllGroups($this->user->getUserId(),$this->DB);
 		while($result = $this->DB->fetch($activeContacts)) {
 			if ($this->user->getUserId() != $result['user_id']) {
 				$this->buildActionAcctsForDropDown($selectAcctMenu,$result['handle'].'\'s Accounts',$result['user_id'],'u'.$result['user_id'],$selectedAcct);
@@ -168,7 +168,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 	function buildActionAcctsForDropDown($selectAcctMenu,$groupName,$userId,$groupId,$selectedAcct) {
 		$allAccountsIndex = 0;
-		$ownedAccountsForUser = AjaxQaSelectAccounts::getSharedAccountsForOwner($userId,$this->user->getUserId(),$this->DB);
+		$ownedAccountsForUser = QA_SelectAccounts::getSharedAccountsForOwner($userId,$this->user->getUserId(),$this->DB);
 		if (($userId == $this->user->getUserId()) or ($this->DB->num($ownedAccountsForUser))) {
 			$selectAcctMenu->addOption($groupName,$groupId,($selectedAcct == $groupId),NULL,'dropdown_group');
 			$this->DB->resetRowPointer($this->activeAccounts);
@@ -184,7 +184,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$allAccountsIndex = 0;
 		$selectAcctMenu = new DropDownMenu($parentElement,$name,$id,$class);
 		$accountSelected = $this->buildAcctsForDropDown($selectAcctMenu,'My Accounts',$this->user->getUserId(),'u'.$this->user->getUserId(),$selectedAcct);
-		$activeContacts = AjaxQaSelectGroupMembers::getAssociatedActiveContactsForAllGroups($this->user->getUserId(),$this->DB);
+		$activeContacts = QA_SelectGroupMembers::getAssociatedActiveContactsForAllGroups($this->user->getUserId(),$this->DB);
 		while($result = $this->DB->fetch($activeContacts)) {
 			if ($this->user->getUserId() != $result['user_id']) {
 				$this->buildAcctsForDropDown($selectAcctMenu,$result['handle'].'\'s Accounts',$result['user_id'],'u'.$result['user_id'],$selectedAcct);
@@ -207,10 +207,10 @@ class AjaxQaTxns extends AjaxQaWidget {
 	}
 
 	function buildTxnsTable() {
-		$divNew = new HTMLDiv($this->container,'txn_id','txn');
-		$this->activeTxns = AjaxQaSelectTxns::getTxns($this->sqlAcctsToShow,$this->sortField,$this->sortDir,$this->DB);
-		$this->activeTxnsSum = AjaxQaSelectTxns::getTxnsSum($this->sqlAcctsToShow,$this->DB);
-		$this->activeTxnsBankSaysSum = AjaxQaSelectTxns::getTxnsBankSaysSum($this->sqlAcctsToShow,$this->DB);
+		$divNew = new HTML_Div($this->container,'txn_id','txn');
+		$this->activeTxns = QA_SelectTxns::getTxns($this->sqlAcctsToShow,$this->sortField,$this->sortDir,$this->DB);
+		$this->activeTxnsSum = QA_SelectTxns::getTxnsSum($this->sqlAcctsToShow,$this->DB);
+		$this->activeTxnsBankSaysSum = QA_SelectTxns::getTxnsBankSaysSum($this->sqlAcctsToShow,$this->DB);
 		$rows = $this->DB->num($this->activeTxns) * 3 + 2;
 		$tableTxn = new Table($divNew,$rows,12,'txn_table','txn');
 		$this->buildTxnTitles($tableTxn,0);
@@ -230,9 +230,9 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Note','q_txn.note',$this->convIdToField('q_txn.note'));
 		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Credit','q_txn.credit',$this->convIdToField('q_txn.credit'));
 		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Debit','q_txn.debit',$this->convIdToField('q_txn.debit'));
-		new HTMLText($tableTxn->cells[$row][$col++],'Balance');
+		new HTML_Text($tableTxn->cells[$row][$col++],'Balance');
 		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Bank Says','q_txn.banksays',$this->convIdToField('q_txn.banksays')); //:BUG:Fixes issue 42
-		new HTMLText($tableTxn->cells[$row][$col++],'Actions');
+		new HTML_Text($tableTxn->cells[$row][$col++],'Actions');
 	}
 
 	function buildNewTxns($tableTxn,$row) {
@@ -240,39 +240,39 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$selectedAcct = ($this->newTxnValues['acct']) ? $this->newTxnValues['acct'] : $this->showAcct; // If a txn was entered use that
 		$account_dd = $this->buildAcctsDropDown($tableTxn->cells[$row][$col++],'new_txn_acct','new_txn_acct','txn_input',$selectedAcct);
 		$this->tabIndex->add($account_dd);
-		new HTMLText($tableTxn->cells[$row][$col++],'-'); // User
-		new HTMLText($tableTxn->cells[$row][$col++],'-'); // Entered
-		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_date',$this->newTxnValues['date'],'new_txn_date','dateselection txn_input');
+		new HTML_Text($tableTxn->cells[$row][$col++],'-'); // User
+		new HTML_Text($tableTxn->cells[$row][$col++],'-'); // Entered
+		$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'new_txn_date',$this->newTxnValues['date'],'new_txn_date','dateselection txn_input');
 		$this->tabIndex->add($txn_current_tag);
-		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_type',$this->newTxnValues['type'],'new_txn_type','txn_input autocomplete_type');
+		$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'new_txn_type',$this->newTxnValues['type'],'new_txn_type','txn_input autocomplete_type');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_establishment\')');
 		$this->tabIndex->add($txn_current_tag);
-		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_establishment',$this->newTxnValues['establishment'],'new_txn_establishment','txn_input autocomplete_establishment');
+		$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'new_txn_establishment',$this->newTxnValues['establishment'],'new_txn_establishment','txn_input autocomplete_establishment');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_note\')');
 		$this->tabIndex->add($txn_current_tag);
-		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_note',$this->newTxnValues['note'],'new_txn_note','txn_input autocomplete_note');
+		$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'new_txn_note',$this->newTxnValues['note'],'new_txn_note','txn_input autocomplete_note');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_credit\')');
 		$this->tabIndex->add($txn_current_tag);
-		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_credit',$this->newTxnValues['credit'],'new_txn_credit','txn_input credit');
+		$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'new_txn_credit',$this->newTxnValues['credit'],'new_txn_credit','txn_input credit');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_debit\')');
 		$this->tabIndex->add($txn_current_tag);
-		$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'new_txn_debit',$this->newTxnValues['debit'],'new_txn_debit','txn_input debit');
+		$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'new_txn_debit',$this->newTxnValues['debit'],'new_txn_debit','txn_input debit');
 		$txn_current_tag->setAttribute('onkeyup','enterFocus(event,\'new_txn_submit\')');
 		$this->tabIndex->add($txn_current_tag);
-		new HTMLText($tableTxn->cells[$row][$col++],'-'); // Balance
-		new HTMLText($tableTxn->cells[$row][$col++],'-'); // Bank Says
+		new HTML_Text($tableTxn->cells[$row][$col++],'-'); // Balance
+		new HTML_Text($tableTxn->cells[$row][$col++],'-'); // Bank Says
 
 		/*ACTIONS*/
 
 		$submitNew = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_add');
 		//$submitNew->setAttribute('onkeyup','enterCall(event,function() {QaTxnAdd(\'new_txn_\');})');
 		$submitNew->setTitle("Add");
-		$submitNewSpan = new HTMLSpan($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick ui-float-left');
+		$submitNewSpan = new HTML_Span($submitNew,'','new_txn_submit','ui-icon ui-icon-plusthick ui-float-left');
 		$this->tabIndex->add($submitNewSpan);
 
 		$splitNew = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_split');
 		$splitNew->setTitle("Transfer");
-		$splitNewSpan = new HTMLSpan($splitNew,'','new_txn_split','ui-icon ui-icon-transferthick-e-w ui-float-left');
+		$splitNewSpan = new HTML_Span($splitNew,'','new_txn_split','ui-icon ui-icon-transferthick-e-w ui-float-left');
 		$this->tabIndex->add($splitNewSpan);
 	}
 
@@ -288,35 +288,35 @@ class AjaxQaTxns extends AjaxQaWidget {
 				$this->tabIndex->add($account_dd);
 
 				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable');
-				new HTMLText($tableTxn->cells[$row][$col++],$txn['handle']);
+				new HTML_Text($tableTxn->cells[$row][$col++],$txn['handle']);
 
 				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' non_editable number');
-				new HTMLText($tableTxn->cells[$row][$col++],date($this->user->getDateFormat(),$txn['entered']));
+				new HTML_Text($tableTxn->cells[$row][$col++],date($this->user->getDateFormat(),$txn['entered']));
 
-				$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'txn_date_'.$txn['id'],date($this->user->getDateFormat(),$txn['date']),'txn_date_'.$txn['id'],'dateselection txn_input number');
+				$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'txn_date_'.$txn['id'],date($this->user->getDateFormat(),$txn['date']),'txn_date_'.$txn['id'],'dateselection txn_input number');
 				$this->tabIndex->add($txn_current_tag);
-				$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'txn_type_'.$txn['id'],$txn['type'],'txn_type_'.$txn['id'],'txn_input');
+				$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'txn_type_'.$txn['id'],$txn['type'],'txn_type_'.$txn['id'],'txn_input');
 				$this->tabIndex->add($txn_current_tag);
-				$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'txn_establishment_'.$txn['id'],$txn['establishment'],'txn_establishment_'.$txn['id'],'txn_input');
+				$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'txn_establishment_'.$txn['id'],$txn['establishment'],'txn_establishment_'.$txn['id'],'txn_input');
 				$this->tabIndex->add($txn_current_tag);
-				$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'txn_note_'.$txn['id'],$txn['note'],'txn_note_'.$txn['id'],'txn_input');
+				$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'txn_note_'.$txn['id'],$txn['note'],'txn_note_'.$txn['id'],'txn_input');
 				$this->tabIndex->add($txn_current_tag);
-				$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'txn_credit_'.$txn['id'],$txn['credit'],'txn_credit_'.$txn['id'],'txn_input number credit');
+				$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'txn_credit_'.$txn['id'],$txn['credit'],'txn_credit_'.$txn['id'],'txn_input number credit');
 				$this->tabIndex->add($txn_current_tag);
-				$txn_current_tag = new HTMLInputText($tableTxn->cells[$row][$col++],'txn_debit_'.$txn['id'],$txn['debit'],'txn_debit_'.$txn['id'],'txn_input number debit');
+				$txn_current_tag = new HTML_InputText($tableTxn->cells[$row][$col++],'txn_debit_'.$txn['id'],$txn['debit'],'txn_debit_'.$txn['id'],'txn_input number debit');
 				$this->tabIndex->add($txn_current_tag);
 
 				$posNeg = (round($currentBalance,2)>=0) ? ' positive' : ' negative';
 				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' number balance'.$posNeg);
-				new HTMLText($tableTxn->cells[$row][$col++],number_format(round($currentBalance,2),2));
+				new HTML_Text($tableTxn->cells[$row][$col++],number_format(round($currentBalance,2),2));
 
 				$posNeg = (round($currentBankSays,2)>=0) ? ' positive' : ' negative';
 				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' number bank_says'.$posNeg);
 				$checked = ($txn['banksays']) ? TRUE : FALSE;
-				$banksays_cb = new HTMLInputCheckbox($tableTxn->cells[$row][$col],'txn_banksays_'.$txn['id'],'txn_banksays_'.$txn['id'],'txn_banksays_check',$checked);
+				$banksays_cb = new HTML_InputCheckbox($tableTxn->cells[$row][$col],'txn_banksays_'.$txn['id'],'txn_banksays_'.$txn['id'],'txn_banksays_check',$checked);
 				$this->tabIndex->add($banksays_cb);
 				$parent_id = ($txn['parent_txn_id']) ? $txn['parent_txn_id'] : $txn['id'];
-				new HTMLText($tableTxn->cells[$row][$col++],number_format(round($currentBankSays,2),2));
+				new HTML_Text($tableTxn->cells[$row][$col++],number_format(round($currentBankSays,2),2));
 
 				$currentBalance = $currentBalance + $txn['debit'] - $txn['credit'];
 				if ($checked) $currentBankSays = $currentBankSays + $txn['debit'] - $txn['credit'];
@@ -325,31 +325,31 @@ class AjaxQaTxns extends AjaxQaWidget {
 
 				$saveTxn = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_save_anchor_'.$txn['id'],'');
 				$saveTxn->setTitle('Save');
-				$iconSpan = new HTMLSpan($saveTxn,'','txn_save_'.$txn['id'],'ui-icon-inactive ui-icon-disk ui-float-left');
+				$iconSpan = new HTML_Span($saveTxn,'','txn_save_'.$txn['id'],'ui-icon-inactive ui-icon-disk ui-float-left');
 				$this->tabIndex->add($iconSpan);
 
 				$tableTxn->cells[$row][$col]->setClass($tableTxn->cells[$row][$col]->getClass().' per_txn_actions');
 				if ($txn['id'] != $txn['parent_txn_id']) {
 					$showHistory = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_show_history_anchor_'.$txn['id'],'txn_show_history');
-					$iconSpan = new HTMLSpan($showHistory,'','txn_show_history_'.$txn['id'],'ui-icon ui-icon-clock ui-float-left');
+					$iconSpan = new HTML_Span($showHistory,'','txn_show_history_'.$txn['id'],'ui-icon ui-icon-clock ui-float-left');
 				} else {
 					$showHistory = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','');
-					$iconSpan = new HTMLSpan($showHistory,'','txn_show_history_'.$txn['id'],'ui-icon-inactive ui-icon-clock ui-float-left');
+					$iconSpan = new HTML_Span($showHistory,'','txn_show_history_'.$txn['id'],'ui-icon-inactive ui-icon-clock ui-float-left');
 				}
 				$showHistory->setTitle('History');
 				$this->tabIndex->add($iconSpan);
 
 				$showNotes = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_show_notes_'.$txn['id'],'txn_show_notes');
 				$showNotes->setTitle('Notes');
-				$iconSpan = new HTMLSpan($showNotes,'','txn_show_notes_'.$txn['id'],'ui-icon ui-icon-note ui-float-left');
+				$iconSpan = new HTML_Span($showNotes,'','txn_show_notes_'.$txn['id'],'ui-icon ui-icon-note ui-float-left');
 				$this->tabIndex->add($iconSpan);
 
 				$deleteTxn = new HTML_Anchor($tableTxn->cells[$row][$col],'#','','txn_delete_anchor_'.$txn['id'],'txn_delete');
 				$deleteTxn->setTitle('Delete');
-				$iconSpan = new HTMLSpan($deleteTxn,'','txn_delete_'.$txn['id'],'ui-icon ui-icon-trash ui-float-left');
+				$iconSpan = new HTML_Span($deleteTxn,'','txn_delete_'.$txn['id'],'ui-icon ui-icon-trash ui-float-left');
 				$this->tabIndex->add($iconSpan);
 
-				new HTMLInputHidden($tableTxn->cells[$row][$col],'txn_parent_id_'.$txn['id'],$parent_id,'txn_parent_id_'.$txn['id']);
+				new HTML_InputHidden($tableTxn->cells[$row][$col],'txn_parent_id_'.$txn['id'],$parent_id,'txn_parent_id_'.$txn['id']);
 
 				$row++;
 
@@ -384,13 +384,13 @@ class AjaxQaTxns extends AjaxQaWidget {
 		$return=FALSE;
 		if ($this->validateNewTxn($date,$credit,$debit)) {
 			$datestamp = strtotime($date);
-			AjaxQaSelectTxns::getTxnActiveStatus($current_txn_id,$this->DB);
+			QA_SelectTxns::getTxnActiveStatus($current_txn_id,$this->DB);
 			$txnActiveStatus = $this->DB->fetch();
 			if (($this->DB->num() >= 1) and ($txnActiveStatus['active'] == 0)) { // If current txn id exists, but is inactive
 				$this->infoMsg->addMessage(0,'This entry was modified before you submitted this change. Please resubmit your changes.');
 			} elseif ($this->insertTxn($acct,$this->user->getUserId(),$datestamp,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays)) {
 				if ($current_txn_id != 'null') {
-					if (AjaxQaModifyTxns::makeTxnInactive($current_txn_id,$this->DB)) {
+					if (QA_ModifyTxns::makeTxnInactive($current_txn_id,$this->DB)) {
 						$this->infoMsg->addMessage(2,'Transaction was successfully modified.');
 						$return=TRUE; // Transaction was modified, and done so successfully
 					}
@@ -444,7 +444,7 @@ class AjaxQaTxns extends AjaxQaWidget {
 			$this->infoMsg->addMessage(-1,'Credit and debit do not have values, this transaction cannot be added.');
 			return false;
 		} else {
-			return AjaxQaModifyTxns::insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays,$this->user,$this->DB);
+			return QA_ModifyTxns::insertTxn($acct,$user_id,$date,$type,$establishment,$note,$credit,$debit,$parent_id,$banksays,$this->user,$this->DB);
 		}
 	}
 }
