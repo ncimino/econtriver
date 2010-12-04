@@ -109,7 +109,7 @@ class QA_SharedAccounts extends QA_Widget {
 		$this->activeShares = $this->DB->query($sql);
 	}
 
-	function buildWidget() {
+	function createWidget() {
 		$this->getContactGroups();
 		$this->getActiveGroups();
 		$this->getSharedAccounts();

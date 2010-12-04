@@ -7,7 +7,7 @@ class QA_TxnHistory extends QA_Txns {
 	}
 
 	function buildHistoryWidget($txn_id) {
-		$this->activeAccounts = QA_SelectAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
+		$this->activeAccounts = QA_Account_Selector::getActiveAccounts($this->user->getUserId(),$this->DB);
 		$this->getTxnHistory($txn_id);
 		$rows = $this->DB->num($this->txnHistory);
 		new HTML_Heading($this->container,3,'History');

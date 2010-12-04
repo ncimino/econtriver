@@ -108,10 +108,10 @@ class QA_Txns extends QA_Widget {
 		}
 	}
 
-	function buildWidget() {
-		$this->activeAccounts = QA_SelectAccounts::getActiveAccounts($this->user->getUserId(),$this->DB);
-		$this->ownedAccounts = QA_SelectAccounts::getOwnedAccounts($this->user->getUserId(),$this->DB);
-		$this->sqlAcctsToShow = QA_SelectAccounts::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);
+	function createWidget() {
+		$this->activeAccounts = QA_Account_Selector::getActiveAccounts($this->user->getUserId(),$this->DB);
+		$this->ownedAccounts = QA_Account_Selector::getOwnedAccounts($this->user->getUserId(),$this->DB);
+		$this->sqlAcctsToShow = QA_Account_Selector::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);
 		if ($this->DB->num($this->activeAccounts)) {
 			$this->buildActions();
 			$this->buildTxnsTable();
@@ -168,7 +168,7 @@ class QA_Txns extends QA_Widget {
 
 	function buildActionAcctsForDropDown($selectAcctMenu,$groupName,$userId,$groupId,$selectedAcct) {
 		$allAccountsIndex = 0;
-		$ownedAccountsForUser = QA_SelectAccounts::getSharedAccountsForOwner($userId,$this->user->getUserId(),$this->DB);
+		$ownedAccountsForUser = QA_Account_Selector::getSharedAccountsForOwner($userId,$this->user->getUserId(),$this->DB);
 		if (($userId == $this->user->getUserId()) or ($this->DB->num($ownedAccountsForUser))) {
 			$selectAcctMenu->addOption($groupName,$groupId,($selectedAcct == $groupId),NULL,'dropdown_group');
 			$this->DB->resetRowPointer($this->activeAccounts);

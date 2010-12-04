@@ -23,7 +23,7 @@ class MainPage {
 	
 	function buildAccountManagementMenu($parentElement) {
 		$aManageAccounts = new HTML_Anchor($parentElement,'#','Manage Accounts','accounts_link');
-		$aManageAccounts->setAttribute('onclick',"QaAccountGet('".self::getQaManageId()."');");
+		$aManageAccounts->setAttribute('onclick',"QA_Account_AJAX_Get('".self::getQaManageId()."');");
 		new HTML_Text($parentElement,' | ');
 		$aManageGroups = new HTML_Anchor($parentElement,'#','Manage Groups');
 		$aManageGroups->setAttribute('onclick',"QaGroupGet('".self::getQaManageId()."');");
