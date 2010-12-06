@@ -9,6 +9,8 @@ abstract class QA_Widget {
 	protected $container;
 	protected $show_msg_div;
 
+	const MAIN_CLASS = 'quick_accts';
+	
 	static function getMainClass() { return 'quick_accts'; }
 	static function getQaMsgsClass() { return 'info_messages'; }
 	static function getQaMsgsId() { return 'widget_info_messages'; }

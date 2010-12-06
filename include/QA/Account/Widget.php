@@ -6,19 +6,35 @@ class QA_Account_Widget extends QA_Widget {
 	private $parentId;
 	private $acctName = '';
 
-	const editAcctNameClass = 'account';
+	//const editAcctNameClass = 'account';
 	
-	function getFsId() { return self::getMainClass().'_id'; }
-	function getFsCloseId() { return self::getMainClass().'_close_id'; }
-	function getCreateAcctClass() { return 'add_acct'; }
-	function getCreateAcctInName() { return self::getCreateAcctClass().'_name'; }
-	function getCreateAcctInId() { return self::getCreateAcctClass().'_text'; }
-	//function getEditAcctNameClass() { return 'account'; }
-	function getEditAcctNameInName() { return self::editAcctNameClass.'_name'; }
-	function getEditAcctNameInId() { return self::editAcctNameClass.'_text'; }
-	function getSharedAcctClass() { return 'shared_accts'; }
-	function getOwnedAcctClass() { return 'owned_accts'; }
-	function getDeletedAcctClass() { return 'deleted_accts'; }
+	const CLASSES = array (	'create'=>'add_acct',
+							'edit'=>'account',
+							'shared'=>'shared_accts',
+							'owned'=>'owned_accts',
+							'deleted'=>'deleted_accts',
+							);
+							//self::MAIN_CLASS <= quick_accts
+	const IDS = array (		'fs'=>'quick_accts_id',
+							'fs_close'=>'quick_accts_close_id',					
+							'create'=>'add_acct_text',					
+							'edit'=>'account_text',
+							);		
+	const NAMES = array (	'create'=>'add_acct_name',
+							'edit'=>'account_name',					
+							);
+						
+	//function getFsId() { return self::getMainClass().'_id'; }
+	//function getFsCloseId() { return self::getMainClass().'_close_id'; }
+	//function getCreateAcctClass() { return 'add_acct'; }
+	//function getCreateAcctInName() { return self::getCreateAcctClass().'_name'; }
+	//function getCreateAcctInId() { return self::getCreateAcctClass().'_text'; }
+	// function getEditAcctNameClass() { return 'account'; }
+	//function getEditAcctNameInName() { return self::editAcctNameClass.'_name'; }
+	//function getEditAcctNameInId() { return self::editAcctNameClass.'_text'; }
+	//function getSharedAcctClass() { return 'shared_accts'; }
+	//function getOwnedAcctClass() { return 'owned_accts'; }
+	//function getDeletedAcctClass() { return 'deleted_accts'; }
 
 	function __construct($parentId) {
 		parent::__construct();
@@ -80,9 +96,9 @@ class QA_Account_Widget extends QA_Widget {
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$divClose = new HTML_Span($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		QA_Account_Builder::buildCreateAccountForm($divQuickAccounts);
-		QA_Account_Builder::buildOwnedAccountsTable($divQuickAccounts);
-		QA_Account_Builder::buildSharedAccountsTable($divQuickAccounts);
-		QA_Account_Builder::buildDeletedAccountsTable($divQuickAccounts);
+		if ($this->DB->num($this->ownedAccounts)>0) QA_Account_Builder::buildOwnedAccountsTable($divQuickAccounts,self::CLASSES['owned'],$this->ownedAccounts);
+		if ($this->DB->num($this->sharedAccounts)>0) QA_Account_Builder::buildSharedAccountsTable($divQuickAccounts,$CLASSES['shared'],$this->sharedAccounts);
+		if ($this->DB->num($this->deletedAccounts)>0) QA_Account_Builder::buildDeletedAccountsTable($divQuickAccounts,$CLASSES['deleted'],$this->deletedAccounts);
 		$this->printHTML();
 	}
 }
