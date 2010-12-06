@@ -1,24 +1,22 @@
 <?php
 class QA_Account_Builder {
-	static function buildOwnedAccountsTable($parentElement) {
-		if ($this->DB->num($this->ownedAccounts)>0) {
-			$divOwnedAccounts = new HTML_Div($parentElement,'',self::getOwnedAcctClass());
-			$this->buildAccountsTable($divOwnedAccounts,'Owned Accounts:',$this->ownedAccounts,self::getOwnedAcctClass());
-		}
+	const OWNED_TITLE = 'Owned Accounts:';
+	const SHARED_TITLE = 'Shared Accounts:';
+	const DELETED_TITLE = 'Deleted Accounts:';
+	
+	static function buildOwnedAccountsTable($parentElement,$class,$ownedAccounts) {
+		$divOwnedAccounts = new HTML_Div($parentElement,'',$class);
+		self::buildAccountsTable($divOwnedAccounts,self::OWNED_TITLE,$ownedAccounts,$class);
 	}
 
-	static function buildSharedAccountsTable($parentElement) {
-		if ($this->DB->num($this->sharedAccounts)>0) {
-			$divSharedAccounts = new HTML_Div($parentElement,'',self::getSharedAcctClass());
-			$this->buildAccountsTable($divSharedAccounts,'Shared Accounts:',$this->sharedAccounts,self::getSharedAcctClass(),false);
-		}
+	static function buildSharedAccountsTable($parentElement,$class,$sharedAccounts) {
+		$divSharedAccounts = new HTML_Div($parentElement,'',$class);
+		self::buildAccountsTable($divSharedAccounts,self::SHARED_TITLE,$sharedAccounts,$class,false);
 	}
 
-	static function buildDeletedAccountsTable($parentElement) {
-		if ($this->DB->num($this->deletedAccounts)>0) {
-			$divOwnedAccounts = new HTML_Div($parentElement,'',self::getDeletedAcctClass());
-			$this->buildAccountsTable($divOwnedAccounts,'Deleted Accounts:',$this->deletedAccounts,self::getDeletedAcctClass(),false,true);
-		}
+	static function buildDeletedAccountsTable($parentElement,$class,$deletedAccounts) {
+		$divOwnedAccounts = new HTML_Div($parentElement,'',$class);
+		self::buildAccountsTable($divOwnedAccounts,self::DELETED_TITLE,$deletedAccounts,$class,false,true);
 	}
 
 	static function buildAccountsTable($parentElement,$title,$queryResult,$tableName,$editable=true,$restorable=false) {
