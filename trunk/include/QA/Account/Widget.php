@@ -96,9 +96,9 @@ class QA_Account_Widget extends QA_Widget {
 		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
 		$divClose = new HTML_Span($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
 		QA_Account_Builder::buildCreateAccountForm($divQuickAccounts);
-		if ($this->DB->num($this->ownedAccounts)>0) QA_Account_Builder::buildOwnedAccountsTable($divQuickAccounts,self::CLASSES['owned'],$this->ownedAccounts);
-		if ($this->DB->num($this->sharedAccounts)>0) QA_Account_Builder::buildSharedAccountsTable($divQuickAccounts,$CLASSES['shared'],$this->sharedAccounts);
-		if ($this->DB->num($this->deletedAccounts)>0) QA_Account_Builder::buildDeletedAccountsTable($divQuickAccounts,$CLASSES['deleted'],$this->deletedAccounts);
+		if ($this->DB->num($this->ownedAccounts)>0) QA_Account_Builder::buildOwnedAccountsTable($divQuickAccounts,self::get(CLASSES,'owned'),$this->ownedAccounts);
+		if ($this->DB->num($this->sharedAccounts)>0) QA_Account_Builder::buildSharedAccountsTable($divQuickAccounts,self::get(CLASSES,'shared'),$this->sharedAccounts);
+		if ($this->DB->num($this->deletedAccounts)>0) QA_Account_Builder::buildDeletedAccountsTable($divQuickAccounts,self::get(CLASSES,'deleted'),$this->deletedAccounts);
 		$this->printHTML();
 	}
 }
