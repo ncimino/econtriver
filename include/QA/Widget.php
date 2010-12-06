@@ -29,6 +29,8 @@ abstract class QA_Widget {
 			$this->infoMsg->commitDiv($divInfoMsg);
 		}
 	}
+	
+	function get($array,$key) {	return $array[$key]; }
 
 	function printHTML() {
 		if ($this->show_msg_div) $this->infoMsg->commitMessages();

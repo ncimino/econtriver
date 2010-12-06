@@ -83,7 +83,7 @@ function AjaxIt(file, content_id, post_data, focus_id, after_load) {
 	} else {
 		post_data = "content_id=" + content_id;
 	}
-	url = "include/" + file.replace("/_/i","/\//" ) + ".php";
+	url = "include/" + file.replace(/_/g,'/' ) + ".php";
 	alert(url);
 	sendPostRequest(url, content_id, post_data, focus_id, after_load);
 }
