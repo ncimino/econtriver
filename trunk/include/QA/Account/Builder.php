@@ -4,30 +4,36 @@ class QA_Account_Builder {
 	const SHARED_TITLE = 'Shared Accounts:';
 	const DELETED_TITLE = 'Deleted Accounts:';
 	
-	static function buildOwnedAccountsTable($parentElement,$class,$ownedAccounts) {
-		$divOwnedAccounts = new HTML_Div($parentElement,'',$class);
-		self::buildAccountsTable($divOwnedAccounts,self::OWNED_TITLE,$ownedAccounts,$class);
+	static function buildOwnedAccountsTable($parentElement,$class,$ownedAccounts,$db) {
+		if ($db->num($ownedAccounts)>0) {
+			$divOwnedAccounts = new HTML_Div($parentElement,'',$class);
+			self::buildAccountsTable($divOwnedAccounts,self::OWNED_TITLE,$ownedAccounts,$class,$db);
+		}
 	}
 
-	static function buildSharedAccountsTable($parentElement,$class,$sharedAccounts) {
-		$divSharedAccounts = new HTML_Div($parentElement,'',$class);
-		self::buildAccountsTable($divSharedAccounts,self::SHARED_TITLE,$sharedAccounts,$class,false);
+	static function buildSharedAccountsTable($parentElement,$class,$sharedAccounts,$db) {
+		if ($db->num($sharedAccounts)>0) {
+			$divSharedAccounts = new HTML_Div($parentElement,'',$class);
+			self::buildAccountsTable($divSharedAccounts,self::SHARED_TITLE,$sharedAccounts,$class,$db,false);
+		}
 	}
 
-	static function buildDeletedAccountsTable($parentElement,$class,$deletedAccounts) {
-		$divOwnedAccounts = new HTML_Div($parentElement,'',$class);
-		self::buildAccountsTable($divOwnedAccounts,self::DELETED_TITLE,$deletedAccounts,$class,false,true);
+	static function buildDeletedAccountsTable($parentElement,$class,$deletedAccounts,$db) {
+		if ($db->num($deletedAccounts)>0) {
+			$divOwnedAccounts = new HTML_Div($parentElement,'',$class);
+			self::buildAccountsTable($divOwnedAccounts,self::DELETED_TITLE,$deletedAccounts,$class,$db,false,true);
+		}
 	}
 
-	static function buildAccountsTable($parentElement,$title,$queryResult,$tableName,$editable=true,$restorable=false) {
+	static function buildAccountsTable($parentElement,$title,$queryResult,$tableName,$db,$editable=true,$restorable=false) {
 		new HTML_Heading($parentElement,5,$title);
 		$cols = ($restorable) ? 2 : 1;
 		$cols = ($editable) ? 3 : $cols;
-		$tableListAccounts = new Table($parentElement,$this->DB->num($queryResult),$cols,$tableName);
+		$tableListAccounts = new Table($parentElement,$db->num($queryResult),$cols,$tableName);
 		$i = 0;
-		while ($account = $this->DB->fetch($queryResult)) {
+		while ($account = $db->fetch($queryResult)) {
 			$accountName = (empty($account['name'])) ? QA_Account_Selector::getAccountNameById($this->getEditAcctId(),$this) : $account['name'];
-			$inputId = $this->getEditAcctNameInId().'_'.$account['id'];
+			$inputId = self::get(IDS,'fs').'_'.$account['id'];
 			$inputName = $this->getEditAcctNameInName().'_'.$account['id'];
 
 			$inputEditAccount = new HTML_InputText($tableListAccounts->cells[$i][0],$inputName,$accountName,$inputId,self::editAcctNameClass);
