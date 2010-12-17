@@ -9,7 +9,7 @@ abstract class QA_Widget {
 	protected $container;
 	protected $show_msg_div;
 
-	const MAIN_CLASS = 'quick_accts';
+	const C_MAIN = 'quick_accts';
 	
 	static function getMainClass() { return 'quick_accts'; }
 	static function getQaMsgsClass() { return 'info_messages'; }
@@ -29,12 +29,14 @@ abstract class QA_Widget {
 			$this->infoMsg->commitDiv($divInfoMsg);
 		}
 	}
-	
-	function get($array,$key) {	return $array[$key]; }
 
 	function printHTML() {
-		if ($this->show_msg_div) $this->infoMsg->commitMessages();
-		printf( '%s', Normalize::innerFragment($this->document) );
+		try {
+			if ($this->show_msg_div) $this->infoMsg->commitMessages();
+			printf( '%s', Normalize::innerFragment($this->document) );
+		} catch (Exception $e) {
+			echo "Caught exception: ".$e;
+		}
 	}
 }
 ?>

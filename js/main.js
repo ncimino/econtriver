@@ -56,8 +56,6 @@ function enterSubmit(exec, thisevent) {
 // onkeyup="enterFocus(event,2)"
 function enterFocus(event, id) {
 	return enterCall(event,function(){focus(id);});
-	//if (event.keyCode == 13) document.getElementById(id).focus()
-	//return event;
 }
 
 // onfocus='clearField(this,"Some Value")'
@@ -135,10 +133,41 @@ function sendPostRequest(url, content_id, post_data, focus_id, after_load) {
 					}
 				}
 			}
-		}
+		},
+		 error : function(xhr, ajaxOptions, thrownError) {
+             if (document.getElementById(content_id)) document.getElementById(content_id).innerHTML = 
+             xhr.responseText +
+             "<p><br />" +
+             "<b>Status</b>: " + xhr.status + "<br />" +
+             "<b>State</b>: " + rdyStateToText(xhr.readyState) + "<br />" +
+             "<b>Error Thrown</b>: " + thrownError + "<br />" +
+             "<b>AJAX Options</b>: " + ajaxOptions + "<br /><br />" +
+             "<b>sendPostRequest</b> called with:<br />" +
+             "* url = " + url + "<br />" +
+             "* content_id = " + content_id + "<br />" +
+	         "* post_data = " + post_data + "<br />" +
+	         "* focus_id = " + focus_id + "<br />" +
+             "* after_load = " + after_load + "<br />" +
+             "</p>";
+         }   
 	});
 }
 
 function isArray(obj) {
 	return (obj.constructor.toString().indexOf("Array") != -1);
+}
+
+function strip(html) {
+	var tmp = document.createElement("DIV");
+	tmp.innerHTML = html;
+	return tmp.textContent||tmp.innerText;
+}
+
+function rdyStateToText(state) {
+	switch(state) {
+		case 1: return "Loading";
+		case 2: return "Loaded";
+		case 3: return "Interactice";
+		case 4: return "Completed";
+	}
 }
