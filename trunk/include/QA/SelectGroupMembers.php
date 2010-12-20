@@ -46,7 +46,7 @@ class QA_SelectGroupMembers {
 	}
 	
 	function getAssociatedActiveContactsForAllGroups($userId,$db) {
-		$activeGroupsSql = QA_SelectGroupMembers::getSqlActiveGroups(QA_SelectGroupMembers::getActiveGroups($userId,$db),$db);
+		$activeGroupsSql = QA_SelectGroupMembers::sqlActiveGroups(QA_SelectGroupMembers::getActiveGroups($userId,$db),$db);
 		$sql = "SELECT q_user_groups.*,user.handle FROM q_user_groups,user
         WHERE ({$activeGroupsSql})
           AND q_user_groups.user_id = user.user_id
@@ -56,7 +56,7 @@ class QA_SelectGroupMembers {
 		return (empty($activeGroupsSql)) ? FALSE : $db->query($sql);
 	}
 	
-	function getSqlActiveGroups($activeGroupsResult,$db) {
+	function sqlActiveGroups($activeGroupsResult,$db) {
 		$i = 0;
 		$db->resetRowPointer($activeGroupsResult);
 		while($result = $db->fetch($activeGroupsResult)) {

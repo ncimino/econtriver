@@ -4,8 +4,8 @@ class QA_TxnNotes extends QA_Txns {
 	private $userGroups; // MySQL result
 	private $txnGroupNotes; // MySQL result
 
-	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$showAcct=NULL,$showMsgDiv=TRUE) {
-		parent::__construct($parentId,$sortId=NULL,$sortDir=NULL,$showAcct=NULL,$showMsgDiv=TRUE);
+	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
+		parent::__construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE);
 	}
 
 	function buildNotesWidget($parent_txn_id) {

@@ -11,9 +11,9 @@ class QA_Txns extends QA_Widget {
 	protected $newTxnValues = array();
 	protected $sortDir = 'DESC';
 	protected $sortField = 'q_txn.date';
-	protected $showAcct = "0";
+	protected $selectedAcct = "0";
 
-	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$showAcct=NULL,$showMsgDiv=TRUE) {
+	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
 		parent::__construct($showMsgDiv,5000);
 		$this->parentId = $parentId;
 		if (!$this->user->verifyUser()) {
@@ -21,8 +21,8 @@ class QA_Txns extends QA_Widget {
 		} else {
 			if (isset($sortDir)) $this->sortDir = $sortDir;
 			if (isset($sortId)) $this->sortField = $this->convIdToField($sortId);
-			if (isset($showAcct)) $this->setShowAcct($showAcct);
-			else $this->getShowAcct();
+			if (isset($selectedAcct)) $this->setselectedAcct($selectedAcct);
+			else $this->getselectedAcct();
 			$this->newTxnValues['acct'] = "0";
 			$this->newTxnValues['date'] = date($this->user->getDateFormat(),$this->user->getTime());
 			$this->newTxnValues['type'] = '';
@@ -33,14 +33,14 @@ class QA_Txns extends QA_Widget {
 		}
 	}
 
-	function setShowAcct($acctId) {
+	function setselectedAcct($acctId) {
 		if (QaSettings::setSetting('show_acct',$this->user->getUserId(),$acctId,$this->DB)) {
-			$this->showAcct = $acctId;
+			$this->selectedAcct = $acctId;
 		}
 	}
 
-	function getShowAcct() {
-		$this->showAcct = QaSettings::getSetting('show_acct',$this->user->getUserId(),$this->DB);
+	function getselectedAcct() {
+		$this->selectedAcct = QaSettings::getSetting('show_acct',$this->user->getUserId(),$this->DB);
 	}
 
 	function convIdToField($input) {
@@ -109,9 +109,9 @@ class QA_Txns extends QA_Widget {
 	}
 
 	function createWidget() {
-		$this->activeAccounts = QA_Account_Selector::getActiveAccounts($this->user->getUserId(),$this->DB);
-		$this->ownedAccounts = QA_Account_Selector::getOwnedAccounts($this->user->getUserId(),$this->DB);
-		$this->sqlAcctsToShow = QA_Account_Selector::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);
+		$this->activeAccounts = QA_Account_Select::activeAccounts($this->user->getUserId(),$this->DB);
+		$this->ownedAccounts = QA_Account_Select::ownedAccounts($this->user->getUserId(),$this->DB);
+		$this->sqlAcctsToShow = QA_Account_Select::sqlAcctsToShow($this->selectedAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);
 		if ($this->DB->num($this->activeAccounts)) {
 			$this->buildActions();
 			$this->buildTxnsTable();
@@ -125,7 +125,7 @@ class QA_Txns extends QA_Widget {
 		$divActions = new HTML_Div($this->container,'txn_actions_id','txn_actions');
 		$jsDateFormat = ($this->user->getDateFormat() == "Y-m-d") ? "yy-mm-dd" : "mm/dd/yy"; // else "m/d/Y"
 		new HTML_InputHidden($divActions,'date_format',$jsDateFormat,'date_format');
-		$this->buildActionsAcctsDropDown($divActions,'show_acct','show_acct',NULL,$this->showAcct);
+		$this->buildActionsAcctsDropDown($divActions,'show_acct','show_acct',NULL,$this->selectedAcct);
 		$this->buildActionsTray($divActions);
 		$divActionContent = new HTML_Div($divActions,'txn_actions_content');
 		$divActionContent->setAttribute('style','display:none;');
@@ -168,7 +168,7 @@ class QA_Txns extends QA_Widget {
 
 	function buildActionAcctsForDropDown($selectAcctMenu,$groupName,$userId,$groupId,$selectedAcct) {
 		$allAccountsIndex = 0;
-		$ownedAccountsForUser = QA_Account_Selector::getSharedAccountsForOwner($userId,$this->user->getUserId(),$this->DB);
+		$ownedAccountsForUser = QA_Account_Select::sharedAccountsForOwner($userId,$this->user->getUserId(),$this->DB);
 		if (($userId == $this->user->getUserId()) or ($this->DB->num($ownedAccountsForUser))) {
 			$selectAcctMenu->addOption($groupName,$groupId,($selectedAcct == $groupId),NULL,'dropdown_group');
 			$this->DB->resetRowPointer($this->activeAccounts);
@@ -237,7 +237,7 @@ class QA_Txns extends QA_Widget {
 
 	function buildNewTxns($tableTxn,$row) {
 		$col = 0;
-		$selectedAcct = ($this->newTxnValues['acct']) ? $this->newTxnValues['acct'] : $this->showAcct; // If a txn was entered use that
+		$selectedAcct = ($this->newTxnValues['acct']) ? $this->newTxnValues['acct'] : $this->selectedAcct; // If a txn was entered use that
 		$account_dd = $this->buildAcctsDropDown($tableTxn->cells[$row][$col++],'new_txn_acct','new_txn_acct','txn_input',$selectedAcct);
 		$this->tabIndex->add($account_dd);
 		new HTML_Text($tableTxn->cells[$row][$col++],'-'); // User

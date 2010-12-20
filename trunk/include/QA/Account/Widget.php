@@ -70,22 +70,22 @@ class QA_Account_Widget extends QA_Widget {
 
 	function createWidget() {
 		try {
-			$this->ownedAccounts = QA_Account_Selector::getOwnedAccounts($this->user->getUserId(),$this->DB);
-			$this->sharedAccounts = QA_Account_Selector::getSharedAccounts($this->user->getUserId(),$this->DB);
-			$this->deletedAccounts  = QA_Account_Selector::getDeletedAccounts($this->user->getUserId(),$this->DB);
-			$divQuickAccounts = new HTML_Fieldset($this->container,self::get(IDS,'fs'));
+			$this->ownedAccounts = QA_Account_Select::ownedAccounts($this->user->getUserId(),$this->DB);
+			$this->sharedAccounts = QA_Account_Select::sharedAccounts($this->user->getUserId(),$this->DB);
+			$this->deletedAccounts  = QA_Account_Select::deletedAccounts($this->user->getUserId(),$this->DB);
+			$divQuickAccounts = new HTML_Fieldset($this->container,I_FS);
 			//*
 			$lClose = new HTML_Legend($divQuickAccounts,'Account Management',NULL,'manage_title');
-			$lClose->setAttribute('onclick',"hideElement('".self::get(IDS,'fs')."','slow');");
+			$lClose->setAttribute('onclick',"hideElement('".I_FS."','slow');");
 			$lClose->setAttribute('title','Close');
 			$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
-			$aClose->setAttribute('onclick',"hideElement('".self::get(IDS,'fs')."','slow');");
-			$divClose = new HTML_Span($aClose,'',self::get(IDS,'fs_close'),'ui-icon ui-icon-circle-close ui-state-red');
+			$aClose->setAttribute('onclick',"hideElement('".I_FS."','slow');");
+			$divClose = new HTML_Span($aClose,'',I_FS,'ui-icon ui-icon-circle-close ui-state-red');
 			//*
 			QA_Account_Builder::buildCreateAccountForm($divQuickAccounts);
-			QA_Account_Builder::buildOwnedAccountsTable($divQuickAccounts,self::get(CLASSES,'owned'),$this->ownedAccounts,$this->DB);
-			QA_Account_Builder::buildSharedAccountsTable($divQuickAccounts,self::get(CLASSES,'shared'),$this->sharedAccounts,$this->DB);
-			QA_Account_Builder::buildDeletedAccountsTable($divQuickAccounts,self::get(CLASSES,'deleted'),$this->deletedAccounts,$this->DB);
+			QA_Account_Builder::buildOwnedAccountsTable($divQuickAccounts,C_OWNED,$this->ownedAccounts,$this->DB);
+			QA_Account_Builder::buildSharedAccountsTable($divQuickAccounts,C_SHARED,$this->sharedAccounts,$this->DB);
+			QA_Account_Builder::buildDeletedAccountsTable($divQuickAccounts,C_DELETED,$this->deletedAccounts,$this->DB);
 			//*/
 			$this->printHTML();
 		} catch (Exception $e) {
