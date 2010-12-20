@@ -62,7 +62,7 @@ class QA_SharedAccounts extends QA_Widget {
 		return $this->DB->query($sql);
 	}
 
-	function getOwnedAccounts() {
+	function ownedAccounts() {
 		$sql = "SELECT * FROM q_acct,q_owners
         WHERE q_acct.id = acct_id 
           AND owner_id = {$this->user->getUserId()}
@@ -70,7 +70,7 @@ class QA_SharedAccounts extends QA_Widget {
 		$this->ownedAccounts = $this->DB->query($sql);
 	}
 
-	function getSharedAccounts() {
+	function sharedAccounts() {
 		$sql = "SELECT * FROM q_acct,q_share,q_user_groups,q_owners
         WHERE q_share.acct_id=q_acct.id
           AND q_user_groups.group_id=q_share.group_id
@@ -112,8 +112,8 @@ class QA_SharedAccounts extends QA_Widget {
 	function createWidget() {
 		$this->getContactGroups();
 		$this->getActiveGroups();
-		$this->getSharedAccounts();
-		$this->getOwnedAccounts();
+		$this->sharedAccounts();
+		$this->ownedAccounts();
 		$divQuickAccounts = new HTML_Fieldset($this->container,self::getFsId(),'manage_title');		
 		$lClose = new HTML_Legend($divQuickAccounts,'Account Sharing');
 		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");

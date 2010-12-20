@@ -5,14 +5,14 @@ class QA_TxnTrash extends QA_Txns {
 	private $numberOfColumns = 11;
 	private $titleRowHeight = 1;
 
-	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$showAcct=NULL,$showMsgDiv=TRUE) {
-		parent::__construct($parentId,$sortId=NULL,$sortDir=NULL,$showAcct=NULL,$showMsgDiv=TRUE);
+	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
+		parent::__construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE);
 	}
 
 	function buildTrashWidget() {
-		$this->activeAccounts = QA_Account_Selector::getActiveAccounts($this->user->getUserId(),$this->DB);
+		$this->activeAccounts = QA_Account_Select::activeAccounts($this->user->getUserId(),$this->DB);
 		$this->getTxnTrash();
-		new HTML_Heading($this->container,3,'Trash Bin for: '.QA_Account_Selector::getAccountNameById($this->showAcct,$this->DB,TRUE));
+		new HTML_Heading($this->container,3,'Trash Bin for: '.QA_Account_Select::accountNameById($this->selectedAcct,$this->DB,TRUE));
 		if (($this->inactiveTxns) and ($this->DB->num($this->inactiveTxns) != 0)) {
 			$rows = $this->DB->num($this->inactiveTxns);
 			$tableTxn = new Table($this->container,$rows+$this->titleRowHeight,$this->numberOfColumns,'txnt_table','txnt');
@@ -49,7 +49,7 @@ class QA_TxnTrash extends QA_Txns {
 	function getParentTxns() {
 		$sql = "SELECT q_txn.*
 				FROM q_txn, q_acct 
-				WHERE (".QA_Account_Selector::getSqlAcctsToShow($this->showAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB).")
+				WHERE (".QA_Account_Select::sqlAcctsToShow($this->selectedAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB).")
 				AND q_txn.active = 0
 				AND q_txn.acct_id = q_acct.id 
 				AND q_txn.parent_txn_id = q_txn.id;";

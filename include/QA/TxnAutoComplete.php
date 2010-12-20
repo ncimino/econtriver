@@ -5,8 +5,8 @@ class QA_TxnAutoComplete extends QA_Txns {
 	private $txnAutoCompleteFieldId;
 	
 	function __construct() {
-		parent::__construct($parentId=NULL,$sortId=NULL,$sortDir=NULL,$showAcct=NULL,$showMsgDiv=FALSE);
-		$this->activeAccounts = QA_Account_Selector::getActiveAccounts($this->user->getUserId(),$this->DB);
+		parent::__construct($parentId=NULL,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=FALSE);
+		$this->activeAccounts = QA_Account_Select::activeAccounts($this->user->getUserId(),$this->DB);
 	}
 	
 	function setFieldId($id) {
@@ -15,7 +15,7 @@ class QA_TxnAutoComplete extends QA_Txns {
 
 	function pullAutoCompleteValues() {
 		$sql = "SELECT DISTINCT q_txn.{$this->txnAutoCompleteFieldId} FROM q_txn,user,q_acct
-					WHERE (".QA_Account_Selector::getSqlActiveAccounts($this->activeAccounts,$this->DB).")
+					WHERE (".QA_Account_Select::sqlActiveAccounts($this->activeAccounts,$this->DB).")
 					  AND q_txn.active = 1
 					  AND q_txn.user_id = user.user_id
 					  AND q_txn.acct_id = q_acct.id
