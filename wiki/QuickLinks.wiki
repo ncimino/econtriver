@@ -1,2 +1,2 @@
-  * [eContriver http://econtriver.com]
+  * [http://econtriver.com eContriver]
   * [eclipse Eclipse]
