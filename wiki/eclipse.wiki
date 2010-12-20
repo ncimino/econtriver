@@ -31,40 +31,22 @@ Eclipse SQL Explorer [Visualize DB] (Use in Help):
 http://eclipsesql.sourceforge.net/
 
 MySQL Driver for Eclipse SQL Explorer to work:
-* Go to: http://dev.mysql.com/downloads
-** Click on MySQL Connectors * Connector/J : http://dev.mysql.com/downloads/connector/j/
-* I cannot get the zip archives to work, so get the tar.gz
-* Extract that archive
-* Move the contents of this archive to the dropins directory
-* Such that the .../mysql-connector-java-x.x.xx directory is now in:
+  * Go to: http://dev.mysql.com/downloads
+  ** Click on MySQL Connectors 
+  ** Connector/J : http://dev.mysql.com/downloads/connector/j/
+  * I cannot get the zip archives to work, so get the tar.gz
+  * Extract that archive
+  * Move the contents of this archive to the dropins directory
+  * Such that the .../mysql-connector-java-x.x.xx directory is now in:
     .../ecplise/dropins/mysql-connector-java-x.x.xx
 
-* Open eclipse and open the SQL Explorer Perspective
-* Click on Create Net Connection Profile
-* Give it some arbitrary name
-* Click Add/Edit Drivers and select MySwl Driver, click on Edit
-* Click on the Extra Class Path tab and click on Add JARs...
-* Navigate to dropins and the 'mysql-connector-java-x.x.xx' directory and select the jar
-* Click Open
-
-
-________________
-
-FileZilla FTP Tool:
-http://filezilla-project.org/--> Click on MySQL Connectors -> Connector/J : http://dev.mysql.com/downloads/connector/j/
-* I cannot get the zip archives to work, so get the tar.gz
--> Extract that archive
--> Move the contents of this archive to the dropins directory
--> Such that the .../mysql-connector-java-x.x.xx directory is now in:
-    .../ecplise/dropins/mysql-connector-java-x.x.xx
-
--> Open eclipse and open the SQL Explorer Perspective
--> Click on Create Net Connection Profile
--> Give it some arbitrary name
--> Click Add/Edit Drivers and select MySwl Driver, click on Edit
--> Click on the Extra Class Path tab and click on Add JARs...
--> Navigate to dropins and the 'mysql-connector-java-x.x.xx' directory and select the jar
--> Click Open
+  * Open eclipse and open the SQL Explorer Perspective
+  * Click on Create Net Connection Profile
+  * Give it some arbitrary name
+  * Click Add/Edit Drivers and select MySwl Driver, click on Edit
+  * Click on the Extra Class Path tab and click on Add JARs...
+  * Navigate to dropins and the 'mysql-connector-java-x.x.xx' directory and select the jar
+  * Click Open
 
 
 ________________
