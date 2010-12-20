@@ -1,0 +1,3 @@
+eContriver.com provides investors, venture capitalists, accountants, and personal account and money management with a shared interface between users that tracks changes and provides power and flexibility to all users.
+
+If you are interested in helping with the development of eContriver, then you can follow this link to setup your developement environment: http://code.google.com/p/econtriver/wiki/eclipse
