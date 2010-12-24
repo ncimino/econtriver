@@ -30,7 +30,7 @@ class QA_Account_Widget extends QA_Widget {
 
 	function addEntries($name) {
 		if ($escapedName = $this->checkAccountName($name)) {
-			if (QA_Account_Modifier::insertAccount($escapedName,$this->DB) and QA_Account_Modifier::insertOwner($this->DB->lastID(),$this->user->getUserId(),$this->DB)) {
+			if (QA_Account_Modify::insert($escapedName,$this->DB) and QA_Account_Modify::insertOwner($this->DB->lastID(),$this->user->getUserId(),$this->DB)) {
 				$this->infoMsg->addMessage(2,'Account was successfully created.');
 			}
 		} else {
@@ -40,20 +40,20 @@ class QA_Account_Widget extends QA_Widget {
 
 	function updateEntries($name,$acctId) {
 		if (!empty($acctId) and $sanitizedName = $this->checkAccountName($name)) {
-			if (QA_Account_Modifier::updateAccount($sanitizedName,$acctId,$this->user->getUserId(),$this->DB)) {
+			if (QA_Account_Modify::update($sanitizedName,$acctId,$this->user->getUserId(),$this->DB)) {
 				$this->infoMsg->addMessage(2,'Account was successfully updated.');
 			}
 		}
 	}
 
 	function dropEntries($acctId) {
-		if (!empty($acctId) and QA_Account_Modifier::dropAccount($acctId,$this->user->getUserId(),$this->DB)) {
+		if (!empty($acctId) and QA_Account_Modify::drop($acctId,$this->user->getUserId(),$this->DB)) {
 			$this->infoMsg->addMessage(2,'Account was successfully deleted.');
 		}
 	}
 
 	function restoreEntries($acctId) {
-		if (!empty($acctId) and QA_Account_Modifier::restoreAccount($acctId,$this->user->getUserId(),$this->DB)) {
+		if (!empty($acctId) and QA_Account_Modify::restore($acctId,$this->user->getUserId(),$this->DB)) {
 			$this->infoMsg->addMessage(2,'Account was successfully restored.');
 		}
 	}
@@ -70,9 +70,9 @@ class QA_Account_Widget extends QA_Widget {
 
 	function createWidget() {
 		try {
-			$this->ownedAccounts = QA_Account_Select::ownedAccounts($this->user->getUserId(),$this->DB);
-			$this->sharedAccounts = QA_Account_Select::sharedAccounts($this->user->getUserId(),$this->DB);
-			$this->deletedAccounts  = QA_Account_Select::deletedAccounts($this->user->getUserId(),$this->DB);
+			$this->ownedAccounts = QA_Account_Select::owned($this->user->getUserId(),$this->DB);
+			$this->sharedAccounts = QA_Account_Select::shared($this->user->getUserId(),$this->DB);
+			$this->deletedAccounts  = QA_Account_Select::deleted($this->user->getUserId(),$this->DB);
 			$divQuickAccounts = new HTML_Fieldset($this->container,I_FS);
 			//*
 			$lClose = new HTML_Legend($divQuickAccounts,'Account Management',NULL,'manage_title');
@@ -82,10 +82,10 @@ class QA_Account_Widget extends QA_Widget {
 			$aClose->setAttribute('onclick',"hideElement('".I_FS."','slow');");
 			$divClose = new HTML_Span($aClose,'',I_FS,'ui-icon ui-icon-circle-close ui-state-red');
 			//*
-			QA_Account_Builder::buildCreateAccountForm($divQuickAccounts);
-			QA_Account_Builder::buildOwnedAccountsTable($divQuickAccounts,C_OWNED,$this->ownedAccounts,$this->DB);
-			QA_Account_Builder::buildSharedAccountsTable($divQuickAccounts,C_SHARED,$this->sharedAccounts,$this->DB);
-			QA_Account_Builder::buildDeletedAccountsTable($divQuickAccounts,C_DELETED,$this->deletedAccounts,$this->DB);
+			QA_Account_Build::buildCreateAccountForm($divQuickAccounts);
+			QA_Account_Build::buildOwnedAccountsTable($divQuickAccounts,C_OWNED,$this->ownedAccounts,$this->DB);
+			QA_Account_Build::buildSharedAccountsTable($divQuickAccounts,C_SHARED,$this->sharedAccounts,$this->DB);
+			QA_Account_Build::buildDeletedAccountsTable($divQuickAccounts,C_DELETED,$this->deletedAccounts,$this->DB);
 			//*/
 			$this->printHTML();
 		} catch (Exception $e) {

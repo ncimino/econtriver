@@ -3,8 +3,8 @@ class QA_Account_Select {
 	
 	const USER_IDENTIFIER = 'u';
 
-	function accountNameById($id,$db,$allowAllAccounts=FALSE) {
-		if (self::isSelectedAcctAUser($id)) { //:KLUDGE: Checks to see if user was selected
+	function nameById($id,$db,$allowAllAccounts=FALSE) {
+		if (self::aUserIsSelected($id)) { //:KLUDGE: Checks to see if user was selected
 			$user = User::selectUserById(self::extractUserId($id),$db);
 			return $user['handle']."'s Accounts";
 		} elseif ($allowAllAccounts and ($id == 0)) {
@@ -18,7 +18,7 @@ class QA_Account_Select {
 		}
 	}
 
-	function ownedAccounts($userId,$db) {
+	function owned($userId,$db) {
 		$sql = "SELECT * FROM q_acct,q_owners
 		        WHERE q_acct.id = acct_id 
 		          AND owner_id = {$userId}
@@ -26,7 +26,7 @@ class QA_Account_Select {
 		return $db->query($sql);
 	}
 
-	function sharedAccounts($userId,$db) {
+	function shared($userId,$db) {
 		$sql = "SELECT * FROM q_acct,q_share,q_user_groups,q_owners
 		        WHERE q_share.acct_id=q_acct.id
 		          AND q_user_groups.group_id=q_share.group_id
@@ -39,7 +39,7 @@ class QA_Account_Select {
 		return $db->query($sql);
 	}
 
-	function sharedAccountsForOwner($ownerId,$userId,$db) {
+	function sharedByOwner($ownerId,$userId,$db) {
 		$sql = "SELECT * FROM q_acct,q_share,q_user_groups,q_owners
 		        WHERE q_share.acct_id=q_acct.id
 		          AND q_user_groups.group_id=q_share.group_id
@@ -52,7 +52,7 @@ class QA_Account_Select {
 		return $db->query($sql);
 	}
 
-	function deletedAccounts($userId,$db) {
+	function deleted($userId,$db) {
 		$sql = "SELECT * FROM q_acct,q_owners
 		        WHERE q_acct.id = acct_id 
 		          AND owner_id = {$userId}
@@ -60,7 +60,7 @@ class QA_Account_Select {
 		return $db->query($sql);
 	}
 
-	function activeAccounts($userId,$db) {
+	function active($userId,$db) {
 		$sql = "SELECT q_acct.*,q_owners.owner_id
 				FROM q_acct,q_owners,q_share,q_user_groups
 				WHERE ( q_acct.id=q_owners.acct_id
@@ -77,7 +77,7 @@ class QA_Account_Select {
 		return $db->query($sql);
 	}
 
-	function sqlActiveAccounts($activeAccountsResult,$db) {
+	function sqlActive($activeAccountsResult,$db) {
 		$i = 0;
 		$db->resetRowPointer($activeAccountsResult);
 		while($result = $db->fetch($activeAccountsResult)) {
@@ -89,7 +89,7 @@ class QA_Account_Select {
 		return (empty($activeAccountSql)) ? FALSE : $activeAccountSql;
 	}
 
-	function sqlActiveSharedAccountsByOwner($ownerId,$activeAccountsResult,$db) {
+	function sqlActiveForOwner($ownerId,$activeAccountsResult,$db) {
 		$i = 0;
 		$db->resetRowPointer($activeAccountsResult);
 		while($result = $db->fetch($activeAccountsResult)) {
@@ -104,17 +104,17 @@ class QA_Account_Select {
 	}
 
 	function sqlAcctsToShow($selectedAcct=FALSE,$activeAccountsResult,$userId,$db) {
-		if (self::isSelectedAcctAUser($selectedAcct)) {
-			$acctsToShow = QA_Account_Select::sqlActiveSharedAccountsByOwner(self::extractUserId($selectedAcct),$activeAccountsResult,$db);
+		if (self::aUserIsSelected($selectedAcct)) {
+			$acctsToShow = self::sqlActiveForOwner(self::extractUserId($selectedAcct),$activeAccountsResult,$db);
 		} elseif ($selectedAcct) {
 			$acctsToShow = "q_txn.acct_id = ".$selectedAcct;
 		} else {
-			$acctsToShow = QA_Account_Select::sqlActiveAccounts($activeAccountsResult,$db);
+			$acctsToShow = self::sqlActive($activeAccountsResult,$db);
 		}
 		return $acctsToShow;
 	}
 
-	function isSelectedAcctAUser($acct) {
+	function aUserIsSelected($acct) {
 		return strstr($acct,USER_IDENTIFIER);
 	}
 

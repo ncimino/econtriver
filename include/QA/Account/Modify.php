@@ -1,6 +1,6 @@
 <?php
-class QA_Account_Modifier {
-	static function insertAccount($acctName,$db) {
+class QA_Account_Modify {
+	static function insert($acctName,$db) {
 		$accountNameEscaped = Normalize::mysql($acctName);
 		$sql = "INSERT INTO q_acct (name,active)
 				VALUES ('{$accountNameEscaped}',1);";
@@ -13,7 +13,7 @@ class QA_Account_Modifier {
 		return $db->query($sql);
 	}
 
-	static function dropAccount($acctId,$userId,$db) {
+	static function drop($acctId,$userId,$db) {
 		$sql = "UPDATE q_acct,q_owners SET active = 0
 				WHERE q_acct.id = {$acctId} 
 				  AND acct_id = q_acct.id 
@@ -21,7 +21,7 @@ class QA_Account_Modifier {
 		return $db->query($sql);
 	}
 
-	static function restoreAccount($acctId,$userId,$db) {
+	static function restore($acctId,$userId,$db) {
 		$sql = "UPDATE q_acct,q_owners
 				  SET active = 1 
 				WHERE q_acct.id = {$acctId} 
@@ -30,7 +30,7 @@ class QA_Account_Modifier {
 		return $db->query($sql);
 	}
 
-	static function updateAccount($name,$acctId,$userId,$db) {
+	static function update($name,$acctId,$userId,$db) {
 		$accountNameEscaped = Normalize::mysql($name);
 		$sql = "UPDATE q_acct,q_owners
 				  SET name = '{$accountNameEscaped}' 
