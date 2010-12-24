@@ -1,5 +1,5 @@
 <?php
-class QA_Account_Builder {
+class QA_Account_Build {
 	const OWNED_TITLE = 'Owned Accounts:';
 	const SHARED_TITLE = 'Shared Accounts:';
 	const DELETED_TITLE = 'Deleted Accounts:';
@@ -32,7 +32,7 @@ class QA_Account_Builder {
 		$tableListAccounts = new Table($parentElement,$db->num($queryResult),$cols,$tableName);
 		$i = 0;
 		while ($account = $db->fetch($queryResult)) {
-			$accountName = (empty($account['name'])) ? QA_Account_Select::accountNameById($this->getEditAcctId(),$this) : $account['name'];
+			$accountName = (empty($account['name'])) ? QA_Account_Select::nameById($this->getEditAcctId(),$this) : $account['name'];
 			$inputId = self::get(IDS,'fs').'_'.$account['id'];
 			$inputName = $this->getEditAcctNameInName().'_'.$account['id'];
 

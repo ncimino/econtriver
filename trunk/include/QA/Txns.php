@@ -109,8 +109,8 @@ class QA_Txns extends QA_Widget {
 	}
 
 	function createWidget() {
-		$this->activeAccounts = QA_Account_Select::activeAccounts($this->user->getUserId(),$this->DB);
-		$this->ownedAccounts = QA_Account_Select::ownedAccounts($this->user->getUserId(),$this->DB);
+		$this->activeAccounts = QA_Account_Select::active($this->user->getUserId(),$this->DB);
+		$this->ownedAccounts = QA_Account_Select::owned($this->user->getUserId(),$this->DB);
 		$this->sqlAcctsToShow = QA_Account_Select::sqlAcctsToShow($this->selectedAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);
 		if ($this->DB->num($this->activeAccounts)) {
 			$this->buildActions();
@@ -168,7 +168,7 @@ class QA_Txns extends QA_Widget {
 
 	function buildActionAcctsForDropDown($selectAcctMenu,$groupName,$userId,$groupId,$selectedAcct) {
 		$allAccountsIndex = 0;
-		$ownedAccountsForUser = QA_Account_Select::sharedAccountsForOwner($userId,$this->user->getUserId(),$this->DB);
+		$ownedAccountsForUser = QA_Account_Select::sharedForOwner($userId,$this->user->getUserId(),$this->DB);
 		if (($userId == $this->user->getUserId()) or ($this->DB->num($ownedAccountsForUser))) {
 			$selectAcctMenu->addOption($groupName,$groupId,($selectedAcct == $groupId),NULL,'dropdown_group');
 			$this->DB->resetRowPointer($this->activeAccounts);
