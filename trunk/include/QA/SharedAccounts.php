@@ -8,8 +8,8 @@ class QA_SharedAccounts extends QA_Widget {
 	private $parentId;
 
 	function getSplitGroupAcctClass() { return 'split_grp_acct'; }
-	function getFsId() { return self::getMainClass().'_id'; }
-	function getFsCloseId() { return self::getMainClass().'_close_id'; }
+	function I_FS { return C_MAIN.'_id'; }
+	function I_FS_CLOSE { return C_MAIN.'_close_id'; }
 	function getAcctClass() { return 'account'; }
 	function getSharedAcctId() { return self::getAcctClass().'id'; }
 	function getOwnedAcctId() { return self::getAcctClass().'id'; }
@@ -114,13 +114,13 @@ class QA_SharedAccounts extends QA_Widget {
 		$this->getActiveGroups();
 		$this->sharedAccounts();
 		$this->ownedAccounts();
-		$divQuickAccounts = new HTML_Fieldset($this->container,self::getFsId(),'manage_title');		
+		$divQuickAccounts = new HTML_Fieldset($this->container,self::I_FS,'manage_title');		
 		$lClose = new HTML_Legend($divQuickAccounts,'Account Sharing');
-		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$lClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
 		$lClose->setAttribute('title','Close');
 		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
-		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
-		$divClose = new HTML_Span($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
+		$aClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
+		$divClose = new HTML_Span($aClose,'',self::I_FS_CLOSE,'ui-icon ui-icon-circle-close ui-state-red');
 		$tableSplit = new Table($divQuickAccounts,1,3,'',self::getSplitGroupAcctClass());
 		$this->buildOwnedAccountsTable($tableSplit->cells[0][0]);
 		$this->buildSharedAccountsTable($tableSplit->cells[0][0]);
@@ -160,7 +160,7 @@ class QA_SharedAccounts extends QA_Widget {
 				$sharesP = new HTML_Paragraph($sharesDiv,$group['name']);
 				if ($allowEditing) {
 					$sharesA = new HTML_Anchor($sharesP,'#','','','');
-					$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('quick_accounts_manage_div','{$group['group_id']}','{$account['id']}');");
+					$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('qa_mng_div','{$group['group_id']}','{$account['id']}');");
 					$sharesSpan = new HTML_Span($sharesA,'','','ui-icon ui-icon-circle-close');
 					$sharesSpan->setStyle('float: right;');
 				}

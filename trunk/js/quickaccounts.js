@@ -16,29 +16,37 @@ function bindQaAccts() {
 	return QaTxnGet();
 }
 
+$(document).ready(function() {
+	// Bind Txn Add focus to Special color
+	$('.acct_axn').live('click', function() {
+		alert(this.getAttribute('id'));
+		var post_data = "action="+this.getAttribute('id');
+		AjaxIt('QA_Account_AJAX', 'qa_mng_div', post_data);
+	});
+});
 function QA_Account_AJAX_Get(content_id) {
-	// AjaxIt('QA_Account_AJAX_Get', content_id, '', '', bindQaAccts());
-	AjaxIt('QA_Account_AJAX_Get', content_id);
+	var post_data = "action=get";
+	AjaxIt('QA_Account_AJAX', content_id, post_data);
 }
 
 function QA_Account_AJAX_Add(content_id, name_id) {
-	var post_data = "name=" + escape(document.getElementById(name_id).value);
-	AjaxIt('QA_Account_AJAX_Add', content_id, post_data, name_id, bindQaAccts());
+	var post_data = "action=add&name=" + escape(document.getElementById(name_id).value);
+	AjaxIt('QA_Account_AJAX', content_id, post_data, name_id, bindQaAccts());
 }
 
 function QA_Account_AJAX_Edit(content_id, name_id, acct_id) {
-	var post_data = "name=" + escape(document.getElementById(name_id).value) + "&acct_id=" + acct_id;
-	AjaxIt('QA_Account_AJAX_Edit', content_id, post_data, name_id, bindQaAccts());
+	var post_data = "action=edit&name=" + escape(document.getElementById(name_id).value) + "&acct_id=" + acct_id;
+	AjaxIt('QA_Account_AJAX', content_id, post_data, name_id, bindQaAccts());
 }
 
 function QA_Account_AJAX_Drop(content_id, acct_id) {
-	var post_data = "acct_id=" + acct_id;
-	AjaxIt('QA_Account_AJAX_Drop', content_id, post_data, '', bindQaAccts());
+	var post_data = "action=drop&acct_id=" + acct_id;
+	AjaxIt('QA_Account_AJAX', content_id, post_data, '', bindQaAccts());
 }
 
 function QA_Account_AJAX_Restore(content_id, acct_id) {
-	var post_data = "acct_id=" + acct_id;
-	AjaxIt('QA_Account_AJAX_Restore', content_id, post_data, '', bindQaAccts());
+	var post_data = "action=restore&acct_id=" + acct_id;
+	AjaxIt('QA_Account_AJAX', content_id, post_data, '', bindQaAccts());
 }
 
 /*
@@ -171,7 +179,7 @@ function QaContactDrop(content_id, user_id) {
  */
 var sort_by_id;
 $(document).ready(function() {
-	if ($('#quick_accounts_txn_div').length) {
+	if ($('#qa_txn_div').length) {
 		QaTxnGet();
 	}
 	
@@ -211,12 +219,12 @@ $(document).ready(function() {
 	// Bind Sort Txns link to QaTxnSort
 	$('.txn_title').live('click', function() {
 		sort_by_id = this.id;
-		QaTxnGet('quick_accounts_txn_div', this.id, 1);
+		QaTxnGet('qa_txn_div', this.id, 1);
 	});
 	
 	// Bind Show Acct dropdown to QaTxnShow
 	$('#show_acct').live('change', function() {
-		QaTxnGet('quick_accounts_txn_div', sort_by_id, 0, this.value);
+		QaTxnGet('qa_txn_div', sort_by_id, 0, this.value);
 	});
 	
 	// Bind BankSays Checkbox to QaTxnEdit
@@ -224,7 +232,7 @@ $(document).ready(function() {
 			.live('click', function() {
 				txn_id = this.getAttribute('id')
 						.slice(this.getAttribute('id').lastIndexOf('_') + 1);
-				QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document
+				QaTxnEdit('qa_txn_div', sort_by_id, 0, document
 						.getElementById('show_acct').value, txn_id);
 			});
 	
@@ -281,12 +289,12 @@ $(document).ready(function() {
 	// Bind Txn Save to QaTxnEdit
 	$('.txn_save').live('click', function() {
 			txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_') + 1);
-			QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document.getElementById('show_acct').value, txn_id);
+			QaTxnEdit('qa_txn_div', sort_by_id, 0, document.getElementById('show_acct').value, txn_id);
 		}).live('keypress', function(e) {
 			if (e.keyCode == 13) {
 				txn_id = this.getAttribute('id')
 					.slice(this.getAttribute('id').lastIndexOf('_') + 1);
-				QaTxnEdit('quick_accounts_txn_div', sort_by_id, 0, document
+				QaTxnEdit('qa_txn_div', sort_by_id, 0, document
 						.getElementById('show_acct').value, txn_id);
 			}
 		});
@@ -295,7 +303,7 @@ $(document).ready(function() {
 	$('.txnh_make_active').live('click', function() {
 		txn_id = this.getAttribute('id').slice(this.getAttribute('id').lastIndexOf('_') + 1);
 		active_txn_id = $('#txnh_make_inactive_' + txn_id).val();
-		QaTxnMakeActive('quick_accounts_txn_div', sort_by_id, 0, document.getElementById('show_acct').value, txn_id, active_txn_id);
+		QaTxnMakeActive('qa_txn_div', sort_by_id, 0, document.getElementById('show_acct').value, txn_id, active_txn_id);
 	});
 	
 	// Bind TxnT Make Active to QaTxnRestore
@@ -334,7 +342,7 @@ function bindQaTxnGetNotes(txn_id) {
 }
 
 function QaTxnEdit(content_id, sort_id, change_dir, show_acct, txn_id, focus_id) {
-	if (!content_id) content_id = 'quick_accounts_txn_div';
+	if (!content_id) content_id = 'qa_txn_div';
 	if (!focus_id) focus_id = '';
 	var post_data = getTxnDataFromInputs('txn_', '_' + txn_id) + "&current_txn_id=" + escape(txn_id);
 	AjaxIt('QaTxnAdd', content_id, post_data, focus_id, bindQaTxn());
@@ -368,13 +376,13 @@ function QaTxnGetTrash(sort_id, change_dir, show_acct, content_id) {
 }
 
 function QaTxnDelete(txn_id, content_id) {
-	if (!content_id) content_id = 'quick_accounts_txn_div';
+	if (!content_id) content_id = 'qa_txn_div';
 	var post_data = "txn_id=" + escape(txn_id) + "&log=true";
 	AjaxIt('QaTxnDelete', content_id, post_data, '', bindQaTxn());
 }
 
 function QaTxnGet(content_id, sort_id, change_dir, show_acct) {
-	if (!content_id) content_id = 'quick_accounts_txn_div';
+	if (!content_id) content_id = 'qa_txn_div';
 	var post_data = getDisplayOptions(sort_id, change_dir, show_acct);
 	AjaxIt('QaTxnGet', content_id, post_data, '', bindQaTxn());
 }
@@ -392,25 +400,25 @@ function getDisplayOptions(sort_id, change_dir, show_acct) {
 }
 
 function QaTxnRestore(txn_id, content_id) {
-	if (!content_id) content_id = 'quick_accounts_txn_div';
+	if (!content_id) content_id = 'qa_txn_div';
 	var post_data = "txn_id=" + escape(txn_id);
 	AjaxIt('QaTxnRestore', content_id, post_data, '', bindQaTxn());
 }
 
 function QaTxnMakeActive(content_id, sort_id, change_dir, show_acct, txn_id, active_txn_id) {
-	if (!content_id) content_id = 'quick_accounts_txn_div';
+	if (!content_id) content_id = 'qa_txn_div';
 	var post_data = getDisplayOptions(sort_id, change_dir, show_acct) + "&" + getTxnDataFromInputs('txnh_', '_' + txn_id) + "&current_txn_id=null" + "&log=true" + "&active_txn_id=" + escape(active_txn_id);
 	AjaxIt('QaTxnMakeActive', content_id, post_data, '', bindQaTxn());
 }
 
 function QaTxnAddNotes(txn_id, note, content_id) {
-	if (!content_id) content_id = 'quick_accounts_txn_div';
+	if (!content_id) content_id = 'qa_txn_div';
 	var post_data = "txn_id=" + escape(txn_id) + "&note=" + escape(note);
 	AjaxIt('QaTxnAddNotes', content_id, post_data, '', bindQaTxn());
 }
 
 function QaTxnAdd(current_txn_id, focus_id, content_id) {
-	if (!content_id) content_id = 'quick_accounts_txn_div';
+	if (!content_id) content_id = 'qa_txn_div';
 	if (!focus_id) focus_id = 'new_txn_type';
 	var post_data = getTxnDataFromInputs('new_txn_') + "&current_txn_id=null";
 	AjaxIt('QaTxnAdd', content_id, post_data, focus_id, bindQaTxn());

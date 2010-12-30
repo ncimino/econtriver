@@ -10,11 +10,10 @@ abstract class QA_Widget {
 	protected $show_msg_div;
 
 	const C_MAIN = 'quick_accts';
+	const C_MSGS = 'info_messages';
 	
-	static function getMainClass() { return 'quick_accts'; }
-	static function getQaMsgsClass() { return 'info_messages'; }
-	static function getQaMsgsId() { return 'widget_info_messages'; }
-
+	const I_MSGS = 'widget_info_messages';
+	
 	function __construct($show_msg_div=TRUE,$tabStartIndex=0) {
 		$this->show_msg_div = $show_msg_div;
 		$this->tabIndex = new TabIndex($tabStartIndex);
@@ -25,7 +24,7 @@ abstract class QA_Widget {
 		$this->document = HTML_Document::createHTML_Document();
 		$this->container = new HTML_Fragment($this->document);
 		if ($this->show_msg_div) {
-			$divInfoMsg = new HTML_Div($this->container,self::getQaMsgsId(),self::getQaMsgsClass());
+			$divInfoMsg = new HTML_Div($this->container,self::I_MSGS,self::C_MSGS);
 			$this->infoMsg->commitDiv($divInfoMsg);
 		}
 	}
