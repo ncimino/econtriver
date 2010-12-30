@@ -7,8 +7,8 @@ class QA_GroupMembers extends QA_Widget {
 	private $parentId;
 
 	function getSplitGroupMemberClass() { return 'split_grp_acct'; }
-	function getFsId() { return self::getMainClass().'_id'; }
-	function getFsCloseId() { return self::getMainClass().'_close_id'; }
+	function I_FS { return C_MAIN.'_id'; }
+	function I_FS_CLOSE { return C_MAIN.'_close_id'; }
 	function getContactClass() { return 'contact'; }
 	function getContactInputId() { return self::getContactClass(); }
 	function getContactId() { return self::getContactClass().'id'; }
@@ -82,13 +82,13 @@ class QA_GroupMembers extends QA_Widget {
 	function createWidget() {
 		$this->activeGroups = QA_SelectGroupMembers::getActiveGroups($this->user->getUserId(),$this->DB);
 		$this->contacts = QA_SelectGroupMembers::getContacts($this->user->getUserId(),$this->DB);
-		$divQuickAccounts = new HTML_Fieldset($this->container,self::getFsId(),'manage_title');
+		$divQuickAccounts = new HTML_Fieldset($this->container,self::I_FS,'manage_title');
 		$lClose = new HTML_Legend($divQuickAccounts,'Group Memberships');
-		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$lClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
 		$lClose->setAttribute('title','Close');
 		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
-		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
-		$divClose = new HTML_Span($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
+		$aClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
+		$divClose = new HTML_Span($aClose,'',self::I_FS_CLOSE,'ui-icon ui-icon-circle-close ui-state-red');
 		$tableSplit = new Table($divQuickAccounts,1,2,'',self::getSplitGroupMemberClass());
 		$this->buildActiveGroupsTable($tableSplit->cells[0][0]);
 		$this->buildAddContactForm($tableSplit->cells[0][1]);
@@ -147,7 +147,7 @@ class QA_GroupMembers extends QA_Widget {
 			$inputEditGroup = new HTML_Div($tableListGroups->cells[$i][0],$inputId,$inputClass);
 			$contactsP = new HTML_Paragraph($inputEditGroup,$contact['handle']);
 			$contactsA = new HTML_Anchor($contactsP,'#','','','');
-			$contactsA->setAttribute('onclick',"QaContactDrop('quick_accounts_manage_div','{$contact['contact_id']}');");
+			$contactsA->setAttribute('onclick',"QaContactDrop('qa_mng_div','{$contact['contact_id']}');");
 			$contactsSpan = new HTML_Span($contactsA,'','','ui-icon ui-icon-circle-close');
 			$contactsSpan->setStyle('float: right;');
 			$i++;

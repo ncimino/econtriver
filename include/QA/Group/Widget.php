@@ -4,17 +4,19 @@ class QA_Group_Widget extends QA_Widget {
 	private $inactiveGroups; // MySQL result
 	private $parentId;
 	private $grpName = '';
+	
+	const C_CREATE = 'add_grp';
+	const C_EDIT = 'group';
+	const C_ACTIVE = 'active_grps';
+	const C_INACTIVE = 'inactive_grps';
+	
+	const I_FS = 'quick_accts_id';
+	const I_FS_CLOSE = 'quick_accts_close_id';
+	const I_CREATE = 'add_grp_text';
+	const I_EDIT = 'group_text';
 
-	function getFsId() { return self::getMainClass().'_id'; }
-	function getFsCloseId() { return self::getMainClass().'_close_id'; }
-	function getCreateGrpClass() { return 'add_grp'; }
-	function getCreateGrpInName() { return self::getCreateGrpClass().'_name'; }
-	function getCreateGrpInId() { return self::getCreateGrpClass().'_text'; }
-	function getEditGrpNameClass() { return 'group'; }
-	function getEditGrpNameInName() { return self::getEditGrpNameClass().'_name'; }
-	function getEditGrpNameInId() { return self::getEditGrpNameClass().'_text'; }
-	function getActiveGrpClass() { return 'active_grps'; }
-	function getInactiveGrpClass() { return 'inactive_grps'; }
+	const N_CREATE = 'add_grp_name';
+	const N_EDIT = 'group_name';
 
 	function __construct($parentId) {
 		parent::__construct();
@@ -167,13 +169,13 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 	function createWidget() {
 		$this->getActiveGroups();
 		$this->getInactiveGroups();
-		$divQuickAccounts = new HTML_Fieldset($this->container,self::getFsId(),'manage_title');
+		$divQuickAccounts = new HTML_Fieldset($this->container,self::I_FS,'manage_title');
 		$lClose = new HTML_Legend($divQuickAccounts,'Group Management');
-		$lClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
+		$lClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
 		$lClose->setAttribute('title','Close');
 		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
-		$aClose->setAttribute('onclick',"hideElement('".self::getFsId()."','slow');");
-		$divClose = new HTML_Span($aClose,'',self::getFsCloseId(),'ui-icon ui-icon-circle-close ui-state-red');
+		$aClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
+		$divClose = new HTML_Span($aClose,'',self::I_FS_CLOSE,'ui-icon ui-icon-circle-close ui-state-red');
 		$this->buildCreateGroupForm($divQuickAccounts);
 		$this->buildActiveGroupsTable($divQuickAccounts);
 		$this->buildInactiveGroupsTable($divQuickAccounts);
@@ -182,15 +184,15 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 
 	function buildActiveGroupsTable($parentElement) {
 		if ($this->DB->num($this->activeGroups)>0) {
-			$divGroups = new HTML_Div($parentElement,self::getActiveGrpClass());
-			$this->buildGroupsTable($divGroups,'Active Groups:',$this->activeGroups,self::getActiveGrpClass());
+			$divGroups = new HTML_Div($parentElement,self::C_ACTIVE);
+			$this->buildGroupsTable($divGroups,'Active Groups:',$this->activeGroups,self::C_ACTIVE);
 		}
 	}
 
 	function buildInactiveGroupsTable($parentElement) {
 		if ($this->DB->num($this->inactiveGroups)>0) {
-			$divGroups = new HTML_Div($parentElement,self::getInactiveGrpClass());
-			$this->buildGroupsTable($divGroups,'Inactive Groups:',$this->inactiveGroups,self::getInactiveGrpClass(),false);
+			$divGroups = new HTML_Div($parentElement,self::C_INACTIVE);
+			$this->buildGroupsTable($divGroups,'Inactive Groups:',$this->inactiveGroups,self::C_INACTIVE,false);
 		}
 	}
 
@@ -201,10 +203,10 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 		$i = 0;
 		while ($group = $this->DB->fetch($queryResult)) {
 			$groupName = (empty($group['name'])) ? $this->getGroupNameById($this->getEditGrpId()) : $group['name'];
-			$inputId = $this->getEditGrpNameInId().'_'.$group['group_id'];
-			$inputName = $this->getEditGrpNameInName().'_'.$group['group_id'];
+			$inputId = $this->I_EDIT.'_'.$group['group_id'];
+			$inputName = $this->N_EDIT.'_'.$group['group_id'];
 
-			$inputEditGroup = new HTML_InputText($tableListGroups->cells[$i][0],$inputName,$groupName,$inputId,$this->getEditGrpNameClass());
+			$inputEditGroup = new HTML_InputText($tableListGroups->cells[$i][0],$inputName,$groupName,$inputId,$this->C_EDIT);
 			if ($editable) {
 				$aEditGroup = new HTML_Anchor($tableListGroups->cells[$i][1],'#','Edit');
 				$aEditGroup->setAttribute('onclick',"QaGroupEdit('{$this->parentId}','{$inputId}','{$group['group_id']}');");
@@ -222,12 +224,12 @@ VALUES ({$this->DB->lastID()},{$this->user->getUserId()},1);";
 	}
 
 	function buildCreateGroupForm($parentElement) {
-		$divAddGroup = new HTML_Div($parentElement,'',$this->getCreateGrpClass());
+		$divAddGroup = new HTML_Div($parentElement,'',$this->C_CREATE);
 		new HTML_Heading($divAddGroup,5,'Add Group:');
-		$inputAddGroup = new HTML_InputText($divAddGroup,$this->getCreateGrpInName(),$this->grpName,$this->getCreateGrpInId(),$this->getCreateGrpClass());
-		$inputAddGroup->setAttribute('onkeypress',"enterCall(event,function() {QaGroupAdd('{$this->parentId}','{$this->getCreateGrpInId()}');})");
+		$inputAddGroup = new HTML_InputText($divAddGroup,$this->N_CREATE(),$this->grpName,$this->I_CREATE,$this->C_CREATE);
+		$inputAddGroup->setAttribute('onkeypress',"enterCall(event,function() {QaGroupAdd('{$this->parentId}','{$this->I_CREATE}');})");
 		$aAddGroup = new HTML_Anchor($divAddGroup,'#','Add Group');
-		$aAddGroup->setAttribute('onclick',"QaGroupAdd('{$this->parentId}','{$this->getCreateGrpInId()}');");
+		$aAddGroup->setAttribute('onclick',"QaGroupAdd('{$this->parentId}','{$this->I_CREATE}');");
 	}
 }
 ?>

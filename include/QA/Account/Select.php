@@ -115,11 +115,11 @@ class QA_Account_Select {
 	}
 
 	function aUserIsSelected($acct) {
-		return strstr($acct,USER_IDENTIFIER);
+		return strstr($acct,self::USER_IDENTIFIER);
 	}
 
 	function extractUserId($acct) {
-		return str_replace(USER_IDENTIFIER,"",$acct);
+		return str_replace(self::USER_IDENTIFIER,"",$acct);
 	}
 }
 ?>

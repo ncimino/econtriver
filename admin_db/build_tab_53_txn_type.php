@@ -1,5 +1,5 @@
 <?php
-require_once '../include/autoload.php';
+require_once 'DB_Handler.php';
 
 $sql = "CREATE TABLE txn_type
 (
