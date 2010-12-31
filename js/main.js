@@ -87,9 +87,6 @@ function AjaxIt(file, content_id, post_data, focus_id, after_load) {
 
 // AjaxGetIt('myfile.php?test=2');
 function AjaxGetIt(file, focus_id) {
-	split_file = file.split("?");
-	pop(split_file);
-	alert(pop(split_file));
 	url = "include/" + file;
 	return sendGetRequest(url, focus_id);
 }

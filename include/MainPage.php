@@ -18,17 +18,13 @@ class MainPage {
 	}
 	
 	function buildAccountManagementMenu($parentElement) {
-		$aManageAccounts = new HTML_Anchor($parentElement,'#','Manage Accounts','acct_get',QA_Account_Build::C_CREATE);
-		//$aManageAccounts->setAttribute('onclick',"QA_Account_AJAX_Get('".self::I_MNG."');");
+		new HTML_Anchor($parentElement,'#','Manage Accounts',QA_Account_Build::C_I_GET,QA_Account_Build::C_AXN);
 		new HTML_Text($parentElement,' | ');
-		$aManageGroups = new HTML_Anchor($parentElement,'#','Manage Groups');
-		//$aManageGroups->setAttribute('onclick',"QaGroupGet('".self::I_MNG."');");
+		new HTML_Anchor($parentElement,'#','Manage Groups');
 		new HTML_Text($parentElement,' | ');
-		$aAccountSharing = new HTML_Anchor($parentElement,'#','Account Sharing');
-		//$aAccountSharing->setAttribute('onclick',"QaSharedAccountsGet('".self::I_MNG."');");
+		new HTML_Anchor($parentElement,'#','Account Sharing');
 		new HTML_Text($parentElement,' | ');
-		$aGroupMembership = new HTML_Anchor($parentElement,'#','Group Membership');
-		//$aGroupMembership->setAttribute('onclick',"QaGroupMembersGet('".self::I_MNG."');");
+		new HTML_Anchor($parentElement,'#','Group Membership');
 	}
 }
 ?>
