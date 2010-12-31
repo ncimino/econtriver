@@ -134,7 +134,7 @@ img {
     margin: 4px;
 }
 
-table.groups, table.owned_accounts, table.shared_accounts {
+table.groups, table.owned_accts, table.shared_accts {
     border: #CCC 1px solid;
     padding: 4px;
     margin: 4px;
@@ -160,7 +160,7 @@ td.split_grp_acct_col {
     min-width: 10em;
 }
 
-.account {
+.accts {
     background-color: #FFE;
     border: #DD0 1px solid;
     padding: 4px;

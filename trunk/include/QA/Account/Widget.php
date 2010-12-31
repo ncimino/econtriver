@@ -69,10 +69,10 @@ class QA_Account_Widget extends QA_Widget {
 			$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 			$aClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
 			$divClose = new HTML_Span($aClose,'',self::I_FS_CLOSE,'ui-icon ui-icon-circle-close ui-state-red');
-			QA_Account_Build::buildCreateAccountForm($divQuickAccounts,$this->acctName,$this->parentId);
-			QA_Account_Build::buildOwnedAccountsTable($divQuickAccounts,$this->ownedAccounts,$this->parentId,$this->DB);
-			QA_Account_Build::buildSharedAccountsTable($divQuickAccounts,$this->sharedAccounts,$this->parentId,$this->DB);
-			QA_Account_Build::buildDeletedAccountsTable($divQuickAccounts,$this->deletedAccounts,$this->parentId,$this->DB);
+			QA_Account_Build::newForm($divQuickAccounts,$this->acctName,$this->parentId);
+			QA_Account_Build::ownedTable($divQuickAccounts,$this->ownedAccounts,$this->parentId,$this->DB);
+			QA_Account_Build::sharedTable($divQuickAccounts,$this->sharedAccounts,$this->parentId,$this->DB);
+			QA_Account_Build::deletedTable($divQuickAccounts,$this->deletedAccounts,$this->parentId,$this->DB);
 			$this->printHTML();
 		} catch (Exception $e) {
 			echo '<h1>Internal Exception:</h1><p>',  $e->getMessage(), "</p>";
