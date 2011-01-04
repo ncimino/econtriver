@@ -21,7 +21,7 @@ class DBCon {
 	
 	private function parseDbIniFile() {
 		if (! $this->ini_arr = parse_ini_file($this->ini_file)) {
-			throw new exception("Failed to parse '{$this->ini_file}'");
+			throw new exception("Failed to parse '{$this->ini_file}'",-1);
 		}
 	}
 

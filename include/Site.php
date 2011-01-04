@@ -10,7 +10,7 @@ class Site {
   public $document;
 
   function __construct($title) {
-    $this->DB = new DBCon();
+  	$this->DB = new DBCon();
     $this->siteInfo = new SiteInfo();
     $this->infoMsg = new InfoMsg();
     $this->user = new User($this->DB,$this->siteInfo,$this->infoMsg);

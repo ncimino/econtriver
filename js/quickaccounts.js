@@ -24,14 +24,19 @@ function prompt(id) {
 	}
 }
 
-$(document).ready(function() {
-	var axn = 'acct_axn';
+function linkAjaxAxn(axn,AJAX,content_id) {
 	$('.'+axn).live('click', function() {
 		var post_data = $('.'+$(this).attr('id')).serialize();
 		if (prompt($(this).attr('id'))) {
-			AjaxIt('QA_Account_AJAX', 'qa_mng_div', post_data);
+			AjaxIt(AJAX, content_id, post_data);
 		}
 	});
+}
+
+$(document).ready(function() {
+	content_id = 'qa_mng_div';
+	linkAjaxAxn('acct_axn','QA_Account_AJAX',content_id);
+	linkAjaxAxn('grp_axn','QA_Group_AJAX',content_id);
 });
 
 /*
@@ -52,23 +57,23 @@ function QaGroupAdd(content_id, name_id) {
 	AjaxIt('QaGroupAdd', content_id, post_data, name_id, bindQaGroups());
 }
 
-function QaGroupEdit(content_id, name_id, group_id) {
-	var post_data = "name=" + escape(document.getElementById(name_id).value) + "&group_id=" + group_id;
+function QaGroupEdit(content_id, name_id, grpId) {
+	var post_data = "name=" + escape(document.getElementById(name_id).value) + "&grpId=" + grpId;
 	AjaxIt('QaGroupEdit', content_id, post_data, name_id, bindQaGroups());
 }
 
-function QaGroupDrop(content_id, group_id) {
-	var post_data = "group_id=" + group_id;
+function QaGroupDrop(content_id, grpId) {
+	var post_data = "grpId=" + grpId;
 	AjaxIt('QaGroupDrop', content_id, post_data, '', bindQaGroups());
 }
 
-function QaGroupPermDrop(content_id, group_id) {
-	var post_data = "group_id=" + group_id;
+function QaGroupPermDrop(content_id, grpId) {
+	var post_data = "grpId=" + grpId;
 	AjaxIt('QaGroupPermDrop', content_id, post_data, '', bindQaGroups());
 }
 
-function QaGroupRejoin(content_id, group_id) {
-	var post_data = "group_id=" + group_id;
+function QaGroupRejoin(content_id, grpId) {
+	var post_data = "grpId=" + grpId;
 	AjaxIt('QaGroupRejoin', content_id, post_data, '', bindQaGroups());
 }
 

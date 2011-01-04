@@ -176,7 +176,7 @@ td.split_grp_acct_col {
 	color: #990;
 }
 
-#quick_accts_id {
+#qa_id {
     position: relative;
     border: lightgray 1px solid;
     padding: 8px;
@@ -186,7 +186,7 @@ td.split_grp_acct_col {
     border-radius: 4px;
 }
 
-#quick_accts_close_id {
+#qa_close_id {
     position: absolute;
     top: 1em;
     right: 0.5em;

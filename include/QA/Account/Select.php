@@ -10,7 +10,7 @@ class QA_Account_Select {
 		} elseif ($allowAllAccounts and ($id == 0)) {
 			return "All Accounts";
 		} else {
-			$sql = "SELECT name FROM q_acct
+			$sql = "SELECT name FROM ".QA_DB_Table::ACCT."
         		WHERE id = {$id};";
 			$db->query($sql);
 			$return = $db->fetch();
@@ -19,64 +19,80 @@ class QA_Account_Select {
 	}
 
 	function owned($userId,$db) {
-		$sql = "SELECT * FROM q_acct,q_owners
-		        WHERE q_acct.id = acct_id 
+		$sql = "SELECT * FROM ".QA_DB_Table::ACCT.",".QA_DB_Table::OWNERS."
+		        WHERE ".QA_DB_Table::ACCT.".id = acct_id 
 		          AND owner_id = {$userId}
 		          AND active = 1;";
 		return $db->query($sql);
 	}
 
 	function shared($userId,$db) {
-		$sql = "SELECT * FROM q_acct,q_share,q_user_groups,q_owners
-		        WHERE q_share.acct_id=q_acct.id
-		          AND q_user_groups.group_id=q_share.group_id
-		          AND q_user_groups.user_id = {$userId}
-		          AND q_user_groups.active = 1
-		          AND q_acct.active = 1
-		          AND q_owners.acct_id = q_acct.id
-		          AND q_owners.owner_id <> {$userId}
-		        GROUP BY q_acct.id;";
+		$sql = "SELECT * FROM ".QA_DB_Table::ACCT.",".QA_DB_Table::SHARE.",".QA_DB_Table::USER_GROUPS.",".QA_DB_Table::OWNERS."
+		        WHERE 
+		        GROUP BY ".QA_DB_Table::ACCT.".id;";
 		return $db->query($sql);
 	}
 
 	function sharedByOwner($ownerId,$userId,$db) {
-		$sql = "SELECT * FROM q_acct,q_share,q_user_groups,q_owners
-		        WHERE q_share.acct_id=q_acct.id
-		          AND q_user_groups.group_id=q_share.group_id
-		          AND q_user_groups.user_id = {$userId}
-		          AND q_user_groups.active = 1
-		          AND q_acct.active = 1
-		          AND q_owners.acct_id = q_acct.id
-		          AND q_owners.owner_id = {$ownerId}
-		        GROUP BY q_acct.id;";
+		$sql = "SELECT * FROM ".QA_DB_Table::ACCT.",".QA_DB_Table::SHARE.",".QA_DB_Table::USER_GROUPS.",".QA_DB_Table::OWNERS."
+		         WHERE ".self::sqlSharedWithUserByOwner($ownerId,$userId)."
+		         GROUP BY ".QA_DB_Table::ACCT.".id;";
 		return $db->query($sql);
 	}
 
 	function deleted($userId,$db) {
-		$sql = "SELECT * FROM q_acct,q_owners
-		        WHERE q_acct.id = acct_id 
-		          AND owner_id = {$userId}
-		          AND active = 0;";
+		$sql = "SELECT * FROM ".QA_DB_Table::ACCT.",".QA_DB_Table::OWNERS."
+		         WHERE ".self::sqlOwnedBy($userId,QA_DB_Table::INACTIVE).";";
 		return $db->query($sql);
 	}
 
 	function active($userId,$db) {
-		$sql = "SELECT q_acct.*,q_owners.owner_id
-				FROM q_acct,q_owners,q_share,q_user_groups
-				WHERE ( q_acct.id=q_owners.acct_id
-				  AND q_owners.owner_id={$userId}
-				  AND q_acct.active=1 ) 
-				  OR ( q_acct.id=q_share.acct_id
-				  AND q_acct.id=q_owners.acct_id
-				  AND q_share.group_id=q_user_groups.group_id
-				  AND q_user_groups.user_id={$userId}
-				  AND q_user_groups.active=1
-				  AND q_acct.active=1 )
-				GROUP BY q_acct.id
-				ORDER BY q_acct.name ASC;";
+		$sql = "SELECT ".QA_DB_Table::ACCT.".*,".QA_DB_Table::OWNERS.".owner_id
+				  FROM ".QA_DB_Table::ACCT.",".QA_DB_Table::OWNERS.",".QA_DB_Table::SHARE.",".QA_DB_Table::USER_GROUPS."
+				 WHERE ( ".self::sqlOwnedBy($userId)." ) 
+				    OR ( ".self::sqlSharedWithUser($userId)." )
+				 GROUP BY ".QA_DB_Table::ACCT.".id
+				 ORDER BY ".QA_DB_Table::ACCT.".name ASC;";
 		return $db->query($sql);
 	}
-
+	
+	function sqlSharedWithUserByOwner($ownerId,$userId,$acctActive=QA_DB_Table::ACTIVE,$shareActive=QA_DB_Table::ACTIVE) {
+		$sql = QA_DB_Table::OWNERS.".owner_id = ".Normalize::mysql($ownerId)."
+				AND ".self::sqlSharedWithUser($userId,$acctActive,$shareActive);
+		return $sql;
+	}
+	
+	function sqlSharedOnly() {
+		$sql = QA_DB_Table::OWNERS.".owner_id <> {$userId}
+				AND ".QA_DB_Table::SHARE.".acct_id=".QA_DB_Table::ACCT.".id
+				AND ".QA_DB_Table::USER_GROUPS.".grpId=".QA_DB_Table::SHARE.".grpId
+				AND ".QA_DB_Table::USER_GROUPS.".user_id = {$userId}
+				AND ".QA_DB_Table::USER_GROUPS.".active = 1
+				AND ".self::sqlLinkAcctWithOwner($active);
+		return $sql;
+	}
+	
+	function sqlSharedWithUser($userId,$acctActive=QA_DB_Table::ACTIVE,$shareActive=QA_DB_Table::ACTIVE) {
+		$sql = QA_DB_Table::ACCT.".id=".QA_DB_Table::SHARE.".acct_id
+				AND ".QA_DB_Table::SHARE.".grpId=".QA_DB_Table::USER_GROUPS.".grpId
+				AND ".QA_DB_Table::USER_GROUPS.".user_id=".Normalize::mysql($userId)."
+				AND ".QA_DB_Table::USER_GROUPS.".active=".Normalize::mysql($shareActive)."
+				AND ".self::sqlLinkAcctWithOwner($acctActive);
+		return $sql;
+	}
+	
+	function sqlOwnedBy($ownerId,$active=QA_DB_Table::ACTIVE) {
+		$sql = QA_DB_Table::OWNERS.".owner_id={$ownerId}
+				AND ".self::sqlLinkAcctWithOwner($active);
+		return $sql;
+	}
+	
+	function sqlLinkAcctWithOwner($active=QA_DB_Table::ACTIVE) {
+		$sql = QA_DB_Table::ACCT.".id=".QA_DB_Table::OWNERS.".acct_id
+				AND ".QA_DB_Table::ACCT.".active=".Normalize::mysql($active);
+		return $sql;
+	}
+	
 	function sqlActive($activeAccountsResult,$db) {
 		$i = 0;
 		$db->resetRowPointer($activeAccountsResult);

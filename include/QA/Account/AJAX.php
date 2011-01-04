@@ -16,7 +16,10 @@ if (isset($_POST[QA_Account_Build::C_AXN])) switch ($_POST[QA_Account_Build::C_A
 	case QA_Account_Build::C_I_RESTORE:
 		$widget->restoreEntries($_POST[QA_Account_Build::N_ACCT_ID]);
 		break;
+	case QA_Account_Build::C_I_GET:
+		break;
 	default:
+		$widget->infoMsg->addMessage(-1,'An Account Management action was attempted, but was not found.');
 		break;	
 } 
 

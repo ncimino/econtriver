@@ -31,6 +31,7 @@ class Normalize {
 	static function sanitize($value,$infoMsg,$siteInfo) {
 		$value = htmlentities($value);
 		if (empty($value)) {
+			$infoMsg->addMessage(0,'You must enter data.');
 			return false;
 		} elseif (!($siteInfo->verifyReferer())) {
 			$infoMsg->addMessage(0,'You cannot enter data using another website.');

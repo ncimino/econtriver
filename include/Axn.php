@@ -1,7 +1,7 @@
 <?php 
 class Axn {
 	public $parentElement;
-	public $text;
+	public $innerHtml;
 	public $action;
 	public $axnClass;
 	public $id;
@@ -15,9 +15,9 @@ class Axn {
 	
 	const N_VERIFY_DELETE = 'ver_del';
 	
-	function __construct($parentElement,$text,$action,$id,$axnClass='axn',$linkId='') {
+	function __construct($parentElement,$innerHtml,$action,$id,$axnClass='axn',$linkId='') {
 		$this->parentElement = $parentElement;
-		$this->text = $text;
+		$this->innerHtml = $innerHtml;
 		$this->action = $action;
 		$this->axnClass = $axnClass;
 		$this->id = $id;
@@ -28,11 +28,11 @@ class Axn {
 	}
 	
 	function setAnchor() {
-		$this->$anchor = new HTML_Anchor($this->parentElement,$this->href,$this->text,$this->uid,$this->axnClass);
+		$this->anchor = new HTML_Anchor($this->parentElement,$this->href,$this->innerHtml,$this->uid,$this->axnClass);
 	}
 	
 	function setLink() {
-		$this->$link = new HTML_InputHidden($this->parentElement,$this->axnClass,$this->action,$this->linkId,$this->uid);
+		$this->link = new HTML_InputHidden($this->parentElement,$this->axnClass,$this->action,$this->linkId,$this->uid);
 	}
 	
 	function setId() {
@@ -41,6 +41,24 @@ class Axn {
 	
 	function getId() {
 		return $this->uid;
+	}
+	
+	function verifyDelete($item) {
+		$this->axn_arr[] = new HTML_InputHidden($this->parentElement,self::N_VERIFY_DELETE,$item,'',$this->uid);
+	}
+	
+	function uses($elements) {
+		foreach ( $elements as $element ) {
+			$element->setClass(self::getId().' '.$element->getClass());
+		}
+	}
+	
+	function remove() {
+		$this->anchor->remove();
+		$this->link->remove();
+		foreach ( $this->axn_arr as $value ) {
+			$value->remove();
+		}
 	}
 }
 ?>

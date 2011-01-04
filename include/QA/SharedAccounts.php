@@ -40,7 +40,7 @@ class QA_SharedAccounts extends QA_Widget {
 	function insertShare($acctId,$grpId) {
 		$this->getShare($acctId,$grpId);
 		if ($this->DB->num() == 0) {
-			$sql = "INSERT INTO q_share (acct_id,group_id) VALUES ('{$acctId}','{$grpId}');";
+			$sql = "INSERT INTO ".QA_DB_Table::SHARE." (acct_id,grpId) VALUES ('{$acctId}','{$grpId}');";
 			return $this->DB->query($sql);
 		} else {
 			$this->infoMsg->addMessage(0,'This group is already associated with this account.');
@@ -48,62 +48,62 @@ class QA_SharedAccounts extends QA_Widget {
 	}
 
 	function getShare($acctId,$grpId) {
-		$sql = "SELECT id FROM q_share WHERE acct_id='{$acctId}' AND group_id='{$grpId}';";
+		$sql = "SELECT id FROM ".QA_DB_Table::SHARE." WHERE acct_id='{$acctId}' AND grpId='{$grpId}';";
 		return $this->DB->query($sql);
 	}
 
 	function dropShare($acctId,$grpId) {
-		$sql = "DELETE q_share.*
-			FROM q_share,q_owners
-			WHERE q_share.acct_id = {$acctId}
-			AND q_share.group_id = {$grpId}
-			AND q_owners.acct_id = q_share.acct_id
-			AND q_owners.owner_id = {$this->user->getUserId()};";
+		$sql = "DELETE ".QA_DB_Table::SHARE.".*
+			FROM ".QA_DB_Table::SHARE.",".QA_DB_Table::OWNERS."
+			WHERE ".QA_DB_Table::SHARE.".acct_id = {$acctId}
+			AND ".QA_DB_Table::SHARE.".grpId = {$grpId}
+			AND ".QA_DB_Table::OWNERS.".acct_id = ".QA_DB_Table::SHARE.".acct_id
+			AND ".QA_DB_Table::OWNERS.".owner_id = {$this->user->getUserId()};";
 		return $this->DB->query($sql);
 	}
 
 	function ownedAccounts() {
-		$sql = "SELECT * FROM q_acct,q_owners
-        WHERE q_acct.id = acct_id 
+		$sql = "SELECT * FROM ".QA_DB_Table::ACCT.",".QA_DB_Table::OWNERS."
+        WHERE ".QA_DB_Table::ACCT.".id = acct_id 
           AND owner_id = {$this->user->getUserId()}
           AND active = 1;";
 		$this->ownedAccounts = $this->DB->query($sql);
 	}
 
 	function sharedAccounts() {
-		$sql = "SELECT * FROM q_acct,q_share,q_user_groups,q_owners
-        WHERE q_share.acct_id=q_acct.id
-          AND q_user_groups.group_id=q_share.group_id
-          AND q_user_groups.user_id = {$this->user->getUserId()}
-          AND q_user_groups.active = 1
-          AND q_acct.active = 1
-          AND q_owners.acct_id = q_acct.id
-          AND q_owners.owner_id <> {$this->user->getUserId()}
-        GROUP BY q_acct.id;";
+		$sql = "SELECT * FROM ".QA_DB_Table::ACCT.",".QA_DB_Table::SHARE.",".QA_DB_Table::USER_GROUPS.",".QA_DB_Table::OWNERS."
+        WHERE ".QA_DB_Table::SHARE.".acct_id=".QA_DB_Table::ACCT.".id
+          AND ".QA_DB_Table::USER_GROUPS.".grpId=".QA_DB_Table::SHARE.".grpId
+          AND ".QA_DB_Table::USER_GROUPS.".user_id = {$this->user->getUserId()}
+          AND ".QA_DB_Table::USER_GROUPS.".active = 1
+          AND ".QA_DB_Table::ACCT.".active = 1
+          AND ".QA_DB_Table::OWNERS.".acct_id = ".QA_DB_Table::ACCT.".id
+          AND ".QA_DB_Table::OWNERS.".owner_id <> {$this->user->getUserId()}
+        GROUP BY ".QA_DB_Table::ACCT.".id;";
 		$this->sharedAccounts = $this->DB->query($sql);
 	}
 
 	function getActiveGroups() {
-		$sql = "SELECT * FROM q_group,q_user_groups
-        WHERE q_group.id = group_id 
+		$sql = "SELECT * FROM ".QA_DB_Table::GROUP.",".QA_DB_Table::USER_GROUPS."
+        WHERE ".QA_DB_Table::GROUP.".id = grpId 
           AND user_id = {$this->user->getUserId()}
           AND active = 1;";
 		$this->activeGroups = $this->DB->query($sql);
 	}
 
 	function getContactGroups() {
-		$sql = "SELECT * FROM contacts,q_user_groups,q_group
+		$sql = "SELECT * FROM contacts,".QA_DB_Table::USER_GROUPS.",".QA_DB_Table::GROUP."
         WHERE owner_id = {$this->user->getUserId()}
-          AND contact_id = q_user_groups.user_id
-          AND q_user_groups.group_id = q_group.id
-          AND q_user_groups.active = 1
-        GROUP BY q_group.id;";
+          AND contact_id = ".QA_DB_Table::USER_GROUPS.".user_id
+          AND ".QA_DB_Table::USER_GROUPS.".grpId = ".QA_DB_Table::GROUP.".id
+          AND ".QA_DB_Table::USER_GROUPS.".active = 1
+        GROUP BY ".QA_DB_Table::GROUP.".id;";
 		$this->contactGroups = $this->DB->query($sql);
 	}
 
 	function getActiveShares($acctId) {
-		$sql = "SELECT * FROM q_share,q_group
-        WHERE q_group.id = group_id 
+		$sql = "SELECT * FROM ".QA_DB_Table::SHARE.",".QA_DB_Table::GROUP."
+        WHERE ".QA_DB_Table::GROUP.".id = grpId 
           AND acct_id = {$acctId}
         ORDER BY name ASC;";
 		$this->activeShares = $this->DB->query($sql);
@@ -154,13 +154,13 @@ class QA_SharedAccounts extends QA_Widget {
 			new HTML_Paragraph($inputAccount,$account['name']);
 			$this->getActiveShares($account['id']);
 			while ($group = $this->DB->fetch()) {
-				$groupId = $this->getActiveGrpId().'_'.$group['group_id'];
+				$grpId = $this->getActiveGrpId().'_'.$group['grpId'];
 				$groupClass = $this->getGrpClass().' ui-draggable sub-item';
-				$sharesDiv = new HTML_Div($tableListAccounts->cells[$i][0],$groupId,$groupClass);
+				$sharesDiv = new HTML_Div($tableListAccounts->cells[$i][0],$grpId,$groupClass);
 				$sharesP = new HTML_Paragraph($sharesDiv,$group['name']);
 				if ($allowEditing) {
 					$sharesA = new HTML_Anchor($sharesP,'#','','','');
-					$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('qa_mng_div','{$group['group_id']}','{$account['id']}');");
+					$sharesA->setAttribute('onclick',"QaSharedAccountsDrop('qa_mng_div','{$group['grpId']}','{$account['id']}');");
 					$sharesSpan = new HTML_Span($sharesA,'','','ui-icon ui-icon-circle-close');
 					$sharesSpan->setStyle('float: right;');
 				}
@@ -188,7 +188,7 @@ class QA_SharedAccounts extends QA_Widget {
 		$tableListGroups = new Table($parentElement,$this->DB->num($queryResult),1);
 		$i = 0;
 		while ($group = $this->DB->fetch($queryResult)) {
-			$inputId = $this->getActiveGrpId().'_'.$group['group_id'];
+			$inputId = $this->getActiveGrpId().'_'.$group['grpId'];
 			$inputClass = $this->getGrpClass().' ui-draggable';
 			$inputEditGroup = new HTML_Div($tableListGroups->cells[$i][0],$inputId,$inputClass);
 			new HTML_Paragraph($inputEditGroup,$group['name']);

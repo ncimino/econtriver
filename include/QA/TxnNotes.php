@@ -34,36 +34,36 @@ class QA_TxnNotes extends QA_Txns {
 	}
 
 	function getUserGroups($parent_txn_id) {
-		$sql = "SELECT q_user_groups.group_id,q_group.name
-				FROM q_user_groups,q_group,q_share,q_txn
-				WHERE q_user_groups.active = 1
-				  AND q_user_groups.user_id = {$this->user->getUserId()}
-				  AND q_user_groups.group_id = q_group.id
-				  AND q_user_groups.group_id = q_share.group_id
-				  AND q_share.acct_id = q_txn.acct_id
+		$sql = "SELECT ".QA_DB_Table::USER_GROUPS.".grpId,".QA_DB_Table::GROUP.".name
+				FROM ".QA_DB_Table::USER_GROUPS.",".QA_DB_Table::GROUP.",".QA_DB_Table::SHARE.",q_txn
+				WHERE ".QA_DB_Table::USER_GROUPS.".active = 1
+				  AND ".QA_DB_Table::USER_GROUPS.".user_id = {$this->user->getUserId()}
+				  AND ".QA_DB_Table::USER_GROUPS.".grpId = ".QA_DB_Table::GROUP.".id
+				  AND ".QA_DB_Table::USER_GROUPS.".grpId = ".QA_DB_Table::SHARE.".grpId
+				  AND ".QA_DB_Table::SHARE.".acct_id = q_txn.acct_id
 				  AND q_txn.parent_txn_id = $parent_txn_id
 				  AND q_txn.active = 1
-				ORDER BY q_group.name ASC;";
+				ORDER BY ".QA_DB_Table::GROUP.".name ASC;";
 		$this->userGroups = $this->DB->query($sql);
 	}
 
 	function getTxnGroupNotes($txn_id,$group_num=NULL) {
 		$group_num = ($group_num === NULL) ? $this->DB->num($this->userGroups) : $group_num;
 		if ($group_num == 0) {
-			$group_ids = " q_group_notes.group_id <> q_group_notes.group_id "; // No group ID ever equals 0
+			$grpIds = " ".QA_DB_Table::GROUP."_notes.grpId <> ".QA_DB_Table::GROUP."_notes.grpId "; // No group ID ever equals 0
 		} else {
-			$current_group_id = $this->DB->fetch($this->userGroups);
-			$group_ids = "q_group_notes.group_id = {$current_group_id['group_id']} ";
-			while ($current_group_id = $this->DB->fetch($this->userGroups)){
-				$group_ids .= ' OR q_group_notes.group_id='.$current_group_id['group_id'];
+			$current_grpId = $this->DB->fetch($this->userGroups);
+			$grpIds = "".QA_DB_Table::GROUP."_notes.grpId = {$current_grpId['grpId']} ";
+			while ($current_grpId = $this->DB->fetch($this->userGroups)){
+				$grpIds .= ' OR ".QA_DB_Table::GROUP."_notes.grpId='.$current_grpId['grpId'];
 			}
 		}
-		$sql = "SELECT q_group_notes.*,user.handle
-				FROM q_group_notes,user
-				WHERE q_group_notes.txn_id={$txn_id}
-				  AND ($group_ids)
-				  AND q_group_notes.user_id = user.user_id
-				ORDER BY q_group_notes.posted DESC;";
+		$sql = "SELECT ".QA_DB_Table::GROUP."_notes.*,user.handle
+				FROM ".QA_DB_Table::GROUP."_notes,user
+				WHERE ".QA_DB_Table::GROUP."_notes.txn_id={$txn_id}
+				  AND ($grpIds)
+				  AND ".QA_DB_Table::GROUP."_notes.user_id = user.user_id
+				ORDER BY ".QA_DB_Table::GROUP."_notes.posted DESC;";
 		$this->txnGroupNotes = $this->DB->query($sql);
 	}
 

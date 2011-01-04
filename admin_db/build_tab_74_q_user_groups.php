@@ -3,14 +3,14 @@ require_once 'DB_Handler.php';
 
 try {
 	$db_obj = new DBCon();
-	$sql = "CREATE TABLE q_user_groups
+	$sql = "CREATE TABLE ".QA_DB_Table::USER_GROUPS."
 (
 id int NOT NULL AUTO_INCREMENT, 
-CONSTRAINT q_user_groups_id PRIMARY KEY(id),
-group_id int NOT NULL,
-CONSTRAINT q_user_groups_group_id FOREIGN KEY (group_id) REFERENCES q_group(id),
+CONSTRAINT ".QA_DB_Table::USER_GROUPS."_id PRIMARY KEY(id),
+grpId int NOT NULL,
+CONSTRAINT ".QA_DB_Table::USER_GROUPS."_grpId FOREIGN KEY (grpId) REFERENCES ".QA_DB_Table::GROUP."(id),
 user_id int NOT NULL,
-CONSTRAINT q_user_groups_user_id FOREIGN KEY (user_id) REFERENCES user(user_id),
+CONSTRAINT ".QA_DB_Table::USER_GROUPS."_user_id FOREIGN KEY (user_id) REFERENCES user(user_id),
 active int(1) NOT NULL
 )";
 
