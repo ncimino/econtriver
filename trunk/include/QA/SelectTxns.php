@@ -9,11 +9,11 @@ class QA_SelectTxns {
 	}
 
 	function getTxns($sqlAcctsToShow,$sortField,$sortDir,$db) {
-		$sql = "SELECT q_txn.*,user.handle FROM q_txn,user,q_acct
+		$sql = "SELECT q_txn.*,user.handle FROM q_txn,user,".QA_DB_Table::ACCT."
 					WHERE (".$sqlAcctsToShow.")
 					  AND q_txn.active = 1
 					  AND q_txn.user_id = user.user_id
-					  AND q_txn.acct_id = q_acct.id
+					  AND q_txn.acct_id = ".QA_DB_Table::ACCT.".id
 					GROUP BY q_txn.id
 					ORDER BY {$sortField} {$sortDir},q_txn.type ASC,q_txn.establishment ASC,q_txn.note ASC,q_txn.entered ASC;"; // Need to add next lvl search for consistent results
 		return $db->query($sql);

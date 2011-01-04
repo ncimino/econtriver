@@ -45,8 +45,8 @@ class QA_Txns extends QA_Widget {
 
 	function convIdToField($input) {
 		switch($input) {
-			case 'q_acct.name': 				$return = 'txn_title_acctname';	break;
-			case 'txn_title_acctname' :			$return = 'q_acct.name'; break;
+			case '".QA_DB_Table::ACCT.".name': 				$return = 'txn_title_acctname';	break;
+			case 'txn_title_acctname' :			$return = '".QA_DB_Table::ACCT.".name'; break;
 			case 'user.handle':					$return = 'txn_title_handle'; break;
 			case 'txn_title_handle' :			$return = 'user.handle'; break;
 			case 'q_txn.entered':				$return = 'txn_title_entered'; break;
@@ -166,11 +166,11 @@ class QA_Txns extends QA_Widget {
 		}
 	}
 
-	function buildActionAcctsForDropDown($selectAcctMenu,$groupName,$userId,$groupId,$selectedAcct) {
+	function buildActionAcctsForDropDown($selectAcctMenu,$groupName,$userId,$grpId,$selectedAcct) {
 		$allAccountsIndex = 0;
 		$ownedAccountsForUser = QA_Account_Select::sharedForOwner($userId,$this->user->getUserId(),$this->DB);
 		if (($userId == $this->user->getUserId()) or ($this->DB->num($ownedAccountsForUser))) {
-			$selectAcctMenu->addOption($groupName,$groupId,($selectedAcct == $groupId),NULL,'dropdown_group');
+			$selectAcctMenu->addOption($groupName,$grpId,($selectedAcct == $grpId),NULL,'dropdown_group');
 			$this->DB->resetRowPointer($this->activeAccounts);
 			while($result = $this->DB->fetch($this->activeAccounts)) {
 				if ($result['owner_id'] == $userId) {
@@ -194,9 +194,9 @@ class QA_Txns extends QA_Widget {
 		return $selectAcctMenu->menu;
 	}
 
-	function buildAcctsForDropDown($selectAcctMenu,$groupName,$userId,$groupId,$selectedAcct) {
+	function buildAcctsForDropDown($selectAcctMenu,$groupName,$userId,$grpId,$selectedAcct) {
 		$allAccountsIndex = 0;
-		$selectAcctMenu->addOption($groupName,$groupId,FALSE);
+		$selectAcctMenu->addOption($groupName,$grpId,FALSE);
 		$selectAcctMenu->disableOption();
 		$this->DB->resetRowPointer($this->activeAccounts);
 		while($result = $this->DB->fetch($this->activeAccounts)) {
@@ -221,7 +221,7 @@ class QA_Txns extends QA_Widget {
 	function buildTxnTitles($tableTxn,$row) {
 		$col = 0;
 
-		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Account','q_acct.name',$this->convIdToField('q_acct.name'));
+		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Account','".QA_DB_Table::ACCT.".name',$this->convIdToField('".QA_DB_Table::ACCT.".name'));
 		$this->addSortableTitle($tableTxn->cells[$row][$col++],'User','user.handle',$this->convIdToField('user.handle'));
 		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Entered','q_txn.entered',$this->convIdToField('q_txn.entered'));
 		$this->addSortableTitle($tableTxn->cells[$row][$col++],'Date','q_txn.date',$this->convIdToField('q_txn.date'));

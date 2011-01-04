@@ -7,7 +7,7 @@ class QA_SelectGroupMembers {
 	}
 
 	function getShare($userId,$grpId,$db) {
-		$sql = "SELECT id FROM q_user_groups WHERE user_id='{$userId}' AND group_id='{$grpId}';";
+		$sql = "SELECT id FROM ".QA_DB_Table::USER_GROUPS." WHERE user_id='{$userId}' AND grpId='{$grpId}';";
 		return $db->query($sql);
 	}
 	
@@ -20,37 +20,37 @@ class QA_SelectGroupMembers {
 	}
 	
 	function getActiveGroups($userId,$db) {
-		$sql = "SELECT * FROM q_group,q_user_groups
-        WHERE q_group.id = group_id 
+		$sql = "SELECT * FROM ".QA_DB_Table::GROUP.",".QA_DB_Table::USER_GROUPS."
+        WHERE ".QA_DB_Table::GROUP.".id = grpId 
           AND user_id = {$userId}
           AND active = 1;";
 		return $db->query($sql);
 	}
 	
 	function getAssociatedActiveContacts($grpId,$db) {
-		$sql = "SELECT q_user_groups.*,user.handle FROM q_user_groups,user
-        WHERE q_user_groups.group_id = {$grpId}
-          AND q_user_groups.user_id = user.user_id
-          AND q_user_groups.active = 1
+		$sql = "SELECT ".QA_DB_Table::USER_GROUPS.".*,user.handle FROM ".QA_DB_Table::USER_GROUPS.",user
+        WHERE ".QA_DB_Table::USER_GROUPS.".grpId = {$grpId}
+          AND ".QA_DB_Table::USER_GROUPS.".user_id = user.user_id
+          AND ".QA_DB_Table::USER_GROUPS.".active = 1
         ORDER BY user.handle ASC;";
 		return $db->query($sql);
 	}
 	
 	function getAssociatedInactiveContacts($grpId,$db) {
-		$sql = "SELECT q_user_groups.*,user.handle FROM q_user_groups,user
-        WHERE q_user_groups.group_id = {$grpId}
-          AND q_user_groups.user_id = user.user_id
-          AND q_user_groups.active = 0
+		$sql = "SELECT ".QA_DB_Table::USER_GROUPS.".*,user.handle FROM ".QA_DB_Table::USER_GROUPS.",user
+        WHERE ".QA_DB_Table::USER_GROUPS.".grpId = {$grpId}
+          AND ".QA_DB_Table::USER_GROUPS.".user_id = user.user_id
+          AND ".QA_DB_Table::USER_GROUPS.".active = 0
         ORDER BY user.handle ASC;";
 		return $db->query($sql);
 	}
 	
 	function getAssociatedActiveContactsForAllGroups($userId,$db) {
 		$activeGroupsSql = QA_SelectGroupMembers::sqlActiveGroups(QA_SelectGroupMembers::getActiveGroups($userId,$db),$db);
-		$sql = "SELECT q_user_groups.*,user.handle FROM q_user_groups,user
+		$sql = "SELECT ".QA_DB_Table::USER_GROUPS.".*,user.handle FROM ".QA_DB_Table::USER_GROUPS.",user
         WHERE ({$activeGroupsSql})
-          AND q_user_groups.user_id = user.user_id
-          AND q_user_groups.active = 1
+          AND ".QA_DB_Table::USER_GROUPS.".user_id = user.user_id
+          AND ".QA_DB_Table::USER_GROUPS.".active = 1
         GROUP BY user.user_id
         ORDER BY user.handle ASC;";
 		return (empty($activeGroupsSql)) ? FALSE : $db->query($sql);
@@ -62,7 +62,7 @@ class QA_SelectGroupMembers {
 		while($result = $db->fetch($activeGroupsResult)) {
 			if ($i == 0 ) $activeGroupsSql = "";
 			elseif ($i < $db->num($activeGroupsResult)) $activeGroupsSql .= " OR ";
-			$activeGroupsSql .= "q_user_groups.group_id = ".$result['group_id'];
+			$activeGroupsSql .= "".QA_DB_Table::USER_GROUPS.".grpId = ".$result['grpId'];
 			$i++;
 		}
 		return (empty($activeGroupsSql)) ? FALSE : $activeGroupsSql;

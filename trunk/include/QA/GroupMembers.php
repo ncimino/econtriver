@@ -67,7 +67,7 @@ class QA_GroupMembers extends QA_Widget {
 
 	function insertShare($userId,$grpId) {
 		if ($this->DB->num(QA_SelectGroupMembers::getShare($userId,$grpId,$this->DB)) == 0) {
-			$sql = "INSERT INTO q_user_groups (user_id,group_id,active) VALUES ('{$userId}','{$grpId}',1);";
+			$sql = "INSERT INTO ".QA_DB_Table::USER_GROUPS." (user_id,grpId,active) VALUES ('{$userId}','{$grpId}',1);";
 			return $this->DB->query($sql);
 		} else {
 			return false;
@@ -108,12 +108,12 @@ class QA_GroupMembers extends QA_Widget {
 		$tableListAccounts = new Table($parentElement,$this->DB->num($queryResult),1);
 		$i = 0;
 		while ($group = $this->DB->fetch($queryResult)) {
-			$groupId = $this->getActiveGrpId().'_'.$group['group_id'];
+			$grpId = $this->getActiveGrpId().'_'.$group['grpId'];
 			$groupClass = $this->getGrpClass().' ui-droppable';
-			$groupAccount = new HTML_Div($tableListAccounts->cells[$i][0],$groupId,$groupClass);
+			$groupAccount = new HTML_Div($tableListAccounts->cells[$i][0],$grpId,$groupClass);
 			new HTML_Paragraph($groupAccount,$group['name']);
-			$this->activeShares = QA_SelectGroupMembers::getAssociatedActiveContacts($group['group_id'],$this->DB);
-			$this->inactiveShares = QA_SelectGroupMembers::getAssociatedInactiveContacts($group['group_id'],$this->DB);
+			$this->activeShares = QA_SelectGroupMembers::getAssociatedActiveContacts($group['grpId'],$this->DB);
+			$this->inactiveShares = QA_SelectGroupMembers::getAssociatedInactiveContacts($group['grpId'],$this->DB);
 			while ($contact = $this->DB->fetch($this->activeShares)) {
 				$contactId = $this->getContactId().'_'.$contact['user_id'];
 				$contactClass = $this->getContactClass().' ui-draggable sub-item';

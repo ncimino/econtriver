@@ -3,10 +3,10 @@ require_once 'DB_Handler.php';
 
 try {
 	$db_obj = new DBCon();
-	$sql = "CREATE TABLE q_group
+	$sql = "CREATE TABLE ".QA_DB_Table::GROUP."
 (
 id int NOT NULL AUTO_INCREMENT, 
-CONSTRAINT q_group_id PRIMARY KEY(id),
+CONSTRAINT ".QA_DB_Table::GROUP."_id PRIMARY KEY(id),
 name varchar(255) NOT NULL,
 UNIQUE (name)
 )";

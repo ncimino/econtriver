@@ -6,8 +6,8 @@ class QA_Account_Widget extends QA_Widget {
 	private $parentId;
 	private $acctName = '';
 	
-	const I_FS = 'quick_accts_id';
-	const I_FS_CLOSE = 'quick_accts_close_id';
+	const I_FS = 'qa_id';
+	const I_FS_CLOSE = 'qa_close_id';
 
 	function __construct($parentId) {
 		parent::__construct();
@@ -19,7 +19,7 @@ class QA_Account_Widget extends QA_Widget {
 
 	function addEntries($name) {
 		if ($eName = $this->checkAccountName($name)) {
-			if (QA_Account_Modify::insert($eName,$this->DB) and QA_Account_Modify::insertOwner($this->DB->lastID(),$this->user->getUserId(),$this->DB)) {
+			if (QA_Account_Modify::add($eName,$this->DB) and QA_Account_Modify::addOwner($this->DB->lastID(),$this->user->getUserId(),$this->DB)) {
 				$this->infoMsg->addMessage(2,'Account was successfully created.');
 			}
 		} else {
@@ -36,13 +36,13 @@ class QA_Account_Widget extends QA_Widget {
 	}
 
 	function dropEntries($acctId) {
-		if (!empty($acctId) and QA_Account_Modify::drop($acctId,$this->user->getUserId(),$this->DB)) {
+		if (!empty($acctId) and QA_Account_Modify::state(QA_DB_Table::INACTIVE,$acctId,$this->user->getUserId(),$this->DB)) {
 			$this->infoMsg->addMessage(2,'Account was successfully deleted.');
 		}
 	}
 
 	function restoreEntries($acctId) {
-		if (!empty($acctId) and QA_Account_Modify::restore($acctId,$this->user->getUserId(),$this->DB)) {
+		if (!empty($acctId) and QA_Account_Modify::state(QA_DB_Table::ACTIVE,$acctId,$this->user->getUserId(),$this->DB)) {
 			$this->infoMsg->addMessage(2,'Account was successfully restored.');
 		}
 	}

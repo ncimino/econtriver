@@ -8,7 +8,7 @@ try {
 id int NOT NULL AUTO_INCREMENT, 
 CONSTRAINT q_txn_id PRIMARY KEY(id),
 acct_id int NOT NULL,
-CONSTRAINT q_txn_acct_id FOREIGN KEY (acct_id) REFERENCES q_acct(id),
+CONSTRAINT q_txn_acct_id FOREIGN KEY (acct_id) REFERENCES ".QA_DB_Table::ACCT."(id),
 user_id int NOT NULL,
 CONSTRAINT q_txn_user_id FOREIGN KEY (user_id) REFERENCES user(user_id),
 entered int NOT NULL,

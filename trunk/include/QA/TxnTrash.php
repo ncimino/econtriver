@@ -32,10 +32,10 @@ class QA_TxnTrash extends QA_Txns {
 			while($parent = $this->DB->fetch($this->parentTxns)) {
 				if ($sql != "") $sql .= " UNION ";
 				$sql .= "SELECT q_txn.*,user.handle
-				FROM q_txn,user,q_acct
+				FROM q_txn,user,".QA_DB_Table::ACCT."
 				WHERE {$parent['id']} = q_txn.parent_txn_id
 				  AND q_txn.user_id = user.user_id
-				  AND q_txn.acct_id = q_acct.id
+				  AND q_txn.acct_id = ".QA_DB_Table::ACCT.".id
 				  AND q_txn.active = 0
 				  AND q_txn.entered = (SELECT max(q_txn.entered) FROM q_txn WHERE {$parent['id']} = q_txn.parent_txn_id)";
 			}
@@ -48,10 +48,10 @@ class QA_TxnTrash extends QA_Txns {
 
 	function getParentTxns() {
 		$sql = "SELECT q_txn.*
-				FROM q_txn, q_acct 
+				FROM q_txn, ".QA_DB_Table::ACCT." 
 				WHERE (".QA_Account_Select::sqlAcctsToShow($this->selectedAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB).")
 				AND q_txn.active = 0
-				AND q_txn.acct_id = q_acct.id 
+				AND q_txn.acct_id = ".QA_DB_Table::ACCT.".id 
 				AND q_txn.parent_txn_id = q_txn.id;";
 		return $this->parentTxns = $this->DB->query($sql);
 	}

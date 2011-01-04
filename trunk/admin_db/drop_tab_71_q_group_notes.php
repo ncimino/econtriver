@@ -3,7 +3,7 @@ require_once 'DB_Handler.php';
 
 try {
 	$db_obj = new DBCon();
-	$sql = "DROP TABLE  `q_group_notes` ;";
+	$sql = "DROP TABLE  `".QA_DB_Table::GROUP."_notes` ;";
 	$db_obj->query($sql);
 	echo "COMPLETED:<BR>\n".$sql."<BR>\n";
 } catch (Exception $err) {

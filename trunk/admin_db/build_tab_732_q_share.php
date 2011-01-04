@@ -3,15 +3,15 @@ require_once 'DB_Handler.php';
 
 try {
 	$db_obj = new DBCon();
-	$sql = "CREATE TABLE q_share
+	$sql = "CREATE TABLE ".QA_DB_Table::SHARE."
 (
 id int NOT NULL AUTO_INCREMENT, 
-CONSTRAINT q_share_id PRIMARY KEY(id),
+CONSTRAINT ".QA_DB_Table::SHARE."_id PRIMARY KEY(id),
 acct_id int NOT NULL,
-CONSTRAINT q_share_acct_id FOREIGN KEY (acct_id) REFERENCES q_acct(id),
-group_id int NOT NULL,
-CONSTRAINT q_share_group_id FOREIGN KEY (group_id) REFERENCES q_group(id),
-CONSTRAINT q_share_acct_id_group_id UNIQUE (acct_id,group_id)
+CONSTRAINT ".QA_DB_Table::SHARE."_acct_id FOREIGN KEY (acct_id) REFERENCES ".QA_DB_Table::ACCT."(id),
+grpId int NOT NULL,
+CONSTRAINT ".QA_DB_Table::SHARE."_grpId FOREIGN KEY (grpId) REFERENCES ".QA_DB_Table::GROUP."(id),
+CONSTRAINT ".QA_DB_Table::SHARE."_acct_id_grpId UNIQUE (acct_id,grpId)
 )";
 //active int(1) NOT NULL,
 

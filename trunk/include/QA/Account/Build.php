@@ -47,28 +47,20 @@ class QA_Account_Build {
 		$tableListAccounts = new Table($parentElement,$db->num($queryResult),$cols,$tableName);
 		$i = 0;
 		while ($account = $db->fetch($queryResult)) {
-			$edit = self::C_I_EDIT.'_'.$account['id'];
-			$delete = self::C_I_DELETE.'_'.$account['id'];
-			$restore = self::C_I_RESTORE.'_'.$account['id'];
-			$inputEditAccount = new HTML_InputText($tableListAccounts->cells[$i][0],self::N_NAME,$account['name'],'',$edit.' '.self::C_ACCTS);
-			new HTML_InputHidden($tableListAccounts->cells[$i][0],self::N_ACCT_ID,$account['id'],'',$edit.' '.$delete.' '.$restore);
+			$inputAccountName = new HTML_InputText($tableListAccounts->cells[$i][0],self::N_NAME,$account['name'],'',self::C_ACCTS);
+			$inputAccountId = new HTML_InputHidden($tableListAccounts->cells[$i][0],self::N_ACCT_ID,$account['id']);
 			if ($editable) {
-				new Axn($tableListAccounts->cells[$i][1],'Edit',self::C_I_EDIT,$i,self::C_AXN);
-				/*new HTML_Anchor($tableListAccounts->cells[$i][1],'#','Edit',$edit,self::C_AXN);
-				new HTML_InputHidden($tableListAccounts->cells[$i][1],self::C_AXN,self::C_I_EDIT,'',$edit);
-				*/
-				
-				new Axn($tableListAccounts->cells[$i][2],'Delete',self::C_I_DELETE,$i,self::C_AXN);
-				/*new HTML_Anchor($tableListAccounts->cells[$i][2],'#','Delete',$delete,self::C_AXN);
-				new HTML_InputHidden($tableListAccounts->cells[$i][2],self::C_AXN,self::C_I_DELETE,'',$delete);
-				*/
-				new HTML_InputHidden($tableListAccounts->cells[$i][2],'ver_del',$account['name'],'',$delete);
+				$editAxn = new Axn($tableListAccounts->cells[$i][1],'Edit',self::C_I_EDIT,$i,self::C_AXN);
+				$deleteAxn = new Axn($tableListAccounts->cells[$i][2],'Delete',self::C_I_DELETE,$i,self::C_AXN);
+				$deleteAxn->verifyDelete($account['name']);
+				$editAxn->uses(array($inputAccountName,$inputAccountId));
+				$deleteAxn->uses(array($inputAccountId));
 			} elseif ($restorable) {
-				$inputEditAccount->setAttribute('disabled',"disabled");
-				new HTML_Anchor($tableListAccounts->cells[$i][1],'#','Restore',$restore,self::C_AXN);
-				new HTML_InputHidden($tableListAccounts->cells[$i][1],self::C_AXN,self::C_I_RESTORE,'',$restore);
+				$restoreAxn = new Axn($tableListAccounts->cells[$i][1],'Restore',self::C_I_RESTORE,$i,self::C_AXN);
+				$restoreAxn->uses(array($inputAccountId));
+				$inputAccountName->setAttribute('disabled',"disabled");
 			} else {
-				$inputEditAccount->setAttribute('disabled',"disabled");
+				$inputAccountName->setAttribute('disabled',"disabled");
 			}
 			$i++;
 		}
