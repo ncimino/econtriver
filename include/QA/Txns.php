@@ -2,7 +2,7 @@
 class QA_Txns extends QA_Widget {
 	protected $activeAccounts; // MySQL result
 	protected $ownedAccounts; // MySQL result
-	protected $sqlAcctsToShow; // SQL syntax
+	protected $acctsToShow; // SQL syntax
 
 	protected $activeTxns; // MySQL result
 	protected $activeTxnsSum; // MySQL result
@@ -111,7 +111,7 @@ class QA_Txns extends QA_Widget {
 	function createWidget() {
 		$this->activeAccounts = QA_Account_Select::active($this->user->getUserId(),$this->DB);
 		$this->ownedAccounts = QA_Account_Select::owned($this->user->getUserId(),$this->DB);
-		$this->sqlAcctsToShow = QA_Account_Select::sqlAcctsToShow($this->selectedAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);
+		$this->acctsToShow = QA_Account_Select::acctsToShow($this->selectedAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);
 		if ($this->DB->num($this->activeAccounts)) {
 			$this->buildActions();
 			$this->buildTxnsTable();
@@ -208,9 +208,9 @@ class QA_Txns extends QA_Widget {
 
 	function buildTxnsTable() {
 		$divNew = new HTML_Div($this->container,'txn_id','txn');
-		$this->activeTxns = QA_SelectTxns::getTxns($this->sqlAcctsToShow,$this->sortField,$this->sortDir,$this->DB);
-		$this->activeTxnsSum = QA_SelectTxns::getTxnsSum($this->sqlAcctsToShow,$this->DB);
-		$this->activeTxnsBankSaysSum = QA_SelectTxns::getTxnsBankSaysSum($this->sqlAcctsToShow,$this->DB);
+		$this->activeTxns = QA_SelectTxns::getTxns($this->acctsToShow,$this->sortField,$this->sortDir,$this->DB);
+		$this->activeTxnsSum = QA_SelectTxns::getTxnsSum($this->acctsToShow,$this->DB);
+		$this->activeTxnsBankSaysSum = QA_SelectTxns::getTxnsBankSaysSum($this->acctsToShow,$this->DB);
 		$rows = $this->DB->num($this->activeTxns) * 3 + 2;
 		$tableTxn = new Table($divNew,$rows,12,'txn_table','txn');
 		$this->buildTxnTitles($tableTxn,0);

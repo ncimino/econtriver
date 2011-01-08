@@ -24,8 +24,8 @@ function prompt(id) {
 	}
 }
 
-function linkAjaxAxn(axn,AJAX,content_id) {
-	$('.'+axn).live('click', function() {
+function linkAjaxAxn(AJAX,content_id) {
+	$('.'+AJAX).live('click', function() {
 		var post_data = $('.'+$(this).attr('id')).serialize();
 		if (prompt($(this).attr('id'))) {
 			AjaxIt(AJAX, content_id, post_data);
@@ -35,8 +35,8 @@ function linkAjaxAxn(axn,AJAX,content_id) {
 
 $(document).ready(function() {
 	content_id = 'qa_mng_div';
-	linkAjaxAxn('acct_axn','QA_Account_AJAX',content_id);
-	linkAjaxAxn('grp_axn','QA_Group_AJAX',content_id);
+	linkAjaxAxn('QA_Account_AJAX',content_id);
+	linkAjaxAxn('QA_Group_AJAX',content_id);
 });
 
 /*

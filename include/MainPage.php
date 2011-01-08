@@ -18,9 +18,9 @@ class MainPage {
 	}
 	
 	function buildAccountManagementMenu($parentElement) {
-		new HTML_Anchor($parentElement,'#','Manage Accounts',QA_Account_Build::C_I_GET,QA_Account_Build::C_AXN);
+		new HTML_Anchor($parentElement,'#','Manage Accounts',QA_Account_Build::A_GET,QA_Account_Build::C_AXN);
 		new HTML_Text($parentElement,' | ');
-		new HTML_Anchor($parentElement,'#','Manage Groups',QA_Group_Build::C_I_GET,QA_Group_Build::C_AXN);
+		//new HTML_Anchor($parentElement,'#','Manage Groups',QA_Group_Build::A_GET,QA_Group_Build::C_AXN);
 		new HTML_Text($parentElement,' | ');
 		new HTML_Anchor($parentElement,'#','Account Sharing');
 		new HTML_Text($parentElement,' | ');

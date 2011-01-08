@@ -8,9 +8,9 @@ class QA_SelectTxns {
 		return $result['parent_txn_id'];
 	}
 
-	function getTxns($sqlAcctsToShow,$sortField,$sortDir,$db) {
+	function getTxns($acctsToShow,$sortField,$sortDir,$db) {
 		$sql = "SELECT q_txn.*,user.handle FROM q_txn,user,".QA_DB_Table::ACCT."
-					WHERE (".$sqlAcctsToShow.")
+					WHERE (".$acctsToShow.")
 					  AND q_txn.active = 1
 					  AND q_txn.user_id = user.user_id
 					  AND q_txn.acct_id = ".QA_DB_Table::ACCT.".id
@@ -19,42 +19,42 @@ class QA_SelectTxns {
 		return $db->query($sql);
 	}
 
-	function getTxnsSum($sqlAcctsToShow,$db) {
-		return self::getCreditSum($sqlAcctsToShow,$db) - self::getDebitSum($sqlAcctsToShow,$db);
+	function getTxnsSum($acctsToShow,$db) {
+		return self::getCreditSum($acctsToShow,$db) - self::getDebitSum($acctsToShow,$db);
 	}
 
-	function getTxnsBankSaysSum($sqlAcctsToShow,$db) {
-		return self::getCreditBankSaysSum($sqlAcctsToShow,$db) - self::getDebitBankSaysSum($sqlAcctsToShow,$db);
+	function getTxnsBankSaysSum($acctsToShow,$db) {
+		return self::getCreditBankSaysSum($acctsToShow,$db) - self::getDebitBankSaysSum($acctsToShow,$db);
 	}
 
-	function getCreditSum($sqlAcctsToShow,$db) {
+	function getCreditSum($acctsToShow,$db) {
 		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
-					WHERE (".$sqlAcctsToShow.")
+					WHERE (".$acctsToShow.")
 					  AND q_txn.active = 1;";
 		$result = $db->fetch($db->query($sql));
 		return $result['total'];
 	}
 
-	function getCreditBankSaysSum($sqlAcctsToShow,$db) {
+	function getCreditBankSaysSum($acctsToShow,$db) {
 		$sql = "SELECT SUM(q_txn.credit) AS total FROM q_txn
-					WHERE (".$sqlAcctsToShow.")
+					WHERE (".$acctsToShow.")
 					  AND q_txn.active = 1
 					  AND q_txn.banksays = 1;";
 		$result = $db->fetch($db->query($sql));
 		return $result['total'];
 	}
 
-	function getDebitSum($sqlAcctsToShow,$db) {
+	function getDebitSum($acctsToShow,$db) {
 		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
-					WHERE (".$sqlAcctsToShow.")
+					WHERE (".$acctsToShow.")
 					  AND q_txn.active = 1;";
 		$result = $db->fetch($db->query($sql));
 		return $result['total'];
 	}
 
-	function getDebitBankSaysSum($sqlAcctsToShow,$db) {
+	function getDebitBankSaysSum($acctsToShow,$db) {
 		$sql = "SELECT SUM(q_txn.debit) AS total FROM q_txn
-					WHERE (".$sqlAcctsToShow.")
+					WHERE (".$acctsToShow.")
 					  AND q_txn.active = 1
 					  AND q_txn.banksays = 1;";
 		$result = $db->fetch($db->query($sql));

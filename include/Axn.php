@@ -1,14 +1,14 @@
 <?php 
 class Axn {
-	public $parentElement;
-	public $innerHtml;
-	public $action;
-	public $axnClass;
-	public $id;
-	public $linkId;
+	protected $parentElement;
+	protected $innerHtml;
+	protected $action;
+	protected $axnClass;
+	protected $id;
+	protected $linkId;
 
 	protected $uid = '';
-	protected $anchor;
+	public $anchor;
 	protected $link;
 	protected $href = '#';
 	protected $axn_arr;

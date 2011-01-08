@@ -6,7 +6,8 @@ class QA_DB_Table {
 	const USER_GROUPS = 'q_user_groups';
 	const SHARE = 'q_share';
 	
-	const ACTIVE = 1;
-	const INACTIVE = 0;
+	const ACTIVE = '1';
+	const INACTIVE = '0';
+	const WILD = '*';
 }
 ?>

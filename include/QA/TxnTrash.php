@@ -49,7 +49,7 @@ class QA_TxnTrash extends QA_Txns {
 	function getParentTxns() {
 		$sql = "SELECT q_txn.*
 				FROM q_txn, ".QA_DB_Table::ACCT." 
-				WHERE (".QA_Account_Select::sqlAcctsToShow($this->selectedAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB).")
+				WHERE (".QA_Account_Select::acctsToShow($this->selectedAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB).")
 				AND q_txn.active = 0
 				AND q_txn.acct_id = ".QA_DB_Table::ACCT.".id 
 				AND q_txn.parent_txn_id = q_txn.id;";

@@ -15,7 +15,7 @@ class QA_TxnAutoComplete extends QA_Txns {
 
 	function pullAutoCompleteValues() {
 		$sql = "SELECT DISTINCT q_txn.{$this->txnAutoCompleteFieldId} FROM q_txn,user,".QA_DB_Table::ACCT."
-					WHERE (".QA_Account_Select::sqlActive($this->activeAccounts,$this->DB).")
+					WHERE (".QA_Account_Select::active($this->activeAccounts,$this->DB).")
 					  AND q_txn.active = 1
 					  AND q_txn.user_id = user.user_id
 					  AND q_txn.acct_id = ".QA_DB_Table::ACCT.".id

@@ -1,16 +1,16 @@
 <?php
 class QA_Account_Build {
-	const C_AXN = 'acct_axn';
+	const C_AXN = 'QA_Account_AJAX';
 	const C_ACCTS = 'accts';
 	const C_SHARED = 'shared_accts';
 	const C_OWNED = 'owned_accts';
 	const C_DELETED = 'deleted_accts';
 	
-	const C_I_GET = 'get_acct';
-	const C_I_CREATE = 'add_acct';
-	const C_I_EDIT = 'edit_acct';
-	const C_I_DELETE = 'delete_acct';
-	const C_I_RESTORE = 'restore_acct';
+	const A_GET = 'get_acct';
+	const A_CREATE = 'add_acct';
+	const A_EDIT = 'edit_acct';
+	const A_DELETE = 'delete_acct';
+	const A_RESTORE = 'restore_acct';
 	
 	const I_CREATE = 'add_acct_text';
 	const I_EDIT = 'account_text';
@@ -50,13 +50,13 @@ class QA_Account_Build {
 			$inputAccountName = new HTML_InputText($tableListAccounts->cells[$i][0],self::N_NAME,$account['name'],'',self::C_ACCTS);
 			$inputAccountId = new HTML_InputHidden($tableListAccounts->cells[$i][0],self::N_ACCT_ID,$account['id']);
 			if ($editable) {
-				$editAxn = new Axn($tableListAccounts->cells[$i][1],'Edit',self::C_I_EDIT,$i,self::C_AXN);
-				$deleteAxn = new Axn($tableListAccounts->cells[$i][2],'Delete',self::C_I_DELETE,$i,self::C_AXN);
+				$editAxn = new Axn($tableListAccounts->cells[$i][1],'Edit',self::A_EDIT,$i,self::C_AXN);
+				$deleteAxn = new Axn($tableListAccounts->cells[$i][2],'Delete',self::A_DELETE,$i,self::C_AXN);
 				$deleteAxn->verifyDelete($account['name']);
 				$editAxn->uses(array($inputAccountName,$inputAccountId));
 				$deleteAxn->uses(array($inputAccountId));
 			} elseif ($restorable) {
-				$restoreAxn = new Axn($tableListAccounts->cells[$i][1],'Restore',self::C_I_RESTORE,$i,self::C_AXN);
+				$restoreAxn = new Axn($tableListAccounts->cells[$i][1],'Restore',self::A_RESTORE,$i,self::C_AXN);
 				$restoreAxn->uses(array($inputAccountId));
 				$inputAccountName->setAttribute('disabled',"disabled");
 			} else {
@@ -69,9 +69,9 @@ class QA_Account_Build {
 	static function newForm($parentElement,$acctName,$parentId) {
 		$divAddAccount = new HTML_Div($parentElement);
 		new HTML_Heading($divAddAccount,5,'Add Account:');
-		new HTML_InputText($divAddAccount,self::N_CREATE,$acctName,self::I_CREATE,self::C_I_CREATE.' '.self::C_ACCTS);		
-		new HTML_Anchor($divAddAccount,'#','Add Account',self::C_I_CREATE,self::C_AXN);
-		new HTML_InputHidden($divAddAccount,self::C_AXN,self::C_I_CREATE,'',self::C_I_CREATE);
+		$inputAccountName = new HTML_InputText($divAddAccount,self::N_CREATE,$acctName,self::I_CREATE,self::C_ACCTS);
+		$createAxn = new Axn($divAddAccount, 'Add Account', self::A_CREATE, '', self::C_AXN);
+		$createAxn->uses(array($inputAccountName));		
 	}
 }
 ?>
