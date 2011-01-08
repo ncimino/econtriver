@@ -68,14 +68,15 @@ class QA_Account_Widget extends QA_Widget {
 			$lClose->setAttribute('title','Close');
 			$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 			$aClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
-			$divClose = new HTML_Span($aClose,'',self::I_FS_CLOSE,'ui-icon ui-icon-circle-close ui-state-red');
+			new HTML_Span($aClose,'',self::I_FS_CLOSE,'ui-icon ui-icon-circle-close ui-state-red');
+			$aHideHelp = new HTML_Anchor($divQuickAccounts,'#','','','');
+			$aHideHelp->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
+			new HTML_Span($aHideHelp,'','','ui-icon ui-icon-info ui-icon-special');
 			QA_Account_Build::newForm($divQuickAccounts,$this->acctName,$this->parentId);
 			QA_Account_Build::ownedTable($divQuickAccounts,$this->ownedAccounts,$this->parentId,$this->DB);
 			QA_Account_Build::sharedTable($divQuickAccounts,$this->sharedAccounts,$this->parentId,$this->DB);
 			QA_Account_Build::deletedTable($divQuickAccounts,$this->deletedAccounts,$this->parentId,$this->DB);
 			$this->printHTML();
-		} catch (Exception $e) {
-			echo '<h1>Internal Exception:</h1><p>',  $e->getMessage(), "</p>";
-		}
+		} catch (Exception $e) { new ExceptionHandler($e); }
 	}
 }

@@ -18,7 +18,7 @@ function bindQaAccts() {
 
 function prompt(id) {
 	if ($('input[type=hidden][name=ver_del].'+id).attr('name')=='ver_del') { 
-		return confirmSubmit("Are you sure you want to delete "+$('input[type=hidden][name=ver_del].'+id).val()+"?"); 
+		return confirmSubmit("Are you sure you want to remove "+$('input[type=hidden][name=ver_del].'+id).val()+"?"); 
 	} else {
 		return true;
 	}
@@ -42,7 +42,7 @@ $(document).ready(function() {
 /*
  * Groups
  */
-
+/*
 function bindQaGroups() {
 	// Refresh Txn info
 	return QaTxnGet();
@@ -75,7 +75,7 @@ function QaGroupPermDrop(content_id, grpId) {
 function QaGroupRejoin(content_id, grpId) {
 	var post_data = "grpId=" + grpId;
 	AjaxIt('QaGroupRejoin', content_id, post_data, '', bindQaGroups());
-}
+}*/
 
 /*
  * Shared Accounts

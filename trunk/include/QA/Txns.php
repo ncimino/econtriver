@@ -109,7 +109,7 @@ class QA_Txns extends QA_Widget {
 	}
 
 	function createWidget() {
-		$this->activeAccounts = QA_Account_Select::active($this->user->getUserId(),$this->DB);
+		$this->activeAccounts = QA_Account_Select::byMember($this->user->getUserId(),$this->DB);
 		$this->ownedAccounts = QA_Account_Select::owned($this->user->getUserId(),$this->DB);
 		$this->acctsToShow = QA_Account_Select::acctsToShow($this->selectedAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);
 		if ($this->DB->num($this->activeAccounts)) {

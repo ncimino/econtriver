@@ -9,7 +9,6 @@ a:link, a:visited, a:hover, a:active {
 
 body {
     position: relative;
-    min-width: 1200px;
     font-family: Verdana, Arial, Helvetica, sans-serif;
     margin: 8px;
 	background-image:url('images/y_fade_bg.gif');
@@ -132,6 +131,13 @@ img {
     border: #DD0 1px solid;
     padding: 4px;
     margin: 4px;
+}
+
+.widget_frame {
+	float: left;
+	border: #CCC thin dashed;
+	margin: 4px;
+	padding: 4px;
 }
 
 table.groups, table.owned_accts, table.shared_accts {

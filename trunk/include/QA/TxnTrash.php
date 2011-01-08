@@ -10,7 +10,7 @@ class QA_TxnTrash extends QA_Txns {
 	}
 
 	function buildTrashWidget() {
-		$this->activeAccounts = QA_Account_Select::active($this->user->getUserId(),$this->DB);
+		$this->activeAccounts = QA_Account_Select::byMember($this->user->getUserId(),$this->DB);
 		$this->getTxnTrash();
 		new HTML_Heading($this->container,3,'Trash Bin for: '.QA_Account_Select::nameById($this->selectedAcct,$this->DB,TRUE));
 		if (($this->inactiveTxns) and ($this->DB->num($this->inactiveTxns) != 0)) {

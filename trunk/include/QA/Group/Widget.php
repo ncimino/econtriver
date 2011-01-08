@@ -4,19 +4,9 @@ class QA_Group_Widget extends QA_Widget {
 	private $inactiveGroups; // MySQL result
 	private $parentId;
 	private $grpName = '';
-	
-	const C_CREATE = 'add_grp';
-	const C_EDIT = 'group';
-	const C_ACTIVE = 'active_grps';
-	const C_INACTIVE = 'inactive_grps';
-	
+
 	const I_FS = 'qa_id';
 	const I_FS_CLOSE = 'qa_close_id';
-	const I_CREATE = 'add_grp_text';
-	const I_EDIT = 'group_text';
-
-	const N_CREATE = 'add_grp_name';
-	const N_EDIT = 'group_name';
 
 	function __construct($parentId) {
 		parent::__construct();
@@ -38,7 +28,7 @@ class QA_Group_Widget extends QA_Widget {
 
 	function updateEntries($name,$grpId) {
 		if (!empty($grpId) and $sanitizedName = $this->checkGroupName($name)) {
-			if ($this->updateGroup($sanitizedName,$grpId)) {
+			if (QA_Group_Modify::update($sanitizedName,$grpId,$this->DB)) {
 				$this->infoMsg->addMessage(2,'Group was successfully updated.');
 			}
 		}
@@ -57,28 +47,32 @@ class QA_Group_Widget extends QA_Widget {
 		}
 	}
 
-	function rejoinEntries($grpId) {
+	function restoreEntries($grpId) {
 		if (!empty($grpId) and QA_Group_Modify::state(QA_DB_Table::ACTIVE,$grpId,$this->user->getUserId(),$this->DB)) {
 			$this->infoMsg->addMessage(2,'Successfully joined group.');
 		}
 	}
 
-	function checkGroupName($name) {
+	function checkGroupName($name,$retry=TRUE) {
 		if (!($sanitizedName = Normalize::sanitize($name,$this->infoMsg,$this->siteInfo))) {
 			return false;
 		} elseif (!(Normalize::groupNames($sanitizedName,$this->infoMsg))) {
 			return false;
-		} elseif ($this->getGroupByName($name)) {
-			$this->infoMsg->addMessage(0,"Group '{$name}' is already in use.");
-			return false;
+		} elseif ($group = QA_Group_Select::getGroupByName($name,$this->DB)) {
+			if (QA_Group_Modify::removeIfEmpty($group['id'],$this->DB) and $retry) {
+				return $this->checkGroupName($name,FALSE);
+			} else { // if to . not needed, only purpose is to clean up
+				$this->infoMsg->addMessage(0,"Group '{$name}' is already in use.");
+				return false;
+			}
 		} else {
 			return $sanitizedName;
 		}
 	}
 
 	function createWidget() {
-		$this->getActiveGroups();
-		$this->getInactiveGroups();
+		$this->activeGroups = QA_Group_Select::byMember($this->user->getUserId(),$this->DB,QA_DB_Table::ACTIVE);
+		$this->inactiveGroups = QA_Group_Select::byMember($this->user->getUserId(),$this->DB,QA_DB_Table::INACTIVE);
 		$divQuickAccounts = new HTML_Fieldset($this->container,self::I_FS,'manage_title');
 		$lClose = new HTML_Legend($divQuickAccounts,'Group Management');
 		$lClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
@@ -86,60 +80,11 @@ class QA_Group_Widget extends QA_Widget {
 		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
 		$divClose = new HTML_Span($aClose,'',self::I_FS_CLOSE,'ui-icon ui-icon-circle-close ui-state-red');
-		$this->buildCreateGroupForm($divQuickAccounts);
-		$this->buildActiveGroupsTable($divQuickAccounts);
-		$this->buildInactiveGroupsTable($divQuickAccounts);
+		QA_Group_Build::newForm($divQuickAccounts,$this->grpName);
+		QA_Group_Build::activeTable($divQuickAccounts,$this->activeGroups,$this->DB);
+		QA_Group_Build::inactiveTable($divQuickAccounts,$this->inactiveGroups,$this->DB);
 		$this->printHTML();
 	}
 
-	function buildActiveGroupsTable($parentElement) {
-		if ($this->DB->num($this->activeGroups)>0) {
-			$divGroups = new HTML_Div($parentElement,self::C_ACTIVE);
-			$this->buildGroupsTable($divGroups,'Active Groups:',$this->activeGroups,self::C_ACTIVE);
-		}
-	}
-
-	function buildInactiveGroupsTable($parentElement) {
-		if ($this->DB->num($this->inactiveGroups)>0) {
-			$divGroups = new HTML_Div($parentElement,self::C_INACTIVE);
-			$this->buildGroupsTable($divGroups,'Inactive Groups:',$this->inactiveGroups,self::C_INACTIVE,false);
-		}
-	}
-
-	function buildGroupsTable($parentElement,$title,$queryResult,$tableName,$editable=true) {
-		new HTML_Heading($parentElement,5,$title);
-		$cols = ($editable) ? 3 : 3;
-		$tableListGroups = new Table($parentElement,$this->DB->num($queryResult),$cols,$tableName);
-		$i = 0;
-		while ($group = $this->DB->fetch($queryResult)) {
-			$groupName = (empty($group['name'])) ? $this->getGroupNameById($this->getEditGrpId()) : $group['name'];
-			$inputId = $this->I_EDIT.'_'.$group['grpId'];
-			$inputName = $this->N_EDIT.'_'.$group['grpId'];
-
-			$inputEditGroup = new HTML_InputText($tableListGroups->cells[$i][0],$inputName,$groupName,$inputId,$this->C_EDIT);
-			if ($editable) {
-				$aEditGroup = new HTML_Anchor($tableListGroups->cells[$i][1],'#','Edit');
-				$aEditGroup->setAttribute('onclick',"QaGroupEdit('{$this->parentId}','{$inputId}','{$group['grpId']}');");
-				$aDropGroup = new HTML_Anchor($tableListGroups->cells[$i][2],'#','Disable');
-				$aDropGroup->setAttribute('onclick',"QaGroupDrop('{$this->parentId}','{$group['grpId']}')");
-			} else {
-				$inputEditGroup->setAttribute('disabled',"disabled");
-				$aRejoinGroup = new HTML_Anchor($tableListGroups->cells[$i][1],'#','Join');
-				$aRejoinGroup->setAttribute('onclick',"QaGroupRejoin('{$this->parentId}','{$group['grpId']}');");
-				$aPermDropGroup = new HTML_Anchor($tableListGroups->cells[$i][2],'#','Leave');
-				$aPermDropGroup->setAttribute('onclick',"if(confirmSubmit('Are you sure you want to leave the \'".$group['name']."\' group?')) { QaGroupPermDrop('{$this->parentId}','{$group['grpId']}'); }");
-			}
-			$i++;
-		}
-	}
-
-	function buildCreateGroupForm($parentElement) {
-		$divAddGroup = new HTML_Div($parentElement,'',$this->C_CREATE);
-		new HTML_Heading($divAddGroup,5,'Add Group:');
-		$inputAddGroup = new HTML_InputText($divAddGroup,$this->N_CREATE(),$this->grpName,$this->I_CREATE,$this->C_CREATE);
-		$inputAddGroup->setAttribute('onkeypress',"enterCall(event,function() {QaGroupAdd('{$this->parentId}','{$this->I_CREATE}');})");
-		$aAddGroup = new HTML_Anchor($divAddGroup,'#','Add Group');
-		$aAddGroup->setAttribute('onclick',"QaGroupAdd('{$this->parentId}','{$this->I_CREATE}');");
-	}
 }
 ?>

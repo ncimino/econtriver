@@ -90,20 +90,20 @@ class QA_GroupMembers extends QA_Widget {
 		$aClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
 		$divClose = new HTML_Span($aClose,'',self::I_FS_CLOSE,'ui-icon ui-icon-circle-close ui-state-red');
 		$tableSplit = new Table($divQuickAccounts,1,2,'',self::getSplitGroupMemberClass());
-		$this->buildActiveGroupsTable($tableSplit->cells[0][0]);
+		$this->activeTable($tableSplit->cells[0][0]);
 		$this->buildAddContactForm($tableSplit->cells[0][1]);
 		$this->buildActiveContactsTable($tableSplit->cells[0][1]);
 		$this->printHTML();
 	}
 
-	function buildActiveGroupsTable($parentElement) {
+	function activeTable($parentElement) {
 		if ($this->DB->num($this->activeGroups)>0) {
 			$divActiveGroups = new HTML_Div($parentElement);
-			$this->buildGroupsTable($divActiveGroups,'Groups:',$this->activeGroups);
+			$this->table($divActiveGroups,'Groups:',$this->activeGroups);
 		}
 	}
 
-	function buildGroupsTable($parentElement,$title,$queryResult) {
+	function table($parentElement,$title,$queryResult) {
 		new HTML_Heading($parentElement,5,$title);
 		$tableListAccounts = new Table($parentElement,$this->DB->num($queryResult),1);
 		$i = 0;

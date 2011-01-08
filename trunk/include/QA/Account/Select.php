@@ -18,37 +18,37 @@ class QA_Account_Select extends QA_Account_SQL {
 		}
 	}
 
-	function owned($userId,$db) {
+	function owned($userId,$db,$acctStatus=self::ACTIVE) {
 		$sql = "SELECT * FROM ".self::ACCT.",".self::OWNERS."
-		        WHERE ".self::ownedByWithStatus($userId).";";
+		        WHERE ".self::ownedBy($userId,$acctStatus).";";
 		return $db->query($sql);
 	}
 
-	function shared($userId,$db) {
+	function shared($userId,$db,$acctStatus=self::ACTIVE,$shareStatus=self::ACTIVE) {
 		$sql = "SELECT * FROM ".self::ACCT.",".self::SHARE.",".self::USER_GROUPS.",".self::OWNERS."
-		        WHERE ".self::sharedOnly($userId)."
-		        GROUP BY ".self::ACCT.".id;";
+				WHERE ".self::sharedOnly($userId,$acctStatus,$shareStatus)."
+				GROUP BY ".self::ACCT.".id;";
 		return $db->query($sql);
 	}
 
-	function sharedByOwner($ownerId,$userId,$db) {
+	function sharedByOwner($ownerId,$userId,$db,$acctStatus=self::ACTIVE,$shareStatus=self::ACTIVE) {
 		$sql = "SELECT * FROM ".self::ACCT.",".self::SHARE.",".self::USER_GROUPS.",".self::OWNERS."
-		         WHERE ".self::sharedWithUserByOwner($ownerId,$userId)."
-		         GROUP BY ".self::ACCT.".id;";
+				WHERE ".self::sharedWithUserByOwner($ownerId,$userId,$acctStatus,$shareStatus)."
+				GROUP BY ".self::ACCT.".id;";
 		return $db->query($sql);
 	}
 
-	function deleted($userId,$db) {
+	function deleted($userId,$db,$acctStatus=self::INACTIVE) {
 		$sql = "SELECT * FROM ".self::ACCT.",".self::OWNERS."
-		         WHERE ".self::ownedByWithStatus($userId,self::INACTIVE).";";
+		         WHERE ".self::ownedBy($userId,$acctStatus).";";
 		return $db->query($sql);
 	}
 
-	function active($userId,$db) {
+	function byMember($userId,$db,$acctStatus=self::ACTIVE,$shareStatus=self::ACTIVE) {
 		$sql = "SELECT ".self::ACCT.".*,".self::OWNERS.".owner_id
 				  FROM ".self::ACCT.",".self::OWNERS.",".self::SHARE.",".self::USER_GROUPS."
-				 WHERE ( ".self::ownedByWithStatus($userId)." ) 
-				    OR ( ".self::sharedWithUser($userId)." )
+				 WHERE ( ".self::ownedBy($userId,$acctStatus)." ) 
+				    OR ( ".self::sharedWithUser($userId,$acctStatus,$shareStatus)." )
 				 GROUP BY ".self::ACCT.".id
 				 ORDER BY ".self::ACCT.".name ASC;";
 		return $db->query($sql);

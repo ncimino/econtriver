@@ -124,7 +124,7 @@ class QA_SharedAccounts extends QA_Widget {
 		$tableSplit = new Table($divQuickAccounts,1,3,'',self::getSplitGroupAcctClass());
 		$this->buildOwnedAccountsTable($tableSplit->cells[0][0]);
 		$this->buildSharedAccountsTable($tableSplit->cells[0][0]);
-		$this->buildActiveGroupsTable($tableSplit->cells[0][1]);
+		$this->activeTable($tableSplit->cells[0][1]);
 		$this->buildContactGroupsTable($tableSplit->cells[0][2]);
 		$this->printHTML();
 	}
@@ -169,21 +169,21 @@ class QA_SharedAccounts extends QA_Widget {
 		}
 	}
 
-	function buildActiveGroupsTable($parentElement) {
+	function activeTable($parentElement) {
 		if ($this->DB->num($this->activeGroups)>0) {
 			$divGroups = new HTML_Div($parentElement);
-			$this->buildGroupsTable($divGroups,'Active Groups:',$this->activeGroups);
+			$this->table($divGroups,'Active Groups:',$this->activeGroups);
 		}
 	}
 
 	function buildContactGroupsTable($parentElement) {
 		if ($this->DB->num($this->contactGroups)>0) {
 			$divGroups = new HTML_Div($parentElement);
-			$this->buildGroupsTable($divGroups,'Contacts belong to:',$this->contactGroups);
+			$this->table($divGroups,'Contacts belong to:',$this->contactGroups);
 		}
 	}
 
-	function buildGroupsTable($parentElement,$title,$queryResult) {
+	function table($parentElement,$title,$queryResult) {
 		new HTML_Heading($parentElement,5,$title);
 		$tableListGroups = new Table($parentElement,$this->DB->num($queryResult),1);
 		$i = 0;
