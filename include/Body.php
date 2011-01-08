@@ -12,7 +12,6 @@ class Body {
 		$divInfoMsg = new HTML_Div($divPage,'top_info_messages','info_messages');
 		$infoMsg->commitDiv($divInfoMsg);
 
-		new HTML_Div($divPage,'banner_ie_limiter','banner_ie_limiter');
 		$divBanner = new HTML_Div($divPage,'banner','banner');
 
 		$this->login = new Login($divBanner,$siteInfo,$user);
