@@ -13,6 +13,8 @@ abstract class QA_Widget {
 	const C_MSGS = 'info_messages';
 	const C_FRAME = 'widget_frame';
 	
+	const I_FS = 'qa_id';
+	const I_FS_CLOSE = 'qa_close_id';
 	const I_MSGS = 'widget_info_messages';
 	
 	function __construct($show_msg_div=TRUE,$tabStartIndex=0) {

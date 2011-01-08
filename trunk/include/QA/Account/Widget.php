@@ -5,9 +5,6 @@ class QA_Account_Widget extends QA_Widget {
 	private $deletedAccounts; // MySQL result
 	private $parentId;
 	private $acctName = '';
-	
-	const I_FS = 'qa_id';
-	const I_FS_CLOSE = 'qa_close_id';
 
 	function __construct($parentId) {
 		parent::__construct();
@@ -62,16 +59,9 @@ class QA_Account_Widget extends QA_Widget {
 			$this->ownedAccounts = QA_Account_Select::owned($this->user->getUserId(),$this->DB);
 			$this->sharedAccounts = QA_Account_Select::shared($this->user->getUserId(),$this->DB);
 			$this->deletedAccounts  = QA_Account_Select::deleted($this->user->getUserId(),$this->DB);
-			$divQuickAccounts = new HTML_Fieldset($this->container,self::I_FS);
-			$lClose = new HTML_Legend($divQuickAccounts,'Account Management',NULL,'manage_title');
-			$lClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
-			$lClose->setAttribute('title','Close');
-			$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
-			$aClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
-			new HTML_Span($aClose,'',self::I_FS_CLOSE,'ui-icon ui-icon-circle-close ui-state-red');
-			$aHideHelp = new HTML_Anchor($divQuickAccounts,'#','','','');
-			$aHideHelp->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
-			new HTML_Span($aHideHelp,'','','ui-icon ui-icon-info ui-icon-special');
+			
+			new QA_Module($this->container);
+			
 			QA_Account_Build::newForm($divQuickAccounts,$this->acctName,$this->parentId);
 			QA_Account_Build::ownedTable($divQuickAccounts,$this->ownedAccounts,$this->parentId,$this->DB);
 			QA_Account_Build::sharedTable($divQuickAccounts,$this->sharedAccounts,$this->parentId,$this->DB);
