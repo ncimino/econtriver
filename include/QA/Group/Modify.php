@@ -7,7 +7,7 @@ class QA_Group_Modify {
 	}
 
 	function addUser($grpId,$userId,$db,$active=QA_DB_Table::ACTIVE) {
-		$sql = "INSERT INTO ".QA_DB_Table::USER_GROUPS." (grpId,user_id,active)
+		$sql = "INSERT INTO ".QA_DB_Table::USER_GROUPS." (group_id,user_id,active)
 				VALUES (".Normalize::mysql($grpId).",
 						".Normalize::mysql($userId).",
 						".Normalize::mysql($active).");";
@@ -18,22 +18,25 @@ class QA_Group_Modify {
 		$sql = "UPDATE ".QA_DB_Table::USER_GROUPS." 
 				   SET active = ".Normalize::mysql($active)." 
 				 WHERE user_id = ".Normalize::mysql($userId)." AND 
-					   grpId = ".Normalize::mysql($grpId).";";
+					   group_id = ".Normalize::mysql($grpId).";";
 		return $db->query($sql);
 	}
 
 	function dropUser($grpId,$userId,$db) {
 		$sql = "DELETE FROM ".QA_DB_Table::USER_GROUPS." 
 				 WHERE user_id = ".Normalize::mysql($userId)." AND 
-				 	   grpId = ".Normalize::mysql($grpId).";";
+				 	   group_id = ".Normalize::mysql($grpId).";";
 		return $db->query($sql);
 	}
 
 	function removeIfEmpty($grpId,$db) {
 		if (QA_Group_Select::isEmpty($grpId,$db)) {
-			if (self::deleteLinks($grpId,$db)) {
-				self::delete($grpId,$db);
-			}
+			if (self::deleteLinks($grpId,$db) and self::delete($grpId,$db)) 
+				return true;
+			else
+				throw new Exception("Failed to remove group or group relationship for group: ".QA_Group_Select::getGroupNameById($grpId,$db)." ({$grpId})");
+		} else {
+			return false;
 		}
 	}
 
@@ -45,30 +48,15 @@ class QA_Group_Modify {
 
 	function deleteLinks($grpId,$db) {
 		$sql = "DELETE FROM ".QA_DB_Table::SHARE." 
-				 WHERE grpId = ".Normalize::mysql($grpId).";";
+				 WHERE group_id = ".Normalize::mysql($grpId).";";
 		return $db->query($sql);
 	}
 
-	function updateGroup($name,$id,$db) {
+	function update($name,$id,$db) {
 		$sql = "UPDATE ".QA_DB_Table::GROUP." 
 				   SET name = '".Normalize::mysql($name)."' 
 				 WHERE id = ".Normalize::mysql($id).";";
 		return $db->query($sql);
-	}
-
-	function getGroupNameById($id,$db) {
-		$sql = "SELECT name FROM ".QA_DB_Table::GROUP."
-        WHERE id = ".Normalize::mysql($id).";";
-		$db->query($sql);
-		$return = $db->fetch();
-		return $return['name'];
-	}
-
-	function getGroupByName($name,$db) {
-		$sql = "SELECT * FROM ".QA_DB_Table::GROUP."
-        WHERE name = '".Normalize::mysql($name)."';";
-		$db->query($sql);
-		return $db->fetch();
 	}
 	
 }

@@ -11,6 +11,7 @@ abstract class QA_Widget {
 
 	const C_MAIN = 'quick_accts';
 	const C_MSGS = 'info_messages';
+	const C_FRAME = 'widget_frame';
 	
 	const I_MSGS = 'widget_info_messages';
 	

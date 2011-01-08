@@ -1,29 +1,29 @@
 <?php
 class QA_Account_SQL extends QA_DB_Table {
-	function sharedWithUserByOwner($ownerId,$userId,$acctActive=self::ACTIVE,$shareActive=self::ACTIVE) {
+	function sharedWithUserByOwner($ownerId,$userId,$acctStatus=NULL,$shareStatus=NULL) {
 		$sql = self::OWNERS.".owner_id = ".Normalize::mysql($ownerId)."
-				AND ".self::sharedWithUser($userId,$acctActive,$shareActive);
+				AND ".self::sharedWithUser($userId,$acctStatus,$shareStatus);
 		return $sql;
 	}
 	
-	function sharedOnly($userId,$acctActive=self::ACTIVE,$shareActive=self::ACTIVE) {
+	function sharedOnly($userId,$acctStatus=NULL,$shareStatus=NULL) {
 		$sql = self::OWNERS.".owner_id <> ".Normalize::mysql($userId)."
-				AND ".self::sharedWithUser($userId,$acctActive,$shareActive);
+				AND ".self::sharedWithUser($userId,$acctStatus,$shareStatus);
 		return $sql;
 	}
 	
-	function sharedWithUser($userId,$acctActive=self::ACTIVE,$shareActive=self::ACTIVE) {
+	function sharedWithUser($userId,$acctStatus=NULL,$shareStatus=NULL) {
 		$sql = self::ACCT.".id=".self::SHARE.".acct_id
 				AND ".self::SHARE.".group_id=".self::USER_GROUPS.".group_id
 				AND ".self::USER_GROUPS.".user_id=".Normalize::mysql($userId)."
-				AND ".self::USER_GROUPS.".active=".Normalize::mysql($shareActive)."
-				AND ".self::acctAndOwnerWithStatus($acctActive);
+				AND ".self::acctAndOwner($acctStatus);
+		$sql .= (isset($shareStatus)) ? " AND ".self::USER_GROUPS.".active=".Normalize::mysql($shareStatus) : "";
 		return $sql;
 	}
 	
-	function ownedByWithStatus($ownerId,$active=self::ACTIVE) {
+	function ownedBy($ownerId,$status=NULL) {
 		$sql = self::OWNERS.".owner_id={$ownerId}
-				AND ".self::acctAndOwnerWithStatus($active);
+				AND ".self::acctAndOwner($status);
 		return $sql;
 	}
 	
@@ -34,14 +34,9 @@ class QA_Account_SQL extends QA_DB_Table {
 		return $sql;
 	}
 	
-	function acctAndOwnerWithStatus($active=self::ACTIVE) {
-		$sql = self::acctAndOwner()."
-				AND ".self::ACCT.".active=".Normalize::mysql($active);
-		return $sql;
-	}
-	
-	function acctAndOwner() {
+	function acctAndOwner($status=NULL) {
 		$sql = self::ACCT.".id=".self::OWNERS.".acct_id";
+		$sql .= (isset($status)) ? " AND ".self::ACCT.".active=".Normalize::mysql($status) : "";
 		return $sql;
 	}
 	
