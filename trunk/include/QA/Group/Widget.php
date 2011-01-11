@@ -2,18 +2,10 @@
 class QA_Group_Widget extends QA_Widget {
 	private $activeGroups; // MySQL result
 	private $inactiveGroups; // MySQL result
-	private $parentId;
 	private $grpName = '';
 
-	const I_FS = 'qa_id';
-	const I_FS_CLOSE = 'qa_close_id';
-
-	function __construct($parentId) {
+	function __construct($parentElement) {
 		parent::__construct();
-		$this->parentId = $parentId;
-		if (!$this->user->verifyUser()) {
-			$this->infoMsg->addMessage(0,'User info is invalid, please login first.');
-		}
 	}
 
 	function addEntries($name) {

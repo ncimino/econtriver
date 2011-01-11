@@ -1,5 +1,6 @@
 <?php
-function __autoload($class_name) {
-	require(str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php');
+function __autoload($className) {
+	echo "Loading:" . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php<br>';
+	require(str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php');
 }
 ?>

@@ -1,7 +1,7 @@
 <?php
 require_once '../../autoload.php';
-
 $widget = new QA_Account_Widget($_POST['content_id']);
+/*
 
 if (isset($_POST[QA_Account_Build::C_AXN])) switch ($_POST[QA_Account_Build::C_AXN]) {
 	case QA_Account_Build::A_CREATE:
@@ -23,5 +23,5 @@ if (isset($_POST[QA_Account_Build::C_AXN])) switch ($_POST[QA_Account_Build::C_A
 		break;	
 } 
 
-$widget->createWidget();
+$widget->createWidget();*/
 ?>
