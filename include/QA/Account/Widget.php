@@ -3,15 +3,10 @@ class QA_Account_Widget extends QA_Widget {
 	private $ownedAccounts; // MySQL result
 	private $sharedAccounts; // MySQL result
 	private $deletedAccounts; // MySQL result
-	private $parentId;
 	private $acctName = '';
 
 	function __construct($parentId) {
-		parent::__construct();
-		$this->parentId = $parentId;
-		if (!$this->user->verifyUser()) {
-			$this->infoMsg->addMessage(0,'User info is invalid, please login first.');
-		}
+		parent::__construct($parentId);
 	}
 
 	function addEntries($name) {
@@ -55,17 +50,18 @@ class QA_Account_Widget extends QA_Widget {
 	}
 
 	function createWidget() {
-		try {
+		try {/*
 			$this->ownedAccounts = QA_Account_Select::owned($this->user->getUserId(),$this->DB);
 			$this->sharedAccounts = QA_Account_Select::shared($this->user->getUserId(),$this->DB);
 			$this->deletedAccounts  = QA_Account_Select::deleted($this->user->getUserId(),$this->DB);
 			
-			new QA_Module($this->container);
+			$this->addMgmtFrame('Account Management');
+			//new QA_Module($this->container);
 			
-			QA_Account_Build::newForm($divQuickAccounts,$this->acctName,$this->parentId);
-			QA_Account_Build::ownedTable($divQuickAccounts,$this->ownedAccounts,$this->parentId,$this->DB);
-			QA_Account_Build::sharedTable($divQuickAccounts,$this->sharedAccounts,$this->parentId,$this->DB);
-			QA_Account_Build::deletedTable($divQuickAccounts,$this->deletedAccounts,$this->parentId,$this->DB);
+			/*QA_Account_Build::newForm($divQuickAccounts,$this->acctName,$this->parentElement);
+			QA_Account_Build::ownedTable($divQuickAccounts,$this->ownedAccounts,$this->parentElement,$this->DB);
+			QA_Account_Build::sharedTable($divQuickAccounts,$this->sharedAccounts,$this->parentElement,$this->DB);
+			QA_Account_Build::deletedTable($divQuickAccounts,$this->deletedAccounts,$this->parentElement,$this->DB);*/
 			$this->printHTML();
 		} catch (Exception $e) { new ExceptionHandler($e); }
 	}

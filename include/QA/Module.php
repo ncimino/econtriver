@@ -1,10 +1,12 @@
 <?php
 class QA_Module extends QA_Widget {
-	function __construct($parentId) {
+
+	function __construct($parentElement) {
 		parent::__construct();
-		$this->parentId = $parentId;
+		/*
+		$this->parentElement = $parentElement;
 		
-		$divQuickAccounts = new HTML_Fieldset($this->parentId,self::I_FS);
+		$divQuickAccounts = new HTML_Fieldset($this->parentElement,self::I_FS);
 		new HTML_Legend($divQuickAccounts,'Account Management',NULL,'manage_title');
 		$aClose = new HTML_Anchor($divQuickAccounts,'#','','','');
 		$aClose->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
@@ -14,7 +16,8 @@ class QA_Module extends QA_Widget {
 		$aHideHelp->setAttribute('title','Help');
 		//$aHideHelp->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
 		new HTML_Span($aHideHelp,'','','ui-icon ui-icon-info ui-icon-special widget_control');
-		
+		*/
+		new HTML_Heading($parentElement, 1, "It's Working!");
 	}
 	
 	
