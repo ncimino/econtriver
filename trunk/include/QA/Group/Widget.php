@@ -1,5 +1,5 @@
 <?php
-class QA_Group_Widget extends QA_Widget {
+class QA_Group_Widget extends QA_Module {
 	private $activeGroups; // MySQL result
 	private $inactiveGroups; // MySQL result
 	private $grpName = '';

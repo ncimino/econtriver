@@ -1,5 +1,5 @@
 <?php
-class QA_GroupMembers extends QA_Widget {
+class QA_GroupMembers extends QA_Module {
 	private $activeGroups; // MySQL result
 	private $activeShares; // MySQL result
 	private $inactiveShares; // MySQL result

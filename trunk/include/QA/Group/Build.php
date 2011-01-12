@@ -19,14 +19,14 @@ class QA_Group_Build {
 	
 	function activeTable($parentElement,$activeGroups,$db) {
 		if ($db->num($activeGroups)>0) {
-			$divGroups = new HTML_Div($parentElement,'',QA_Widget::C_FRAME);
+			$divGroups = new HTML_Div($parentElement,'',QA_Module::C_FRAME);
 			self::table($divGroups,'Active Groups:',$activeGroups,'',$db);
 		}
 	}
 
 	function inactiveTable($parentElement,$inactiveGroups,$db) {
 		if ($db->num($inactiveGroups)>0) {
-			$divGroups = new HTML_Div($parentElement,'',QA_Widget::C_FRAME);
+			$divGroups = new HTML_Div($parentElement,'',QA_Module::C_FRAME);
 			self::table($divGroups,'Inactive Groups:',$inactiveGroups,'',$db,false);
 		}
 	}
@@ -57,7 +57,7 @@ class QA_Group_Build {
 	}
 
 	function newForm($parentElement,$name) {
-		$divAddGroup = new HTML_Div($parentElement, '', QA_Widget::C_FRAME);
+		$divAddGroup = new HTML_Div($parentElement, '', QA_Module::C_FRAME);
 		new HTML_Heading($divAddGroup,5,'Add Group:');
 		$inputAddGroup = new HTML_InputText($divAddGroup,self::N_CREATE,$name,self::I_CREATE,self::C_GRP);
 		$createAxn = new Axn($divAddGroup, 'Add Group', self::A_CREATE, '0', self::C_AXN);
