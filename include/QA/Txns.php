@@ -1,5 +1,5 @@
 <?php
-class QA_Txns extends QA_Widget {
+class QA_Txns extends QA_Module {
 	protected $activeAccounts; // MySQL result
 	protected $ownedAccounts; // MySQL result
 	protected $acctsToShow; // SQL syntax

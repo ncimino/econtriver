@@ -18,21 +18,21 @@ class QA_Account_Build {
 	
 	static function ownedTable($parentElement,$ownedAccounts,$parentId,$db) {
 		if ($db->num($ownedAccounts)>0) {
-			$divOwnedAccounts = new HTML_Div($parentElement,'',QA_Widget::C_FRAME);
+			$divOwnedAccounts = new HTML_Div($parentElement,'',QA_Module::C_FRAME);
 			self::table($divOwnedAccounts,$ownedAccounts,$parentId,'Owned Accounts:','acct_edit',$db);
 		}
 	}
 
 	static function sharedTable($parentElement,$sharedAccounts,$parentId,$db) {
 		if ($db->num($sharedAccounts)>0) {
-			$divSharedAccounts = new HTML_Div($parentElement,'',QA_Widget::C_FRAME);
+			$divSharedAccounts = new HTML_Div($parentElement,'',QA_Module::C_FRAME);
 			self::table($divSharedAccounts,$sharedAccounts,$parentId,'Shared Accounts:','',$db,false);
 		}
 	}
 
 	static function deletedTable($parentElement,$deletedAccounts,$parentId,$db) {
 		if ($db->num($deletedAccounts)>0) {
-			$divOwnedAccounts = new HTML_Div($parentElement,'',QA_Widget::C_FRAME);
+			$divOwnedAccounts = new HTML_Div($parentElement,'',QA_Module::C_FRAME);
 			self::table($divOwnedAccounts,$deletedAccounts,$parentId,'Deleted Accounts:','',$db,false,true);
 		}
 	}
@@ -64,7 +64,7 @@ class QA_Account_Build {
 	}
 
 	static function newForm($parentElement,$name,$parentId) {
-		$divAddAccount = new HTML_Div($parentElement,'', QA_Widget::C_FRAME);
+		$divAddAccount = new HTML_Div($parentElement,'', QA_Module::C_FRAME);
 		new HTML_Heading($divAddAccount,5,'Add Account:');
 		$inputAccountName = new HTML_InputText($divAddAccount,self::N_CREATE,$name,self::I_CREATE,self::C_ACCTS);
 		$createAxn = new Axn($divAddAccount, 'Add Account', self::A_CREATE, '', self::C_AXN);

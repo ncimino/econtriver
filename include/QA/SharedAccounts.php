@@ -1,5 +1,5 @@
 <?php
-class QA_SharedAccounts extends QA_Widget {
+class QA_SharedAccounts extends QA_Module {
 	private $ownedAccounts; // MySQL result
 	private $sharedAccounts; // MySQL result
 	private $activeShares; // MySQL result

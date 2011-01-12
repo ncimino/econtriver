@@ -1,5 +1,5 @@
 <?php
-class QA_Account_Widget extends QA_Widget {
+class QA_Account_Module extends QA_Module {
 	private $ownedAccounts; // MySQL result
 	private $sharedAccounts; // MySQL result
 	private $deletedAccounts; // MySQL result
@@ -50,18 +50,19 @@ class QA_Account_Widget extends QA_Widget {
 	}
 
 	function createWidget() {
-		try {/*
+		try {
 			$this->ownedAccounts = QA_Account_Select::owned($this->user->getUserId(),$this->DB);
 			$this->sharedAccounts = QA_Account_Select::shared($this->user->getUserId(),$this->DB);
 			$this->deletedAccounts  = QA_Account_Select::deleted($this->user->getUserId(),$this->DB);
 			
-			$this->addMgmtFrame('Account Management');
+			$mgmtFrame = $this->addMgmtFrame('Account Management');
 			//new QA_Module($this->container);
 			
-			/*QA_Account_Build::newForm($divQuickAccounts,$this->acctName,$this->parentElement);
-			QA_Account_Build::ownedTable($divQuickAccounts,$this->ownedAccounts,$this->parentElement,$this->DB);
-			QA_Account_Build::sharedTable($divQuickAccounts,$this->sharedAccounts,$this->parentElement,$this->DB);
-			QA_Account_Build::deletedTable($divQuickAccounts,$this->deletedAccounts,$this->parentElement,$this->DB);*/
+			QA_Account_Build::newForm($mgmtFrame,$this->acctName,$this->parentId);
+			QA_Account_Build::ownedTable($mgmtFrame,$this->ownedAccounts,$this->parentId,$this->DB);
+			QA_Account_Build::sharedTable($mgmtFrame,$this->sharedAccounts,$this->parentId,$this->DB);
+			QA_Account_Build::deletedTable($mgmtFrame,$this->deletedAccounts,$this->parentId,$this->DB);
+			/**/
 			$this->printHTML();
 		} catch (Exception $e) { new ExceptionHandler($e); }
 	}
