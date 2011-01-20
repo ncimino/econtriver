@@ -73,7 +73,7 @@
 
 /* Misc visuals
 ----------------------------------*/ /* Overlays */
-.ui-widget-overlay {
+.ui-module-overlay {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -88,22 +88,22 @@
 * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Trebuchet%20MS,%20Tahoma,%20Verdana,%20Arial,%20sans-serif&fwDefault=bold&fsDefault=1.1em&cornerRadius=4px&bgColorHeader=f6a828&bgTextureHeader=12_gloss_wave.png&bgImgOpacityHeader=35&borderColorHeader=e78f08&fcHeader=ffffff&iconColorHeader=ffffff&bgColorContent=eeeeee&bgTextureContent=03_highlight_soft.png&bgImgOpacityContent=100&borderColorContent=dddddd&fcContent=333333&iconColorContent=222222&bgColorDefault=f6f6f6&bgTextureDefault=02_glass.png&bgImgOpacityDefault=100&borderColorDefault=cccccc&fcDefault=1c94c4&iconColorDefault=ef8c08&bgColorHover=fdf5ce&bgTextureHover=02_glass.png&bgImgOpacityHover=100&borderColorHover=fbcb09&fcHover=c77405&iconColorHover=ef8c08&bgColorActive=ffffff&bgTextureActive=02_glass.png&bgImgOpacityActive=65&borderColorActive=fbd850&fcActive=eb8f00&iconColorActive=ef8c08&bgColorHighlight=ffe45c&bgTextureHighlight=03_highlight_soft.png&bgImgOpacityHighlight=75&borderColorHighlight=fed22f&fcHighlight=363636&iconColorHighlight=228ef1&bgColorError=b81900&bgTextureError=08_diagonals_thick.png&bgImgOpacityError=18&borderColorError=cd0a0a&fcError=ffffff&iconColorError=ffd27a&bgColorOverlay=666666&bgTextureOverlay=08_diagonals_thick.png&bgImgOpacityOverlay=20&opacityOverlay=50&bgColorShadow=000000&bgTextureShadow=01_flat.png&bgImgOpacityShadow=10&opacityShadow=20&thicknessShadow=5px&offsetTopShadow=-5px&offsetLeftShadow=-5px&cornerRadiusShadow=5px
 */ /* Component containers
 ----------------------------------*/
-.ui-widget {
+.ui-module {
 	font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
 	font-size: 1.1em;
 }
 
-.ui-widget .ui-widget {
+.ui-module .ui-module {
 	font-size: 1em;
 }
 
-.ui-widget input,.ui-widget select,.ui-widget textarea,.ui-widget button
+.ui-module input,.ui-module select,.ui-module textarea,.ui-module button
 	{
 	font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
 	font-size: 1em;
 }
 
-.ui-widget-content {
+.ui-module-content {
 	border: 1px solid #dddddd;
 	background: #eeeeee
 		url(images/ui-bg_highlight-soft_100_eeeeee_1x100.png) 50% top repeat-x
@@ -111,11 +111,11 @@
 	color: #333333;
 }
 
-.ui-widget-content a {
+.ui-module-content a {
 	color: #333333;
 }
 
-.ui-widget-header {
+.ui-module-header {
 	border: 1px solid #e78f08;
 	background: #f6a828 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png)
 		50% 50% repeat-x;
@@ -123,13 +123,13 @@
 	font-weight: bold;
 }
 
-.ui-widget-header a {
+.ui-module-header a {
 	color: #ffffff;
 }
 
 /* Interaction states
 ----------------------------------*/
-.ui-state-default,.ui-widget-content .ui-state-default {
+.ui-state-default,.ui-module-content .ui-state-default {
 	border: 1px solid #cccccc;
 	background: #f6f6f6 url(images/ui-bg_glass_100_f6f6f6_1x400.png) 50% 50%
 		repeat-x;
@@ -143,7 +143,7 @@
 	text-decoration: none;
 }
 
-.ui-state-hover,.ui-widget-content .ui-state-hover,.ui-state-focus,.ui-widget-content .ui-state-focus
+.ui-state-hover,.ui-module-content .ui-state-hover,.ui-state-focus,.ui-module-content .ui-state-focus
 	{
 	border: 1px solid #fbcb09;
 	background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50%
@@ -157,7 +157,7 @@
 	text-decoration: none;
 }
 
-.ui-state-active,.ui-widget-content .ui-state-active {
+.ui-state-active,.ui-module-content .ui-state-active {
 	border: 1px solid #fbd850;
 	background: #ffffff url(images/ui-bg_glass_65_ffffff_1x400.png) 50% 50%
 		repeat-x;
@@ -170,49 +170,49 @@
 	text-decoration: none;
 }
 
-.ui-widget :active {
+.ui-module :active {
 	outline: none;
 }
 
 /* Interaction Cues
 ----------------------------------*/
-.ui-state-highlight,.ui-widget-content .ui-state-highlight {
+.ui-state-highlight,.ui-module-content .ui-state-highlight {
 	border: 1px solid #fed22f;
 	background: #ffe45c url(images/ui-bg_highlight-soft_75_ffe45c_1x100.png)
 		50% top repeat-x;
 	color: #363636;
 }
 
-.ui-state-highlight a,.ui-widget-content .ui-state-highlight a {
+.ui-state-highlight a,.ui-module-content .ui-state-highlight a {
 	color: #363636;
 }
 
-.ui-state-error,.ui-widget-content .ui-state-error {
+.ui-state-error,.ui-module-content .ui-state-error {
 	border: 1px solid #cd0a0a;
 	background: #b81900
 		url(images/ui-bg_diagonals-thick_18_b81900_40x40.png) 50% 50% repeat;
 	color: #ffffff;
 }
 
-.ui-state-error a,.ui-widget-content .ui-state-error a {
+.ui-state-error a,.ui-module-content .ui-state-error a {
 	color: #ffffff;
 }
 
-.ui-state-error-text,.ui-widget-content .ui-state-error-text {
+.ui-state-error-text,.ui-module-content .ui-state-error-text {
 	color: #ffffff;
 }
 
-.ui-priority-primary,.ui-widget-content .ui-priority-primary {
+.ui-priority-primary,.ui-module-content .ui-priority-primary {
 	font-weight: bold;
 }
 
-.ui-priority-secondary,.ui-widget-content .ui-priority-secondary {
+.ui-priority-secondary,.ui-module-content .ui-priority-secondary {
 	opacity: .7;
 	filter: Alpha(Opacity = 70);
 	font-weight: normal;
 }
 
-.ui-state-disabled,.ui-widget-content .ui-state-disabled {
+.ui-state-disabled,.ui-module-content .ui-state-disabled {
 	opacity: .35;
 	filter: Alpha(Opacity = 35);
 	background-image: none;
@@ -226,11 +226,11 @@
 	background-image: url(images/ui-icons_222222_256x240.png);
 }
 
-.ui-widget-content .ui-icon {
+.ui-module-content .ui-icon {
 	background-image: url(images/ui-icons_222222_256x240.png);
 }
 
-.ui-widget-header .ui-icon {
+.ui-module-header .ui-icon {
 	background-image: url(images/ui-icons_ffffff_256x240.png);
 }
 
@@ -1021,14 +1021,14 @@
 }
 
 /* Overlays */
-.ui-widget-overlay {
+.ui-module-overlay {
 	background: #666666
 		url(images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat;
 	opacity: .50;
 	filter: Alpha(Opacity = 50);
 }
 
-.ui-widget-shadow {
+.ui-module-shadow {
 	margin: -5px 0 0 -5px;
 	padding: 5px;
 	background: #000000 url(images/ui-bg_flat_10_000000_40x100.png) 50% 50%

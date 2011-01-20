@@ -1,6 +1,6 @@
 <?php
 require_once '../autoload.php';
-$widget = new QA_GroupMembers($_POST['content_id']);
-$widget->addContact($_POST['name']);
-$widget->createWidget();
+$module = new QA_GroupMembers($_POST['content_id']);
+$module->addContact($_POST['name']);
+$module->createWidget();
 ?>
