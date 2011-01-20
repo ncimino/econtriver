@@ -55,7 +55,7 @@ class QA_Account_Module extends QA_Module {
 			$this->sharedAccounts = QA_Account_Select::shared($this->user->getUserId(),$this->DB);
 			$this->deletedAccounts  = QA_Account_Select::deleted($this->user->getUserId(),$this->DB);
 			
-			$mgmtFrame = $this->addMgmtFrame('Account Management');
+			$mgmtFrame = $this->addFrame('Account Management');
 			//new QA_Module($this->container);
 			
 			QA_Account_Build::newForm($mgmtFrame,$this->acctName,$this->parentId);

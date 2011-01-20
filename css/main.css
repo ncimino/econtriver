@@ -49,7 +49,7 @@ div#banner_site_name {
     font-size: x-large;
 }
 
-div#widget_info_messages {
+div#module_info_messages {
     margin: 3px;
 }
 
@@ -127,7 +127,7 @@ img {
     margin: 4px;
 }
 
-.widget_frame {
+.module_frame {
 	float: left;
 	border: #CCC thin dashed;
 	margin: 4px;
@@ -186,7 +186,7 @@ td.split_grp_acct_col {
     border-radius: 4px;
 }
 
-.widget_control {
+.module_control {
     /*position: absolute;*/
 	float: right;
     top: 1em;

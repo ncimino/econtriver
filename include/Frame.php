@@ -1,5 +1,5 @@
 <?php
-abstract class ModuleCore {
+class Frame {
 	protected $tabIndex;
 	protected $DB;
 	protected $siteInfo;

@@ -1,5 +1,5 @@
 <?php
 require_once '../autoload.php';
-$widget = new QA_Txns($_POST['content_id'],$_POST['sort_id'],$_POST['sort_dir'],$_POST['show_acct']);
-$widget->createWidget();
+$module = new QA_Txns($_POST['content_id'],$_POST['sort_id'],$_POST['sort_dir'],$_POST['show_acct']);
+$module->createWidget();
 ?>
