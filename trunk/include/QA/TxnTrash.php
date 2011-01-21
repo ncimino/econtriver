@@ -5,11 +5,11 @@ class QA_TxnTrash extends QA_Txns {
 	private $numberOfColumns = 11;
 	private $titleRowHeight = 1;
 
-	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
-		parent::__construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE);
+	function __construct($sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
+		parent::__construct($sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE);
 	}
 
-	function buildTrashWidget() {
+	function buildTrashModule() {
 		$this->activeAccounts = QA_Account_Select::byMember($this->user->getUserId(),$this->DB);
 		$this->getTxnTrash();
 		new HTML_Heading($this->container,3,'Trash Bin for: '.QA_Account_Select::nameById($this->selectedAcct,$this->DB,TRUE));

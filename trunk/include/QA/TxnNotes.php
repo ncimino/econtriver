@@ -4,11 +4,11 @@ class QA_TxnNotes extends QA_Txns {
 	private $userGroups; // MySQL result
 	private $txnGroupNotes; // MySQL result
 
-	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
-		parent::__construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE);
+	function __construct($sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
+		parent::__construct($sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE);
 	}
 
-	function buildNotesWidget($parent_txn_id) {
+	function buildNotesModule($parent_txn_id) {
 		$this->getTxnNotes($parent_txn_id);
 		$this->getUserGroups($parent_txn_id);
 		$this->getTxnGroupNotes($parent_txn_id);

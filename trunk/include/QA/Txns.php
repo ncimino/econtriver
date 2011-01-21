@@ -13,9 +13,8 @@ class QA_Txns extends QA_Module {
 	protected $sortField = 'q_txn.date';
 	protected $selectedAcct = "0";
 
-	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
+	function __construct($sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
 		parent::__construct($showMsgDiv,5000);
-		$this->parentId = $parentId;
 		if (!$this->user->verifyUser()) {
 			$this->infoMsg->addMessage(0,'User info is invalid, please login first.');
 		} else {
@@ -108,7 +107,7 @@ class QA_Txns extends QA_Module {
 		}
 	}
 
-	function createWidget() {
+	function createModule() {
 		$this->activeAccounts = QA_Account_Select::byMember($this->user->getUserId(),$this->DB);
 		$this->ownedAccounts = QA_Account_Select::owned($this->user->getUserId(),$this->DB);
 		$this->acctsToShow = QA_Account_Select::acctsToShow($this->selectedAcct,$this->activeAccounts,$this->user->getUserId(),$this->DB);

@@ -1,19 +1,16 @@
 <?php
-abstract class QA_Module extends ModuleCore {
-	protected $parentId;
-	
+class QA_Module extends CORE_Module {
 	const C_FRAME = 'module_frame';
 	const C_MAIN = 'quick_accts';
 	const C_MGMT = 'manage_title';
-	const C_MSGS = 'info_messages';
+	const C_MSGS = 'info_msgs';
 	
 	const I_FS = 'qa_id';
 	const I_FS_CLOSE = 'qa_close_id';
-	const I_MSGS = 'module_info_messages';
+	const I_MSGS = 'module_msgs';
 	
-	function __construct($parentId,$showMsgs=TRUE,$tabStartIndex=0) {
+	function __construct($showMsgs=TRUE,$tabStartIndex=0) {
 		parent::__construct($showMsgs,$tabStartIndex);
-		$this->parentId = $parentId;
 		if ($this->showMsgs) {
 			$divMsgs = new HTML_Div($this->container,self::I_MSGS,self::C_MSGS);
 			$this->infoMsg->commitDiv($divMsgs);
@@ -23,8 +20,5 @@ abstract class QA_Module extends ModuleCore {
 		}
 	}
 	
-	function addFrame($title) {
-		return parent::addFrame($title,self::I_FS,self::C_MGMT);
-	}
 }
 ?>

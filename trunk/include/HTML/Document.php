@@ -1,7 +1,7 @@
 <?php
 class HTML_Document extends DOMImplementation {
 	function __construct() { }
-	static function createHTML_Document($qualifiedName = "html",
+	static function create($qualifiedName = "html",
 	$publicId = "-//W3C//DTD XHTML 1.0 Transitional//EN",
 	//$publicId = "-//W3C//DTD XHTML 1.0 Strict//EN",
 	$systemId = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd",

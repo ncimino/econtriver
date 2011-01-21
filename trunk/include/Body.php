@@ -9,7 +9,7 @@ class Body {
 		$this->HTML_Body = new HTML_Body($HTML_Document);
 		$divPage = new HTML_Div($this->HTML_Body,'page','page');
 
-		$divInfoMsg = new HTML_Div($divPage,'top_info_messages','info_messages');
+		$divInfoMsg = new HTML_Div($divPage,'top_msgs','info_msgs');
 		$infoMsg->commitDiv($divInfoMsg);
 
 		$divBanner = new HTML_Div($divPage,'banner','banner');

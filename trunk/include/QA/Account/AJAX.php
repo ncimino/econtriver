@@ -22,5 +22,5 @@ if (isset($_POST[QA_Account_Build::C_AXN])) switch ($_POST[QA_Account_Build::C_A
 		break;	
 } 
 
-$module->createWidget();
+$module->createModule();
 ?>

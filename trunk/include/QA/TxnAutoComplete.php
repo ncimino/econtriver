@@ -5,7 +5,7 @@ class QA_TxnAutoComplete extends QA_Txns {
 	private $txnAutoCompleteFieldId;
 	
 	function __construct() {
-		parent::__construct($parentId=NULL,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=FALSE);
+		parent::__construct($sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=FALSE);
 		$this->activeAccounts = QA_Account_Select::byMember($this->user->getUserId(),$this->DB);
 	}
 	

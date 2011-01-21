@@ -1,42 +1,28 @@
 <?php
 class Frame {
 	protected $tabIndex;
-	protected $DB;
-	protected $siteInfo;
-	protected $infoMsg;
-	protected $user;
-	protected $document;
+	protected $fieldsetId;
+	protected $legendClass;
+	protected $title;
 	protected $container;
-	protected $showMsgs;
 
-	function __construct() {
-		$this->showMsgs = $showMsgs;
+	function __construct($parentElement,$title,$fieldsetId,$legendClass=0,$tabStartIndex=0) {
+		$this->container = new HTML_Fieldset($parentElement);
 		$this->tabIndex = new TabIndex($tabStartIndex);
-		$this->DB = new DBCon();
-		$this->siteInfo = new SiteInfo();
-		$this->infoMsg = new InfoMsg();
-		$this->user = new User($this->DB,$this->siteInfo,$this->infoMsg);
-		$this->document = HTML_Document::createHTML_Document();
-		$this->container = new HTML_Fragment($this->document);
-	}
-
-	function printHTML() {
-		if ($this->showMsgs) $this->infoMsg->commitMessages();
-		printf( '%s', Normalize::innerFragment($this->document) );
+		$this->title = $title;
+		$this->fieldsetId = $fieldsetId;
+		$this->legendClass = $legendClass;
 	}
 	
-	function addFrame($title,$id,$class) {
-		$divMgmt = new HTML_Fieldset($this->container,$id);
-		new HTML_Legend($divMgmt,$title,'',$class);
-		$aClose = new HTML_Anchor($divMgmt,'#','','','');
-		$aClose->setAttribute('onclick',"hideElement('".$id."','slow');");
-		$aClose->setAttribute('title','Close');
-		new HTML_Span($aClose,'','','ui-icon ui-icon-circle-close ui-state-red module_control');
-		$aHideHelp = new HTML_Anchor($divMgmt,'#','','','');
-		$aHideHelp->setAttribute('title','Help');
-		//$aHideHelp->setAttribute('onclick',"hideElement('".self::I_FS."','slow');");
-		new HTML_Span($aHideHelp,'','','ui-icon ui-icon-info ui-icon-special module_control');
-		return $divMgmt;
+	function getContainer() {
+		return $this->container;
+	}
+	
+	function build() {
+		$this->container->setId($this->fieldsetId);
+		new HTML_Legend($this->container,$this->title,'',$this->legendClass);
+		new HTML_Span($this->container,'','','ui-icon ui-icon-circle-close ui-state-red module_control');
+		new HTML_Span($this->container,'','','ui-icon ui-icon-info ui-icon-special module_control');
 	}
 }
 ?>

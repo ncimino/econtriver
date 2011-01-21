@@ -4,7 +4,6 @@ class QA_GroupMembers extends QA_Module {
 	private $activeShares; // MySQL result
 	private $inactiveShares; // MySQL result
 	private $contacts; // MySQL result
-	private $parentId;
 
 	function getSplitGroupMemberClass() { return 'split_grp_acct'; }
 	function I_FS { return C_MAIN.'_id'; }
@@ -16,9 +15,8 @@ class QA_GroupMembers extends QA_Module {
 	function getActiveGrpId() { return self::getGrpClass().'id'; }
 	function getInactiveGrpId() { return self::getGrpClass().'id'; }
 
-	function __construct($parentId) {
+	function __construct() {
 		parent::__construct();
-		$this->parentId = $parentId;
 		if (!$this->user->verifyUser()) {
 			$this->infoMsg->addMessage(0,'User info is invalid, please login first.');
 		}
@@ -79,7 +77,7 @@ class QA_GroupMembers extends QA_Module {
 		return $this->DB->query($sql);
 	}
 
-	function createWidget() {
+	function createModule() {
 		$this->activeGroups = QA_SelectGroupMembers::getActiveGroups($this->user->getUserId(),$this->DB);
 		$this->contacts = QA_SelectGroupMembers::getContacts($this->user->getUserId(),$this->DB);
 		$divQuickAccounts = new HTML_Fieldset($this->container,self::I_FS,'manage_title');
@@ -158,9 +156,9 @@ class QA_GroupMembers extends QA_Module {
 		$divAddContact = new HTML_Div($parentElement);
 		new HTML_Heading($divAddContact,5,'Add Contact:');
 		$inputAddContact = new HTML_InputText($divAddContact,'contact','Email or User name','contact');
-		$inputAddContact->setAttribute('onkeypress',"enterCall(event,function() {QaContactAdd('{$this->parentId}','".self::getContactInputId()."');})");
+		/*parentid*/$inputAddContact->setAttribute('onkeypress',"enterCall(event,function() {QaContactAdd('{$this->parentId}','".self::getContactInputId()."');})");
 		$aAddContact = new HTML_Anchor($divAddContact,'#','Add Contact');
-		$aAddContact->setAttribute('onclick',"QaContactAdd('{$this->parentId}','".self::getContactInputId()."');");
+		/*parentid*/$aAddContact->setAttribute('onclick',"QaContactAdd('{$this->parentId}','".self::getContactInputId()."');");
 	}
 }
 ?>
