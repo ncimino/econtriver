@@ -5,7 +5,6 @@ class QA_SharedAccounts extends QA_Module {
 	private $activeShares; // MySQL result
 	private $activeGroups; // MySQL result
 	private $contactGroups; // MySQL result
-	private $parentId;
 
 	function getSplitGroupAcctClass() { return 'split_grp_acct'; }
 	function I_FS { return C_MAIN.'_id'; }
@@ -17,9 +16,8 @@ class QA_SharedAccounts extends QA_Module {
 	function getActiveGrpId() { return self::getGrpClass().'id'; }
 	function getInactiveGrpId() { return self::getGrpClass().'id'; }
 
-	function __construct($parentId) {
+	function __construct() {
 		parent::__construct();
-		$this->parentId = $parentId;
 		if (!$this->user->verifyUser()) {
 			$this->infoMsg->addMessage(0,'User info is invalid, please login first.');
 		}
@@ -109,7 +107,7 @@ class QA_SharedAccounts extends QA_Module {
 		$this->activeShares = $this->DB->query($sql);
 	}
 
-	function createWidget() {
+	function createModule() {
 		$this->getContactGroups();
 		$this->getActiveGroups();
 		$this->sharedAccounts();

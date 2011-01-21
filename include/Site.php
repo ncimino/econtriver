@@ -14,7 +14,7 @@ class Site {
     $this->siteInfo = new SiteInfo();
     $this->infoMsg = new InfoMsg();
     $this->user = new User($this->DB,$this->siteInfo,$this->infoMsg);
-    $this->document = HTML_Document::createHTML_Document();
+    $this->document = HTML_Document::create();
     $this->head = new Head($this->document,$this->siteInfo);
     $this->body = new Body($this->document,$this->infoMsg,$this->siteInfo,$this->user,$title);
     $this->content = $this->body->divMid;

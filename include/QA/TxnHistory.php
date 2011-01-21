@@ -2,11 +2,11 @@
 class QA_TxnHistory extends QA_Txns {
 	private $txnHistory; // MySQL result
 
-	function __construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
-		parent::__construct($parentId,$sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE);
+	function __construct($sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE) {
+		parent::__construct($sortId=NULL,$sortDir=NULL,$selectedAcct=NULL,$showMsgDiv=TRUE);
 	}
 
-	function buildHistoryWidget($txn_id) {
+	function buildHistoryModule($txn_id) {
 		$this->activeAccounts = QA_Account_Select::byMember($this->user->getUserId(),$this->DB);
 		$this->getTxnHistory($txn_id);
 		$rows = $this->DB->num($this->txnHistory);

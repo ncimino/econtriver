@@ -1,5 +1,5 @@
 <?php
-class QA_Group_Widget extends QA_Module {
+class QA_Group_Module extends QA_Module {
 	private $activeGroups; // MySQL result
 	private $inactiveGroups; // MySQL result
 	private $grpName = '';
@@ -62,7 +62,7 @@ class QA_Group_Widget extends QA_Module {
 		}
 	}
 
-	function createWidget() {
+	function createModule() {
 		$this->activeGroups = QA_Group_Select::byMember($this->user->getUserId(),$this->DB,QA_DB_Table::ACTIVE);
 		$this->inactiveGroups = QA_Group_Select::byMember($this->user->getUserId(),$this->DB,QA_DB_Table::INACTIVE);
 		$divQuickAccounts = new HTML_Fieldset($this->container,self::I_FS,'manage_title');

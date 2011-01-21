@@ -9,7 +9,7 @@ class EmailDocument {
 	function __construct($siteInfo,$user,$title) {
 		$this->siteInfo = $siteInfo;
 		$this->user = $user;
-		$this->document = HTML_Document::createHTML_Document();
+		$this->document = HTML_Document::create();
 
 		$HTML_Head = new HTML_Head($this->document);
 		new HTML_Title($HTML_Head,$siteInfo->getName());

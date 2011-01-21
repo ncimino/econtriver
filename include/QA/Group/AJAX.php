@@ -2,7 +2,7 @@
 require_once '../../autoload.php';
 
 try {
-	$module = new QA_Group_Widget($_POST['content_id']);
+	$module = new QA_Group_Module($_POST['content_id']);
 	
 	if (isset($_POST[QA_Group_Build::C_AXN])) switch ($_POST[QA_Group_Build::C_AXN]) {
 		case QA_Group_Build::A_CREATE:
@@ -27,7 +27,7 @@ try {
 			break;	
 	} 
 	
-	$module->createWidget();
+	$module->createModule();
 } catch (Exception $e) { new ExceptionHandler($e); }
 
 ?>

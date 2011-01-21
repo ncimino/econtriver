@@ -5,8 +5,8 @@ class QA_Account_Module extends QA_Module {
 	private $deletedAccounts; // MySQL result
 	private $acctName = '';
 
-	function __construct($parentId) {
-		parent::__construct($parentId);
+	function __construct() {
+		parent::__construct();
 	}
 
 	function addEntries($name) {
@@ -49,20 +49,17 @@ class QA_Account_Module extends QA_Module {
 		}
 	}
 
-	function createWidget() {
+	function createModule() {
 		try {
 			$this->ownedAccounts = QA_Account_Select::owned($this->user->getUserId(),$this->DB);
 			$this->sharedAccounts = QA_Account_Select::shared($this->user->getUserId(),$this->DB);
 			$this->deletedAccounts  = QA_Account_Select::deleted($this->user->getUserId(),$this->DB);
 			
-			$mgmtFrame = $this->addFrame('Account Management');
-			//new QA_Module($this->container);
-			
-			QA_Account_Build::newForm($mgmtFrame,$this->acctName,$this->parentId);
-			QA_Account_Build::ownedTable($mgmtFrame,$this->ownedAccounts,$this->parentId,$this->DB);
-			QA_Account_Build::sharedTable($mgmtFrame,$this->sharedAccounts,$this->parentId,$this->DB);
-			QA_Account_Build::deletedTable($mgmtFrame,$this->deletedAccounts,$this->parentId,$this->DB);
-			/**/
+			$frame = new QA_Frame($this->container,'Account Management',$this->tabIndex);
+			QA_Account_Build::newForm($frame->getContainer(),$this->acctName);
+			QA_Account_Build::ownedTable($frame->getContainer(),$this->ownedAccounts,$this->DB);
+			QA_Account_Build::sharedTable($frame->getContainer(),$this->sharedAccounts,$this->DB);
+			QA_Account_Build::deletedTable($frame->getContainer(),$this->deletedAccounts,$this->DB);		
 			$this->printHTML();
 		} catch (Exception $e) { new ExceptionHandler($e); }
 	}

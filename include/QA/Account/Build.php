@@ -16,28 +16,28 @@ class QA_Account_Build {
 	const N_CREATE = 'new_acct_name';
 	const N_NAME = 'acct_name';
 	
-	static function ownedTable($parentElement,$ownedAccounts,$parentId,$db) {
+	static function ownedTable($parentElement,$ownedAccounts,$db) {
 		if ($db->num($ownedAccounts)>0) {
 			$divOwnedAccounts = new HTML_Div($parentElement,'',QA_Module::C_FRAME);
-			self::table($divOwnedAccounts,$ownedAccounts,$parentId,'Owned Accounts:','acct_edit',$db);
+			self::table($divOwnedAccounts,$ownedAccounts,'Owned Accounts:','acct_edit',$db);
 		}
 	}
 
-	static function sharedTable($parentElement,$sharedAccounts,$parentId,$db) {
+	static function sharedTable($parentElement,$sharedAccounts,$db) {
 		if ($db->num($sharedAccounts)>0) {
 			$divSharedAccounts = new HTML_Div($parentElement,'',QA_Module::C_FRAME);
-			self::table($divSharedAccounts,$sharedAccounts,$parentId,'Shared Accounts:','',$db,false);
+			self::table($divSharedAccounts,$sharedAccounts,'Shared Accounts:','',$db,false);
 		}
 	}
 
-	static function deletedTable($parentElement,$deletedAccounts,$parentId,$db) {
+	static function deletedTable($parentElement,$deletedAccounts,$db) {
 		if ($db->num($deletedAccounts)>0) {
 			$divOwnedAccounts = new HTML_Div($parentElement,'',QA_Module::C_FRAME);
-			self::table($divOwnedAccounts,$deletedAccounts,$parentId,'Deleted Accounts:','',$db,false,true);
+			self::table($divOwnedAccounts,$deletedAccounts,'Deleted Accounts:','',$db,false,true);
 		}
 	}
 
-	static function table($parentElement,$queryResult,$parentId,$title,$tableName,$db,$editable=true,$restorable=false) {
+	static function table($parentElement,$queryResult,$title,$tableName,$db,$editable=true,$restorable=false) {
 		new HTML_Heading($parentElement,5,$title);
 		$cols = ($restorable) ? 2 : 1;
 		$cols = ($editable) ? 3 : $cols;
@@ -63,7 +63,7 @@ class QA_Account_Build {
 		}
 	}
 
-	static function newForm($parentElement,$name,$parentId) {
+	static function newForm($parentElement,$name) {
 		$divAddAccount = new HTML_Div($parentElement,'', QA_Module::C_FRAME);
 		new HTML_Heading($divAddAccount,5,'Add Account:');
 		$inputAccountName = new HTML_InputText($divAddAccount,self::N_CREATE,$name,self::I_CREATE,self::C_ACCTS);
